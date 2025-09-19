@@ -60,11 +60,11 @@ const Categories = () => {
                 />
               </Link>
               <Link
-                href="/residential-homes"
-                className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-full flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:top-0 duration-500"
+                href="/appartment"
+                className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-0 flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:bg-black/20 duration-500"
               >
-                <div className="flex justify-end mt-4 sm:mt-6">
-                  <div className="bg-white text-dark rounded-full w-fit p-3 sm:p-4">
+                <div className="flex justify-end mt-4 sm:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="bg-white text-dark rounded-full w-fit p-3 sm:p-4 mr-4">
                     <Icon
                       icon="ph:arrow-right"
                       width={20}
@@ -75,7 +75,7 @@ const Categories = () => {
                 </div>
                 <div className="flex flex-col gap-2 sm:gap-2.5">
                   <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-medium">
-                    Residential Homes
+                    Appartment
                   </h3>
                   <p className="text-white/80 text-sm sm:text-base leading-5 sm:leading-6">
                     Experience elegance and comfort with our exclusive luxury
@@ -89,7 +89,7 @@ const Categories = () => {
             <div className="relative rounded-2xl overflow-hidden group">
               <Link href="/luxury-villa">
                 <Image
-                  src="/images/categories/luxury-villa.jpg"
+                  src="/images/categories/plots.png"
                   alt="villas"
                   width={680}
                   height={386}
@@ -99,10 +99,10 @@ const Categories = () => {
               </Link>
               <Link
                 href="/luxury-villa"
-                className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-full flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:top-0 duration-500"
+                className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-0 flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:bg-black/20 duration-500"
               >
-                <div className="flex justify-end mt-4 sm:mt-6">
-                  <div className="bg-white text-dark rounded-full w-fit p-3 sm:p-4">
+                <div className="flex justify-end mt-4 sm:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="bg-white text-dark rounded-full w-fit p-3 sm:p-4 mr-4">
                     <Icon
                       icon="ph:arrow-right"
                       width={20}
@@ -113,7 +113,7 @@ const Categories = () => {
                 </div>
                 <div className="flex flex-col gap-2 sm:gap-2.5">
                   <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-medium">
-                    Luxury villas
+                    Plots
                   </h3>
                   <p className="text-white/80 text-sm sm:text-base leading-5 sm:leading-6">
                     Experience elegance and comfort with our exclusive luxury
@@ -122,78 +122,39 @@ const Categories = () => {
                 </div>
               </Link>
             </div>
-          </div>
-          <div className="lg:col-span-3 md:col-span-6 col-span-12 mb-6 lg:mb-0">
+          </div>{" "}
+          <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
             <div className="relative rounded-2xl overflow-hidden group">
-              <Link href="/appartment">
+              <Link href="/luxury-villa">
                 <Image
-                  src="/images/categories/appartment.jpg"
-                  alt="appartment"
-                  width={320}
+                  src="/images/categories/building.png"
+                  alt="villas"
+                  width={680}
                   height={386}
                   className="w-full h-auto"
                   unoptimized={true}
                 />
               </Link>
               <Link
-                href="/appartment"
-                className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-full flex flex-col justify-between pl-4 sm:pl-6 lg:pl-8 pb-4 sm:pb-6 lg:pb-8 pr-4 sm:pr-6 lg:pr-4 group-hover:top-0 duration-500"
+                href="/luxury-villa"
+                className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-0 flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:bg-black/20 duration-500"
               >
-                <div className="flex justify-end mt-4 sm:mt-6">
-                  <div className="bg-white text-dark rounded-full w-fit p-3 sm:p-4">
+                <div className="flex justify-end mt-4 sm:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="bg-white text-dark rounded-full w-fit p-3 sm:p-4 mr-4">
                     <Icon
                       icon="ph:arrow-right"
-                      width={18}
-                      height={18}
-                      className="sm:w-5 sm:h-5 lg:w-6 lg:h-6"
+                      width={20}
+                      height={20}
+                      className="sm:w-6 sm:h-6"
                     />
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 sm:gap-2.5">
                   <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-medium">
-                    Appartment
+                    Explore More.{" "}
                   </h3>
                   <p className="text-white/80 text-sm sm:text-base leading-5 sm:leading-6">
-                    Experience elegance and comfort with our exclusive luxury
-                    apartments, designed for sophisticated living.
-                  </p>
-                </div>
-              </Link>
-            </div>
-          </div>
-          <div className="lg:col-span-3 md:col-span-6 col-span-12">
-            <div className="relative rounded-2xl overflow-hidden group">
-              <Link href="/office-spaces">
-                <Image
-                  src="/images/categories/office.jpg"
-                  alt="office"
-                  width={320}
-                  height={386}
-                  className="w-full h-auto"
-                  unoptimized={true}
-                />
-              </Link>
-              <Link
-                href="/office-spaces"
-                className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-full flex flex-col justify-between pl-4 sm:pl-6 lg:pl-8 pb-4 sm:pb-6 lg:pb-8 pr-4 sm:pr-6 lg:pr-4 group-hover:top-0 duration-500"
-              >
-                <div className="flex justify-end mt-4 sm:mt-6">
-                  <div className="bg-white text-dark rounded-full w-fit p-3 sm:p-4">
-                    <Icon
-                      icon="ph:arrow-right"
-                      width={18}
-                      height={18}
-                      className="sm:w-5 sm:h-5 lg:w-6 lg:h-6"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 sm:gap-2.5">
-                  <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-medium">
-                    Office Spaces
-                  </h3>
-                  <p className="text-white/80 text-sm sm:text-base leading-5 sm:leading-6">
-                    Experience modern and professional office spaces, designed
-                    for productivity and business success.
+                    See all the available properties and find your dream home
                   </p>
                 </div>
               </Link>
