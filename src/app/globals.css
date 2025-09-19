@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @plugin 'tailwindcss-animate';
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -11,9 +11,11 @@
   --color-dark: #172023;
 
   /* Shadow */
-  --shadow-3xl: 0px 4px 6px -2px #0000000D, 0px 10px 15px -3px #0000001A;
+  --shadow-3xl: 0px 4px 6px -2px #0000000d, 0px 10px 15px -3px #0000001a;
   --shadow-auth: 0 20px 25px -5px #0000001a;
-  --shadow-dark-auth: rgba(255, 255, 255, 0.1) 0px 12px 28px 0px, rgba(255, 255, 255, 0.1) 0px 2px 4px 0px, rgba(255, 255, 255, 0.05) 0px 0px 0px 1px inset;
+  --shadow-dark-auth: rgba(255, 255, 255, 0.1) 0px 12px 28px 0px,
+    rgba(255, 255, 255, 0.1) 0px 2px 4px 0px,
+    rgba(255, 255, 255, 0.05) 0px 0px 0px 1px inset;
 
   /* font size */
   --text-xm: 1.125rem;
@@ -71,10 +73,11 @@ html {
 }
 
 section {
-  @apply py-24
+  @apply py-24;
 }
 
-.blog-details p, .blog-details hr {
+.blog-details p,
+.blog-details hr {
   @apply mb-8;
 }
 
@@ -95,7 +98,7 @@ section {
 }
 
 .blog-details ol li {
-  @apply mb-0
+  @apply mb-0;
 }
 
 .blog-details h1 {
@@ -115,9 +118,9 @@ section {
 }
 
 .blog-details hr {
-  @apply border-white
+  @apply border-white;
 }
 
 .blog-details p {
-  @apply text-dark dark:text-white text-xm leading-[1.2]
+  @apply text-dark dark:text-white text-xm leading-[1.2];
 }
