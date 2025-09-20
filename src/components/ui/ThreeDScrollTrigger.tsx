@@ -128,19 +128,34 @@ function ThreeDScrollTriggerRowImpl({
     const container = containerRef.current;
     if (!container) return;
 
-    const block = container.querySelector(
-      ".threed-scroll-trigger-block"
-    ) as HTMLElement;
-    if (block) {
-      unitWidthRef.current = block.scrollWidth;
-      // keep just enough to cover the viewport + 1
-      const containerWidth = container.offsetWidth;
-      const needed = Math.max(
-        2,
-        Math.ceil(containerWidth / unitWidthRef.current) + 1
-      );
-      setNumCopies(needed);
-    }
+    // Use a timeout to ensure the DOM is fully rendered
+    const measureWidth = () => {
+      const block = container.querySelector(
+        ".threed-scroll-trigger-block"
+      ) as HTMLElement;
+      if (block) {
+        // Force a reflow to get accurate measurements
+        const blockWidth = block.scrollWidth || block.offsetWidth;
+        if (blockWidth > 0) {
+          unitWidthRef.current = blockWidth;
+          // keep just enough to cover the viewport + 2 for smoother scrolling
+          const containerWidth = container.offsetWidth;
+          const needed = Math.max(
+            3,
+            Math.ceil((containerWidth * 1.5) / blockWidth) + 2
+          );
+          setNumCopies(needed);
+        }
+      }
+    };
+
+    // Measure immediately
+    measureWidth();
+
+    // Also measure after a short delay to ensure React components are fully rendered
+    const timeoutId = setTimeout(measureWidth, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [childrenArray]);
 
   // Animation loop
@@ -161,16 +176,17 @@ function ThreeDScrollTriggerRowImpl({
     const moveBy =
       currentDirection * pixelsPerSecond * (1 + speedMultiplier) * dt;
 
-    const newX = baseXRef.current + moveBy;
-    // ✅ instead of wrap, shift back when > unitWidth
-    if (newX > unitWidth) {
-      baseXRef.current = newX - unitWidth;
-    } else if (newX < -unitWidth) {
-      baseXRef.current = newX + unitWidth;
-    } else {
-      baseXRef.current = newX;
+    let newX = baseXRef.current + moveBy;
+
+    // Ensure seamless wrapping
+    while (newX >= unitWidth) {
+      newX -= unitWidth;
+    }
+    while (newX <= -unitWidth) {
+      newX += unitWidth;
     }
 
+    baseXRef.current = newX;
     x.set(baseXRef.current);
   });
 

@@ -1,7 +1,7 @@
 import FeaturedProperty from "@/components/Home/FeaturedProperty";
 import Hero from "@/components/Home/Hero";
 import Plots from "@/components/Home/Plots";
-import Services from "@/components/Home/Services";
+import Categories from "@/components/Home/Categories";
 import Testimonial from "@/components/Home/Testimonial";
 import BlogSmall from "@/components/shared/Blog";
 import GetInTouch from "@/components/Home/GetInTouch";
@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <Services />
+      <Categories />
       <ParallaxScroll />
       <Plots />
       <FeaturedProperty />

@@ -91,13 +91,13 @@ const Header: React.FC = () => {
         }`}
       >
         <div className="flex justify-between items-center gap-2 w-full">
-          <div>
+          <div className="w-[20%]">
             <Link href="/">
               <Image
                 src={"/images/header/dark-logo.svg"}
                 alt="logo"
-                width={150}
-                height={68}
+                width={600}
+                height={600}
                 unoptimized={true}
                 className={`${
                   isHomepage
@@ -112,8 +112,8 @@ const Header: React.FC = () => {
               <Image
                 src={"/images/header/logo.svg"}
                 alt="logo"
-                width={150}
-                height={68}
+                width={600}
+                height={600}
                 unoptimized={true}
                 className={`${
                   isHomepage
@@ -127,7 +127,69 @@ const Header: React.FC = () => {
               />
             </Link>
           </div>
-          <div className="flex items-center gap-2 sm:gap-6">
+          <div className={`hidden md:block md:flex flex-row `}>
+            <Link
+              href="#"
+              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
+                isHomepage
+                  ? sticky
+                    ? "text-dark dark:text-white hover:text-primary"
+                    : "text-white hover:text-primary"
+                  : "text-dark hover:text-primary"
+              }`}
+            >
+              Plots
+            </Link>
+            <Link
+              href="#"
+              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
+                isHomepage
+                  ? sticky
+                    ? "text-dark dark:text-white hover:text-primary"
+                    : "text-white hover:text-primary"
+                  : "text-dark hover:text-primary"
+              }`}
+            >
+              Apartments
+            </Link>
+            <Link
+              href="#"
+              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
+                isHomepage
+                  ? sticky
+                    ? "text-dark dark:text-white hover:text-primary"
+                    : "text-white hover:text-primary"
+                  : "text-dark hover:text-primary"
+              }`}
+            >
+              About
+            </Link>{" "}
+            <Link
+              href="#"
+              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
+                isHomepage
+                  ? sticky
+                    ? "text-dark dark:text-white hover:text-primary"
+                    : "text-white hover:text-primary"
+                  : "text-dark hover:text-primary"
+              }`}
+            >
+              Contact
+            </Link>
+            <Link
+              href="#"
+              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
+                isHomepage
+                  ? sticky
+                    ? "text-dark dark:text-white hover:text-primary"
+                    : "text-white hover:text-primary"
+                  : "text-dark hover:text-primary"
+              }`}
+            >
+              Blogs
+            </Link>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-6 w-[20%]">
             <Button
               isIconOnly
               className="bg-transparent hover:cursor-pointer"
@@ -155,10 +217,10 @@ const Header: React.FC = () => {
             <div className={`hidden md:block`}>
               <Link
                 href="#"
-                className={`text-base text-inherit flex items-center gap-2 border-r pr-6 ${
+                className={`text-base text-inherit flex items-center gap-2 ${
                   isHomepage
                     ? sticky
-                      ? "text-dark dark:text-white hover:text-primary border-dark dark:border-white"
+                      ? "text-dark dark:text-white hover:text-primary"
                       : "text-white hover:text-primary"
                     : "text-dark hover:text-primary"
                 }`}
@@ -166,8 +228,7 @@ const Header: React.FC = () => {
                 <Icon icon={"ph:phone-bold"} width={24} height={24} />
                 +1-212-456-789
               </Link>
-            </div>
-
+            </div>{" "}
             <div className="md:hidden" ref={sideMenuRef}>
               <Button
                 onClick={() => setNavbarOpen(true)}
