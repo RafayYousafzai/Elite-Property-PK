@@ -1,20 +1,22 @@
 "use client";
-import { navLinks } from "@/app/api/navlink";
 import { Icon } from "@iconify/react";
+import type React from "react";
+
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
-import NavLink from "./Navigation/NavLink";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import {
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-} from "@heroui/react";
+import { Button, Drawer, DrawerBody, DrawerContent } from "@heroui/react";
+
+// Navigation configuration - edit this array to modify navigation items
+const navigationItems = [
+  { name: "Plots", href: "/plots" },
+  { name: "Apartments", href: "/apartments" },
+  { name: "About", href: "/about" },
+  { name: "Contact", href: "/contact" },
+  { name: "Blogs", href: "/blogs" },
+];
 
 const Header: React.FC = () => {
   const [sticky, setSticky] = useState(false);
@@ -79,27 +81,27 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed h-24 py-1 z-50 w-full transition-all duration-300 lg:px-0 px-4  ${
+      className={`fixed h-20 md:h-24 py-1 z-50 w-full transition-all duration-300 lg:px-0 px-4  ${
         sticky
           ? "top-0 bg-white dark:bg-dark shadow-md"
           : "top-1 bg-transparent "
       }  ${hidden ? "-translate-y-full" : "translate-y-0 "}`}
     >
       <nav
-        className={`w-auto mx-auto max-w-8xl flex items-center justify-between py-4 duration-300 ${
+        className={`w-auto mx-auto max-w-8xl flex items-center justify-between py-0 pt-4 md:py-4 duration-300 ${
           sticky ? " dark:bg-dark top-5 px-4 " : "shadow-none top-0"
         }`}
       >
-        <div className="flex justify-between items-center gap-2 w-full">
-          <div className="w-[20%]">
+        <div className="flex justify-between items-center w-full">
+          <div className="flex-shrink-0">
             <Link href="/">
               <Image
                 src={"/images/header/dark-logo.svg"}
                 alt="logo"
-                width={600}
-                height={600}
+                width={300}
+                height={300}
                 unoptimized={true}
-                className={`${
+                className={`h-auto w-24 sm:w-32 md:w-40 mt-1 md:mt-2 ${
                   isHomepage
                     ? sticky
                       ? "block dark:hidden"
@@ -107,7 +109,7 @@ const Header: React.FC = () => {
                     : sticky
                     ? "block dark:hidden"
                     : "block dark:hidden"
-                }`}
+                } `}
               />
               <Image
                 src={"/images/header/logo.svg"}
@@ -115,7 +117,7 @@ const Header: React.FC = () => {
                 width={600}
                 height={600}
                 unoptimized={true}
-                className={`${
+                className={`h-auto w-24 sm:w-32 md:w-40 mt-1 md:mt-2 ${
                   isHomepage
                     ? sticky
                       ? "hidden dark:block"
@@ -127,79 +129,41 @@ const Header: React.FC = () => {
               />
             </Link>
           </div>
-          <div className={`hidden md:block md:flex flex-row `}>
-            <Link
-              href="#"
-              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
-                isHomepage
-                  ? sticky
-                    ? "text-dark dark:text-white hover:text-primary"
-                    : "text-white hover:text-primary"
-                  : "text-dark hover:text-primary"
-              }`}
-            >
-              Plots
-            </Link>
-            <Link
-              href="#"
-              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
-                isHomepage
-                  ? sticky
-                    ? "text-dark dark:text-white hover:text-primary"
-                    : "text-white hover:text-primary"
-                  : "text-dark hover:text-primary"
-              }`}
-            >
-              Apartments
-            </Link>
-            <Link
-              href="#"
-              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
-                isHomepage
-                  ? sticky
-                    ? "text-dark dark:text-white hover:text-primary"
-                    : "text-white hover:text-primary"
-                  : "text-dark hover:text-primary"
-              }`}
-            >
-              About
-            </Link>{" "}
-            <Link
-              href="#"
-              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
-                isHomepage
-                  ? sticky
-                    ? "text-dark dark:text-white hover:text-primary"
-                    : "text-white hover:text-primary"
-                  : "text-dark hover:text-primary"
-              }`}
-            >
-              Contact
-            </Link>
-            <Link
-              href="#"
-              className={`text-base text-inherit flex items-center gap-2  pr-6 ${
-                isHomepage
-                  ? sticky
-                    ? "text-dark dark:text-white hover:text-primary"
-                    : "text-white hover:text-primary"
-                  : "text-dark hover:text-primary"
-              }`}
-            >
-              Blogs
-            </Link>
+
+          <div className={`hidden md:flex flex-row items-center`}>
+            {navigationItems.map((item, index) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className={`text-base text-inherit flex items-center gap-2 pr-6 transition-colors duration-200 ${
+                    isActive
+                      ? "text-primary font-medium"
+                      : isHomepage
+                      ? sticky
+                        ? "text-dark dark:text-white hover:text-primary"
+                        : "text-white hover:text-primary"
+                      : "text-dark dark:text-white hover:text-primary"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
           </div>
-          <div className="flex items-center gap-2 sm:gap-6 w-[20%]">
+
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-6 flex-shrink-0">
             <Button
               isIconOnly
-              className="bg-transparent hover:cursor-pointer"
+              className="bg-transparent hover:cursor-pointer p-1 sm:p-2"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               <Icon
                 icon={"solar:sun-bold"}
-                width={32}
-                height={32}
-                className={`dark:hidden block ${
+                width={24}
+                height={24}
+                className={`sm:w-8 sm:h-8 dark:hidden block ${
                   isHomepage
                     ? sticky
                       ? "text-dark"
@@ -209,70 +173,86 @@ const Header: React.FC = () => {
               />
               <Icon
                 icon={"solar:moon-bold"}
-                width={32}
-                height={32}
-                className="dark:block hidden text-white"
+                width={24}
+                height={24}
+                className="sm:w-8 sm:h-8 dark:block hidden text-white"
               />
             </Button>
+
             <div className={`hidden md:block`}>
               <Link
-                href="#"
-                className={`text-base text-inherit flex items-center gap-2 ${
+                href="tel:+1-212-456-789"
+                className={`text-base text-inherit flex items-center gap-2 transition-colors duration-200 ${
                   isHomepage
                     ? sticky
                       ? "text-dark dark:text-white hover:text-primary"
                       : "text-white hover:text-primary"
-                    : "text-dark hover:text-primary"
+                    : "text-dark dark:text-white hover:text-primary"
                 }`}
               >
                 <Icon icon={"ph:phone-bold"} width={24} height={24} />
                 +1-212-456-789
               </Link>
-            </div>{" "}
+            </div>
+
             <div className="md:hidden" ref={sideMenuRef}>
               <Button
                 onClick={() => setNavbarOpen(true)}
-                className={`flex items-center gap-3 p-2 sm:px-5 sm:py-3 rounded-full font-semibold hover:cursor-pointer border ${
-                  isHomepage
-                    ? sticky
-                      ? "text-white bg-dark dark:bg-white dark:text-dark dark:hover:text-white dark:hover:bg-dark hover:text-dark hover:bg-white border-dark dark:border-white"
-                      : "text-dark bg-white dark:text-dark hover:bg-transparent hover:text-white border-white"
-                    : "bg-dark text-white hover:bg-transparent hover:text-dark dark:bg-white dark:text-dark dark:hover:bg-transparent dark:hover:text-white duration-300"
-                }`}
+                isIconOnly
+                className="bg-transparent hover:cursor-pointer p-1 sm:p-2"
                 aria-label="Toggle mobile menu"
               >
-                <span>
-                  <Icon icon={"ph:list"} width={24} height={24} />
-                </span>
-                <span className="hidden sm:block">Menu</span>
+                <Icon
+                  icon={"ph:list"}
+                  width={24}
+                  height={24}
+                  className={`sm:w-7 sm:h-7 ${
+                    sticky ? "text-dark dark:text-white" : "text-white"
+                  }`}
+                />
               </Button>
             </div>
+
             <Drawer
               isOpen={navbarOpen}
               onOpenChange={() => setNavbarOpen(!navbarOpen)}
+              size="sm"
+              placement="right"
             >
               <DrawerContent>
                 {(onClose) => (
                   <>
-                    <DrawerHeader className="flex flex-col gap-1">
-                      Drawer Title
-                    </DrawerHeader>
-                    <DrawerBody>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Nullam pulvinar risus non risus hendrerit venenatis.
-                        Pellentesque sit amet hendrerit risus, sed porttitor
-                        quam.
-                      </p>
+                    <DrawerBody className="p-0">
+                      <nav className="flex flex-col">
+                        {navigationItems.map((item, index) => {
+                          const isActive = pathname === item.href;
+                          return (
+                            <Link
+                              key={index}
+                              href={item.href}
+                              onClick={() => setNavbarOpen(false)}
+                              className={`px-6 py-4 text-base transition-colors duration-200 border-b border-gray-100 dark:border-gray-800 last:border-b-0 ${
+                                isActive
+                                  ? "text-primary bg-primary/5 border-r-2 border-r-primary font-medium"
+                                  : "text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800"
+                              }`}
+                            >
+                              {item.name}
+                            </Link>
+                          );
+                        })}
+                      </nav>
+                      <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
+                        <Link
+                          href="tel:+1-212-456-789"
+                          onClick={() => setNavbarOpen(false)}
+                          className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-200"
+                        >
+                          <Icon icon="ph:phone-bold" width={20} height={20} />
+                          <span>+1-212-456-789</span>
+                        </Link>
+                      </div>
                     </DrawerBody>
-                    <DrawerFooter>
-                      <Button color="danger" variant="light" onPress={onClose}>
-                        Close
-                      </Button>
-                      <Button color="primary" onPress={onClose}>
-                        Action
-                      </Button>
-                    </DrawerFooter>
                   </>
                 )}
               </DrawerContent>
