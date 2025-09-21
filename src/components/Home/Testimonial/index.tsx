@@ -17,7 +17,7 @@ const Card = ({
 }) => {
   return (
     <div
-      className={`bg-slate-100 dark:bg-neutral-900 rounded-none p-6 max-w-md m-2 transition-colors shrink-0 ${className}`}
+      className={`bg-slate-50 dark:bg-neutral-900 rounded-none p-6 max-w-md m-2 transition-colors shrink-0 ${className}`}
       style={style}
     >
       <div className="flex items-center">
@@ -87,21 +87,7 @@ export default function Testimonials() {
           ))}
         </ThreeDScrollTriggerRow>
       </ThreeDScrollTriggerContainer>
-      <ThreeDScrollTriggerContainer>
-        <ThreeDScrollTriggerRow baseVelocity={5} direction={-1}>
-          {testimonialData.slice(0, 3).map((testimonial, index) => (
-            <div key={`row1-${index}`}>
-              <Card
-                name={testimonial.name}
-                company={testimonial.company}
-                image={testimonial.image}
-                feedback={testimonial.feedback}
-                className="inline-block"
-              />
-            </div>
-          ))}
-        </ThreeDScrollTriggerRow>
-      </ThreeDScrollTriggerContainer>
+
       <ThreeDScrollTriggerContainer>
         <ThreeDScrollTriggerRow baseVelocity={5} direction={1}>
           {testimonialData.slice(0, 3).map((testimonial, index) => (
