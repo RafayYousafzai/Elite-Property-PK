@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const GetInTouch: React.FC = () => {
   return (
-    <section>
+    <>
       <div className="container max-w-8xl mx-auto px-5 2xl:px-0">
         <div className="relative rounded-t-none overflow-hidden">
           <video
@@ -52,7 +52,7 @@ const GetInTouch: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
+    </>
   );
 };
 

@@ -52,7 +52,7 @@ const FeaturedProperty: React.FC = () => {
                       alt={item.alt}
                       width={680}
                       height={530}
-                      className="rounded-none w-none h-540"
+                      className="rounded-none w-none h-[350px] object-cover md:h-540"
                       unoptimized={true}
                     />
                   </CarouselItem>

@@ -11,13 +11,13 @@ const Footer = () => {
             Stay updated with the latest news, promotions, and exclusive offers.
           </p>
           <div className="flex lg:flex-row flex-col items-center lg:gap-10 gap-3">
-            <div className="flex gap-2 lg:order-1 order-2">
+            <div className="flex gap-2 lg:order-1 order-2 flex-wrap">
               <input
                 type="email"
                 placeholder="Enter Your Email"
-                className="rounded-full py-4 px-6 bg-white/10 placeholder:text-white text-white focus-visible:outline-0"
+                className="rounded-full py-4 px-6 bg-white/10 placeholder:text-white text-white focus-visible:outline-0 w-full md:w-auto"
               />
-              <button className="text-dark bg-white py-4 px-8 font-semibold rounded-full hover:bg-primary hover:text-white duration-300 hover:cursor-pointer">
+              <button className="text-dark bg-white py-4 px-8 font-semibold rounded-full hover:bg-primary hover:text-white duration-300 hover:cursor-pointer w-full md:w-auto">
                 Subscribe
               </button>
             </div>

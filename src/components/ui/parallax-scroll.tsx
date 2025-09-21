@@ -1,7 +1,7 @@
 "use client";
 
 import { useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
@@ -14,6 +14,19 @@ import { useRouter } from "next/navigation";
 export const ParallaxScroll = ({ className }: { className?: string }) => {
   const properties: PropertyHomes[] = propertyHomes;
   const router = useRouter();
+
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth < 768); // 768px is breakpoint
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   const gridRef = useRef<any>(null);
   const { scrollYProgress } = useScroll({
@@ -65,7 +78,7 @@ export const ParallaxScroll = ({ className }: { className?: string }) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-start max-w-full mx-auto gap-10 pt-10 pb-40">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-start max-w-full mx-auto gap-10 pt-10 md:pb-40">
         {/* First Part */}
         <div className="grid gap-10">
           {firstPart.map((property, idx) => (
@@ -78,7 +91,7 @@ export const ParallaxScroll = ({ className }: { className?: string }) => {
               <div className="relative overflow-hidden">
                 <Image
                   src={property.images[0].src}
-                  className="h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   alt={property.name}
@@ -101,18 +114,18 @@ export const ParallaxScroll = ({ className }: { className?: string }) => {
           ))}
         </div>
         {/* Second Part */}
-        <div className="grid gap-10 md:-mt-16 mb-60 md:mb-0">
+        <div className="grid gap-10 md:-mt-16 ">
           {secondPart.map((property, idx) => (
             <motion.div
               onClick={() => handleClick(property.slug)}
-              style={{ y: translateSecond }}
+              style={{ y: isSmallScreen ? translateFirst : translateSecond }}
               key={"grid-2" + idx}
               className="group relative cursor-pointer"
             >
               <div className="relative overflow-hidden">
                 <Image
                   src={property.images[0].src}
-                  className="h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   alt={property.name}
@@ -146,7 +159,7 @@ export const ParallaxScroll = ({ className }: { className?: string }) => {
               <div className="relative overflow-hidden">
                 <Image
                   src={property.images[0].src}
-                  className="h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   alt={property.name}
@@ -168,19 +181,19 @@ export const ParallaxScroll = ({ className }: { className?: string }) => {
             </motion.div>
           ))}
         </div>
-        {/* Second Part */}
-        <div className="grid gap-10 md:-mt-16 mb-60 md:mb-0">
+        {/* Fourth Part */}
+        <div className="grid gap-10 md:-mt-16 ">
           {secondPart.map((property, idx) => (
             <motion.div
               onClick={() => handleClick(property.slug)}
-              style={{ y: translateSecond }}
+              style={{ y: isSmallScreen ? translateFirst : translateSecond }}
               key={"grid-2" + idx}
               className="group relative cursor-pointer"
             >
               <div className="relative overflow-hidden">
                 <Image
                   src={property.images[0].src}
-                  className="h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   alt={property.name}
