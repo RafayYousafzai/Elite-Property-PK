@@ -52,19 +52,19 @@ const FeaturedProperty: React.FC = () => {
                       alt={item.alt}
                       width={680}
                       height={530}
-                      className="rounded-none w-full h-540"
+                      className="rounded-none w-none h-540"
                       unoptimized={true}
                     />
                   </CarouselItem>
                 ))}
               </CarouselContent>
             </Carousel>
-            <div className="absolute left-2/5 bg-dark/50 rounded-full py-2.5 bottom-10 flex justify-center mt-4 gap-2.5 px-2.5">
+            <div className="absolute left-2/5 bg-dark/50 rounded-none py-2.5 bottom-10 flex justify-center mt-4 gap-2.5 px-2.5">
               {Array.from({ length: count }).map((_, index) => (
                 <button
                   key={index}
                   onClick={() => handleDotClick(index)}
-                  className={`w-2.5 h-2.5 rounded-full ${
+                  className={`w-2.5 h-2.5 rounded-none ${
                     current === index + 1 ? "bg-white" : "bg-white/50"
                   }`}
                 />
@@ -191,7 +191,7 @@ const FeaturedProperty: React.FC = () => {
             <div className="flex gap-10">
               <Link
                 href="/contactus"
-                className="py-4 px-8 bg-primary hover:bg-dark duration-300 rounded-full text-white"
+                className="py-4 px-8 bg-primary hover:bg-dark duration-300 rounded-none text-white"
               >
                 Get in touch
               </Link>

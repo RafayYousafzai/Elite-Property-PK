@@ -42,7 +42,7 @@ const Categories = () => {
             </p>
             <Link
               href="/properties"
-              className="inline-block py-3 sm:py-4 px-6 sm:px-8 bg-primary text-sm sm:text-base leading-4 text-white rounded-full font-semibold mt-6 sm:mt-8 hover:bg-dark duration-300 transition-colors"
+              className="inline-block py-3 sm:py-4 px-6 sm:px-8 bg-primary text-sm sm:text-base leading-4 text-white rounded-NONE font-semibold mt-6 sm:mt-8 hover:bg-dark duration-300 transition-colors"
             >
               View properties
             </Link>

@@ -87,7 +87,21 @@ export default function Testimonials() {
           ))}
         </ThreeDScrollTriggerRow>
       </ThreeDScrollTriggerContainer>
-
+      <ThreeDScrollTriggerContainer>
+        <ThreeDScrollTriggerRow baseVelocity={5} direction={-1}>
+          {testimonialData.slice(0, 3).map((testimonial, index) => (
+            <div key={`row1-${index}`}>
+              <Card
+                name={testimonial.name}
+                company={testimonial.company}
+                image={testimonial.image}
+                feedback={testimonial.feedback}
+                className="inline-block"
+              />
+            </div>
+          ))}
+        </ThreeDScrollTriggerRow>
+      </ThreeDScrollTriggerContainer>
       <ThreeDScrollTriggerContainer>
         <ThreeDScrollTriggerRow baseVelocity={5} direction={1}>
           {testimonialData.slice(0, 3).map((testimonial, index) => (
