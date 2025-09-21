@@ -13,13 +13,16 @@ export default function Home() {
     <main>
       <Hero />
       <Categories />
-      <ParallaxScroll />
-      {/* <Plots /> */}
       <FeaturedProperty />
-      <Testimonial />
-      <BlogSmall />
+      <ParallaxScroll />
       <GetInTouch />
+      <BlogSmall />
+      {/* <Plots /> */}
       <FAQ />
+      <Testimonial />
+      <br />
+      <br />
+      <br />
     </main>
   );
 }
