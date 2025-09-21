@@ -4,7 +4,12 @@
 
 import { HeroUIProvider } from "@heroui/react";
 import "./globals.css";
+import SmoothScrollProvider from "@/components/scrolling/SmoothScrollProvider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+  return (
+    <HeroUIProvider>
+      <SmoothScrollProvider>{children}</SmoothScrollProvider>
+    </HeroUIProvider>
+  );
 }
