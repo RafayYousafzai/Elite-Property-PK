@@ -17,7 +17,7 @@ const Card = ({
 }) => {
   return (
     <div
-      className={`bg-slate-50 dark:bg-neutral-900 rounded-2xl p-6 max-w-md m-2 transition-colors shrink-0 ${className}`}
+      className={`bg-slate-100 dark:bg-neutral-900 rounded-none p-6 max-w-md m-2 transition-colors shrink-0 ${className}`}
       style={style}
     >
       <div className="flex items-center">

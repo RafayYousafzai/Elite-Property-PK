@@ -19,7 +19,7 @@ export default function RootLayout({
   session,
 }: Readonly<{
   children: React.ReactNode;
-  session: any;
+  session: unknown;
 }>) {
   return (
     <html lang="en">
