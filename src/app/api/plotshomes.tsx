@@ -7,6 +7,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "15 s aurora ave, miami",
     rate: "570,000",
     area: 120,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property1/property1.jpg",
@@ -28,6 +29,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "18 s aurora ave, miami",
     rate: "575,000",
     area: 150,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property2/property2.jpg",
@@ -49,6 +51,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "20 s aurora ave, miami",
     rate: "580,000",
     area: 180,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property3/property3.jpg",
@@ -70,6 +73,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "12 emerald heights, los angeles",
     rate: "590,000",
     area: 200,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property4/property4.jpg",
@@ -91,6 +95,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "25 skyline boulevard, san diego",
     rate: "710,000",
     area: 90,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property5/property5.jpg",
@@ -112,6 +117,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "18 sapphire bay road, naples",
     rate: "630,000",
     area: 130,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property6/property6.jpg",
@@ -133,6 +139,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "22 ocean breeze drive, malibu",
     rate: "620,000",
     area: 180,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property7.jpg",
@@ -154,6 +161,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "10 palm view lane, beverly hills",
     rate: "750,000",
     area: 150,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property8.jpg",
@@ -175,6 +183,7 @@ export const propertyPlots: PlotsHomes[] = [
     location: "8 sunset cove, miami beach",
     rate: "680,000",
     area: 120,
+    photoSphere: "/360.jpg",
     images: [
       {
         src: "/images/properties/property9.jpg",

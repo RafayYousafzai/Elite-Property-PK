@@ -5,6 +5,7 @@ export type PlotsHomes = {
   rate: string;
   area: number;
   images: PlotsImage[];
+  photoSphere: string;
 };
 
 interface PlotsImage {

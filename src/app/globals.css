@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin 'tailwindcss-animate';
+@import "@photo-sphere-viewer/core/index.css";
 
 @plugin './hero.ts';
 /* Note: You may need to change the path to fit your project structure */

@@ -208,7 +208,9 @@ const Header: React.FC = () => {
                   width={24}
                   height={24}
                   className={`sm:w-7 sm:h-7 ${
-                    sticky ? "text-dark dark:text-white" : "text-white"
+                    sticky
+                      ? "text-dark dark:text-white"
+                      : "text-dark dark:text-white"
                   }`}
                 />
               </Button>

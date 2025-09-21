@@ -11,6 +11,7 @@
   "dependencies": {
     "@heroui/react": "^2.8.4",
     "@iconify/react": "^5.2.0",
+    "@photo-sphere-viewer/core": "^5.14.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-slot": "^1.1.2",
     "@studio-freight/lenis": "^1.0.42",
@@ -25,6 +26,7 @@
     "next-auth": "^4.24.11",
     "next-themes": "^0.4.5",
     "nextjs-toploader": "^3.8.16",
+    "photo-sphere-viewer": "^4.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
@@ -33,7 +35,8 @@
     "remark-html": "^16.0.1",
     "slick-carousel": "^1.8.1",
     "tailwind-merge": "^3.0.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "yet-another-react-lightbox": "^3.25.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
