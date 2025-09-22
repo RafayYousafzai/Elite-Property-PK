@@ -11,8 +11,16 @@ import Image from "next/image";
 import { propertyHomes } from "@/app/api/propertyhomes";
 import { useRouter } from "next/navigation";
 
-export const ParallaxScroll = ({ className }: { className?: string }) => {
-  const properties: PropertyHomes[] = propertyHomes;
+export const ParallaxScroll = ({
+  className,
+  items = propertyHomes,
+  isLessColls = false,
+}: {
+  className?: string;
+  items: PropertyHomes[];
+  isLessColls?: boolean;
+}) => {
+  const properties: PropertyHomes[] = items;
   const router = useRouter();
 
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -56,29 +64,35 @@ export const ParallaxScroll = ({ className }: { className?: string }) => {
       )}
       ref={gridRef}
     >
-      <div className="mb-16 flex flex-col gap-3 ">
-        <div className="flex gap-2.5 items-center justify-center">
-          <span>
-            <Icon
-              icon={"ph:house-simple-fill"}
-              width={20}
-              height={20}
-              className="text-primary"
-            />
-          </span>
-          <p className="text-base font-semibold text-dark/75 dark:text-white/75">
-            Apartments
+      {!isLessColls && (
+        <div className="mb-16 flex flex-col gap-3 ">
+          <div className="flex gap-2.5 items-center justify-center">
+            <span>
+              <Icon
+                icon={"ph:house-simple-fill"}
+                width={20}
+                height={20}
+                className="text-primary"
+              />
+            </span>
+            <p className="text-base font-semibold text-dark/75 dark:text-white/75">
+              Apartments
+            </p>
+          </div>
+          <h2 className="text-40 lg:text-52 font-medium text-black dark:text-white text-center tracking-tight leading-11 mb-2">
+            Discover inspiring designed apartments.
+          </h2>
+          <p className="text-xm font-normal text-black/50 dark:text-white/50 text-center">
+            Curated apartments where elegance, style, and comfort unite.
           </p>
         </div>
-        <h2 className="text-40 lg:text-52 font-medium text-black dark:text-white text-center tracking-tight leading-11 mb-2">
-          Discover inspiring designed apartments.
-        </h2>
-        <p className="text-xm font-normal text-black/50 dark:text-white/50 text-center">
-          Curated apartments where elegance, style, and comfort unite.
-        </p>
-      </div>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-start max-w-full mx-auto gap-10 pt-10 md:pb-40">
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 ${
+          isLessColls ? "lg:grid-cols-3" : "lg:grid-cols-4"
+        } items-start max-w-full mx-auto gap-10 pt-10 md:pb-40`}
+      >
         {/* First Part */}
         <div className="grid gap-10">
           {firstPart.map((property, idx) => (
@@ -182,39 +196,41 @@ export const ParallaxScroll = ({ className }: { className?: string }) => {
           ))}
         </div>
         {/* Fourth Part */}
-        <div className="grid gap-10 md:-mt-16 ">
-          {secondPart.map((property, idx) => (
-            <motion.div
-              onClick={() => handleClick(property.slug)}
-              style={{ y: isSmallScreen ? translateFirst : translateSecond }}
-              key={"grid-2" + idx}
-              className="group relative cursor-pointer"
-            >
-              <div className="relative overflow-hidden">
-                <Image
-                  src={property.images[0].src}
-                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
-                  height="400"
-                  width="400"
-                  alt={property.name}
-                />
-                {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent">
-                  <div className="absolute bottom-4 left-4 text-white ">
-                    <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                      <p className="text-sm  mb-1">{property.location}</p>{" "}
-                      <p className="text-sm "> {property.area} sqft</p>
-                    </div>
+        {!isLessColls && (
+          <div className="grid gap-10 md:-mt-16 ">
+            {secondPart.map((property, idx) => (
+              <motion.div
+                onClick={() => handleClick(property.slug)}
+                style={{ y: isSmallScreen ? translateFirst : translateSecond }}
+                key={"grid-2" + idx}
+                className="group relative cursor-pointer"
+              >
+                <div className="relative overflow-hidden">
+                  <Image
+                    src={property.images[0].src}
+                    className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                    height="400"
+                    width="400"
+                    alt={property.name}
+                  />
+                  {/* Property Name (Always Visible) */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent">
+                    <div className="absolute bottom-4 left-4 text-white ">
+                      <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
+                        <p className="text-sm  mb-1">{property.location}</p>{" "}
+                        <p className="text-sm "> {property.area} sqft</p>
+                      </div>
 
-                    <h3 className="text-2xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
-                      {property.name}
-                    </h3>
+                      <h3 className="text-2xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
+                        {property.name}
+                      </h3>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

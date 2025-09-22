@@ -7,6 +7,7 @@ import BlogSmall from "@/components/shared/Blog";
 import GetInTouch from "@/components/Home/GetInTouch";
 import FAQ from "@/components/Home/FAQs";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
+import { propertyHomes } from "./api/propertyhomes";
 
 export default function Home() {
   return (
@@ -14,7 +15,7 @@ export default function Home() {
       <Hero />
       <Categories />
       <FeaturedProperty />
-      <ParallaxScroll />
+      <ParallaxScroll items={propertyHomes} />
       <GetInTouch />
       <BlogSmall />
       {/* <Plots /> */}
