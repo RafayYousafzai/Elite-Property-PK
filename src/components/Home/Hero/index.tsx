@@ -1,81 +1,112 @@
+import type React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const Hero: React.FC = () => {
   return (
-    <section className="!py-0">
-      <div className="bg-gradient-to-b from-[#1e3c72] via-lightskyblue dark:via-[#4298b0] to-white/10 dark:to-black/10 overflow-hidden relative">
-        <div className="container max-w-8xl mx-auto px-5 2xl:px-0 pt-32 md:pt-60 md:pb-68">
-          <div className="relative text-white dark:text-dark text-center md:text-start z-10  md:max-w-lg rounded-2xl">
-            <h1 className="text-inherit text-6xl sm:text-8xl font-semibold -tracking-wider  mb-4">
-              Live Luxury.
-            </h1>
-            <p className="text-inherit text-xm font-medium md:max-w-md">
-              Discover exclusive plots and luxury apartments in DHA Islamabad
-              with Arham Real Estate. Secure investments, modern living, and
-              timeless elegance all in one prestigious community.
-            </p>
-            <div className="flex flex-col xs:flex-row justify-center md:justify-start gap-4 mt-4">
-              <Link
-                href="/contactus"
-                className="px-8 py-4 border border-white dark:border-dark bg-white dark:bg-dark text-dark dark:text-white duration-300 dark:hover:text-dark hover:bg-transparent hover:text-white text-base font-semibold rounded-none hover:cursor-pointer"
-              >
-                Get in touch
-              </Link>
-              <button className="px-8 py-4 border border-white dark:border-dark bg-transparent text-white dark:text-dark hover:bg-white dark:hover:bg-dark dark:hover:text-white hover:text-dark duration-300 text-base font-semibold rounded-none hover:cursor-pointer">
-                View Details
-              </button>
+    <section className="relative h-screen overflow-hidden ">
+      {/* Background Image with Enhanced Overlay */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/hero/modern-apartment-building-with-numerous-windows-and-balconies_49091535.jpeg"
+          alt="Luxury apartments in DHA Islamabad"
+          fill
+          priority
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 flex items-center mt-24 xl:mt-28 2xl:mt-40 ">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Text Content */}
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <h1 className="text-6xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.9] tracking-tight text-balance">
+                  Live{" "}
+                  <span className="bg-primary bg-clip-text text-transparent">
+                    Luxury
+                  </span>
+                  .
+                </h1>
+                <p className="text-lg sm:text-xl lg:text-2xl text-white/90 leading-relaxed max-w-2xl text-pretty font-light">
+                  Discover exclusive plots and luxury apartments in DHA
+                  Islamabad with Arham Real Estate. Secure investments, modern
+                  living, and timeless elegance all in one prestigious
+                  community.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold rounded-none transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25"
+                >
+                  <Link href="/contactus">Get in Touch</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white cursor-pointer hover:text-card-foreground px-8 py-6 text-lg font-semibold rounded-none transition-all duration-300 hover:scale-105"
+                >
+                  View Properties
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="hidden md:block absolute top-0 md:-right-160 lg:-right-80">
-            <Image
-              src={"images/hero/homely.png"}
-              alt="heroImg"
-              width={1082}
-              height={1016}
-              priority={false}
-              unoptimized={true}
-              className=" w-[1082px] h-[1016px] object-contain"
-            />
+
+            <div className="hidden md:flex lg:justify-self-end">
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 lg:p-10 shadow-2xl">
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="text-center space-y-2">
+                    <p className="text-3xl lg:text-4xl font-bold text-white">
+                      500+
+                    </p>
+                    <p className="text-sm lg:text-base text-white/70 font-medium">
+                      Premium Properties
+                    </p>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-3xl lg:text-4xl font-bold text-white">
+                      $2.5B+
+                    </p>
+                    <p className="text-sm lg:text-base text-white/70 font-medium">
+                      Properties Sold
+                    </p>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-3xl lg:text-4xl font-bold text-white">
+                      15+
+                    </p>
+                    <p className="text-sm lg:text-base text-white/70 font-medium">
+                      Years Experience
+                    </p>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-3xl lg:text-4xl font-bold text-white">
+                      98%
+                    </p>
+                    <p className="text-sm lg:text-base text-white/70 font-medium">
+                      Client Satisfaction
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        {/* add something here */}
-        <div className="md:absolute bottom-0 md:-right-68 xl:right-0 bg-white dark:bg-black py-12 px-8 mobile:px-16 md:pl-16 md:pr-[195px] rounded-2xl md:rounded-none md:rounded-tl-2xl mt-24">
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:flex gap-16 md:gap-24 sm:text-center dark:text-white text-black">
-            <div className="flex flex-col sm:items-center gap-3">
-              <p className="text-2xl sm:text-3xl font-medium text-inherit">
-                500+
-              </p>
-              <p className="text-sm sm:text-base font-normal text-black/50 dark:text-white/50">
-                Premium Properties
-              </p>
-            </div>
-            <div className="flex flex-col sm:items-center gap-3">
-              <p className="text-2xl sm:text-3xl font-medium text-inherit">
-                $2.5B+
-              </p>
+      </div>
 
-              <p className="text-sm sm:text-base font-normal text-black/50 dark:text-white/50">
-                Properties Sold
-              </p>
-            </div>
-            <div className="flex flex-col sm:items-center gap-3">
-              <p className="text-2xl sm:text-3xl font-medium text-inherit">
-                15+
-              </p>
-              <p className="text-sm sm:text-base font-normal text-black/50 dark:text-white/50">
-                Years Experience
-              </p>
-            </div>
-            <div className="flex flex-col sm:items-center gap-3">
-              <p className="text-2xl sm:text-3xl font-medium text-inherit">
-                98%
-              </p>
-              <p className="text-sm sm:text-base font-normal text-black/50 dark:text-white/50">
-                Client Satisfaction
-              </p>
-            </div>
-          </div>
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+        <div className="flex flex-col items-center space-y-2 text-white/60">
+          <span className="text-sm font-medium tracking-wider uppercase">
+            Scroll
+          </span>
+          <div className="w-px h-12 bg-gradient-to-b from-white/60 to-transparent animate-pulse" />
         </div>
       </div>
     </section>
