@@ -5,15 +5,15 @@ import type React from "react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button, Drawer, DrawerBody, DrawerContent } from "@heroui/react";
 
 // Navigation configuration - edit this array to modify navigation items
 const navigationItems = [
   { name: "Home", href: "/" },
-  { name: "Plots", href: "/plots" },
-  { name: "Apartments", href: "/apartments" },
+  { name: "Plots", href: "/explore?type=plots" },
+  { name: "Apartments", href: "/explore?type=homes" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contactus" },
   { name: "Blogs", href: "/blogs" },
@@ -24,6 +24,9 @@ const Header: React.FC = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const typeParam = searchParams.get("type");
 
   const sideMenuRef = useRef<HTMLDivElement>(null);
 
@@ -133,7 +136,25 @@ const Header: React.FC = () => {
 
           <div className={`hidden md:flex flex-row items-center`}>
             {navigationItems.map((item, index) => {
-              const isActive = pathname === item.href;
+              // Check if current path and params match exactly
+              let isActive = false;
+              if (item.href === pathname) {
+                isActive = true;
+              } else if (
+                pathname === "/explore" &&
+                item.href.startsWith("/explore")
+              ) {
+                // For explore pages, check the type parameter more simply
+                if (item.href.includes("type=plots") && typeParam === "plots") {
+                  isActive = true;
+                } else if (
+                  item.href.includes("type=homes") &&
+                  typeParam === "homes"
+                ) {
+                  isActive = true;
+                }
+              }
+
               return (
                 <Link
                   key={index}
@@ -207,10 +228,12 @@ const Header: React.FC = () => {
                   icon={"ph:list"}
                   width={24}
                   height={24}
-                  className={`sm:w-7 sm:h-7 ${
-                    sticky
-                      ? "text-dark dark:text-white"
-                      : "text-dark dark:text-white"
+                  className={`sm:w-7 sm:h-7  ${
+                    isHomepage
+                      ? sticky
+                        ? "text-dark"
+                        : "text-white"
+                      : "text-dark"
                   }`}
                 />
               </Button>
@@ -223,25 +246,51 @@ const Header: React.FC = () => {
               placement="right"
             >
               <DrawerContent>
-                {(onClose) => (
+                {() => (
                   <>
                     <DrawerBody className="p-0">
                       <nav className="flex flex-col">
                         {navigationItems.map((item, index) => {
-                          const isActive = pathname === item.href;
+                          // Check if current path and params match exactly
+                          let isActive = false;
+                          if (item.href === pathname) {
+                            isActive = true;
+                          } else if (
+                            pathname === "/explore" &&
+                            item.href.startsWith("/explore")
+                          ) {
+                            // For explore pages, check the type parameter more simply
+                            if (
+                              item.href.includes("type=plots") &&
+                              typeParam === "plots"
+                            ) {
+                              isActive = true;
+                            } else if (
+                              item.href.includes("type=homes") &&
+                              typeParam === "homes"
+                            ) {
+                              isActive = true;
+                            }
+                          }
+
                           return (
-                            <Link
+                            <button
                               key={index}
-                              href={item.href}
-                              onClick={() => setNavbarOpen(false)}
-                              className={`px-6 py-4 text-base transition-colors duration-200 border-b border-gray-100 dark:border-gray-800 last:border-b-0 ${
+                              onClick={() => {
+                                setNavbarOpen(false);
+                                // Small delay to ensure drawer closes first
+                                setTimeout(() => {
+                                  router.push(item.href);
+                                }, 100);
+                              }}
+                              className={`w-full text-left px-6 py-4 text-base transition-colors duration-200 border-b border-gray-100 dark:border-gray-800 last:border-b-0 ${
                                 isActive
                                   ? "text-primary bg-primary/5 border-r-2 border-r-primary font-medium"
                                   : "text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800"
                               }`}
                             >
                               {item.name}
-                            </Link>
+                            </button>
                           );
                         })}
                       </nav>

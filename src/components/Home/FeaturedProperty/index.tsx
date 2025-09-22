@@ -36,6 +36,29 @@ const FeaturedProperty: React.FC = () => {
   return (
     <section>
       <div className="container max-w-8xl mx-auto px-5 2xl:px-0">
+        <div className="md:hidden block mb-10">
+          <p className=" text-dark/75 dark:text-white/75 text-base font-semibold gap-2">
+            <Icon
+              icon="ph:house-simple-fill"
+              className="text-2xl text-primary "
+            />
+            Featured property
+          </p>
+          <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white">
+            Modern luxe villa
+          </h2>
+          <div className="flex items-center gap-2.5">
+            <Icon
+              icon="ph:map-pin"
+              width={28}
+              height={26}
+              className="text-dark/50 dark:text-white/50"
+            />
+            <p className="text-dark/50 dark:text-white/50 text-base">
+              20 S Aurora Ave, Miami
+            </p>
+          </div>
+        </div>
         <div className="grid lg:grid-cols-2 gap-10">
           <div className="relative">
             <Carousel
@@ -72,8 +95,8 @@ const FeaturedProperty: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col gap-10">
-            <div>
-              <p className="text-dark/75 dark:text-white/75 text-base font-semibold flex gap-2">
+            <div className="md:block hidden ">
+              <p className=" text-dark/75 dark:text-white/75 text-base font-semibold gap-2">
                 <Icon
                   icon="ph:house-simple-fill"
                   className="text-2xl text-primary "

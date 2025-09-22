@@ -26,6 +26,7 @@ import { Chip, Button, ButtonGroup } from "@heroui/react";
 import PropertyCard from "@/components/Home/Properties/Card/Card";
 import PlotCard from "@/components/Home/Plots/Card/Card";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
+import { useSearchParams } from "next/navigation";
 
 const PropertySkeleton = () => (
   <div className="animate-pulse">
@@ -38,13 +39,37 @@ const PropertySkeleton = () => (
 );
 
 export default function SearchPage() {
-  const [filters, setFilters] = useState<SearchFilters>({
-    propertyType: "all",
-    priceRange: [0, 1000000],
-    minArea: 0,
-    maxArea: 500,
-    searchQuery: "",
+  const searchParams = useSearchParams();
+  const typeParam = searchParams.get("type");
+
+  // Initialize filters with URL parameter if present
+  const [filters, setFilters] = useState<SearchFilters>(() => {
+    const initialPropertyType =
+      typeParam === "homes" ? "homes" : typeParam === "plots" ? "plots" : "all";
+    return {
+      propertyType: initialPropertyType,
+      priceRange: [0, 1000000],
+      minArea: 0,
+      maxArea: 500,
+      searchQuery: "",
+    };
   });
+
+  // Update filters when URL parameters change
+  useEffect(() => {
+    if (typeParam) {
+      const newPropertyType =
+        typeParam === "homes"
+          ? "homes"
+          : typeParam === "plots"
+          ? "plots"
+          : "all";
+      setFilters((prev) => ({
+        ...prev,
+        propertyType: newPropertyType,
+      }));
+    }
+  }, [typeParam]);
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -196,7 +221,7 @@ export default function SearchPage() {
                   <div className="hidden sm:flex items-center gap-1 rounded-lg p-1">
                     <Button
                       size="sm"
-                      color={viewMode === "grid" && "primary"}
+                      color={viewMode === "grid" ? "primary" : "default"}
                       onPress={() => handleViewModeChange("grid")}
                       className={`h-9 px-4 transition-all duration-200  `}
                     >
@@ -205,7 +230,7 @@ export default function SearchPage() {
                     </Button>
                     <Button
                       className={`h-9 px-4 transition-all duration-200  `}
-                      color={viewMode === "list" && "primary"}
+                      color={viewMode === "list" ? "primary" : "default"}
                       size="sm"
                       onPress={() => handleViewModeChange("list")}
                     >
@@ -235,10 +260,21 @@ export default function SearchPage() {
                       variant="flat"
                       size="sm"
                       onClick={() => setMobileFiltersOpen(true)}
-                      className="bg-transparent text-md"
+                      className="bg-transparent text-md lg:hidden"
                     >
                       <SlidersHorizontal className="h-4 w-4 mr-2" />
                       Filters
+                    </Button>
+
+                    {/* Desktop Sidebar Toggle */}
+                    <Button
+                      variant="flat"
+                      size="sm"
+                      onClick={() => setSidebarOpen(!sidebarOpen)}
+                      className="bg-transparent text-md hidden lg:flex"
+                    >
+                      <SlidersHorizontal className="h-4 w-4 mr-2" />
+                      {sidebarOpen ? "Hide" : "Show"} Filters
                     </Button>
 
                     {/* Mobile View Toggle */}

@@ -4,7 +4,7 @@ import { FooterLinks } from "@/app/api/footerlinks";
 
 const Footer = () => {
   return (
-    <footer className="relative z-10 bg-dark">
+    <footer className="relative z-10 bg-primary">
       <div className="container mx-auto max-w-8xl pt-14 px-4 sm:px-6 lg:px-0">
         <div className="flex lg:items-center justify-between items-end lg:gap-11 pb-14 border-b border-white/10 lg:flex-nowrap flex-wrap gap-6">
           <p className="text-white text-sm lg:max-w-1/5">
@@ -21,7 +21,7 @@ const Footer = () => {
                 Subscribe
               </button>
             </div>
-            <p className="text-white/40 text-sm lg:max-w-[45%] order-1 lg:order-2">
+            <p className="text-white text-sm lg:max-w-[45%] order-1 lg:order-2">
               By subscribing, you agree to receive our promotional emails. You
               can unsubscribe at any time.
             </p>
@@ -61,7 +61,7 @@ const Footer = () => {
               </h2>
               <Link
                 href="/contactus"
-                className="bg-primary text-base font-semibold py-4 px-8 rounded-none text-white hover:bg-white hover:text-dark duration-300 hover:cursor-pointer"
+                className="bg-white text-base font-semibold py-4 px-8 rounded-none text-pretty hover:bg-white hover:text-dark duration-300 hover:cursor-pointer"
               >
                 Get In Touch
               </Link>
@@ -72,7 +72,7 @@ const Footer = () => {
                   <div key={index}>
                     <Link
                       href={item.href}
-                      className="text-white/40 text-xm hover:text-white"
+                      className="text-white text-xm hover:text-white"
                     >
                       {item.label}
                     </Link>
@@ -86,7 +86,7 @@ const Footer = () => {
                   <div key={index}>
                     <Link
                       href={item.href}
-                      className="text-white/40 text-xm hover:text-white"
+                      className="text-white text-xm hover:text-white"
                     >
                       {item.label}
                     </Link>
@@ -97,12 +97,12 @@ const Footer = () => {
           </div>
         </div>
         <div className="flex justify-between md:flex-nowrap flex-wrap items-center py-6 gap-6">
-          <p className="text-white/40 text-sm ">©2025 - Design & Developed</p>
+          <p className="text-white text-sm ">©2025 - Design & Developed</p>
           <div className="flex gap-8 items-center">
-            <Link href="#" className="text-white/40 hover:text-primary text-sm">
+            <Link href="#" className="text-white hover:text-primary text-sm">
               Terms of service
             </Link>
-            <Link href="#" className="text-white/40 hover:text-primary text-sm">
+            <Link href="#" className="text-white hover:text-primary text-sm">
               Privacy policy
             </Link>
           </div>

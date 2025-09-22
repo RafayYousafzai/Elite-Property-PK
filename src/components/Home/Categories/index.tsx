@@ -41,7 +41,7 @@ const Categories = () => {
               apartments to spacious villas, tailored to your needs
             </p>
             <Link
-              href="/properties"
+              href="/explore"
               className="inline-block py-3 sm:py-4 px-6 sm:px-8 bg-primary text-sm sm:text-base leading-4 text-white rounded-NONE font-semibold mt-6 sm:mt-8 hover:bg-dark duration-300 transition-colors"
             >
               View properties
@@ -60,7 +60,7 @@ const Categories = () => {
                 />
               </Link>
               <Link
-                href="/appartment"
+                href="/explore?type=homes"
                 className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-0 flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:bg-black/20 duration-500"
               >
                 <div className="flex justify-end mt-4 sm:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -87,7 +87,7 @@ const Categories = () => {
           </div>
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
             <div className="relative rounded-none overflow-hidden group">
-              <Link href="/plots">
+              <Link href="/explore?type=plots">
                 <Image
                   src="/images/categories/plots.png"
                   alt="villas"
@@ -98,7 +98,7 @@ const Categories = () => {
                 />
               </Link>
               <Link
-                href="/plots"
+                href="/explore?type=plots"
                 className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-0 flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:bg-black/20 duration-500"
               >
                 <div className="flex justify-end mt-4 sm:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -125,7 +125,7 @@ const Categories = () => {
           </div>{" "}
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
             <div className="relative rounded-none overflow-hidden group">
-              <Link href="/search?category=all">
+              <Link href="/explore">
                 <Image
                   src="/images/categories/building.png"
                   alt="villas"
@@ -136,7 +136,7 @@ const Categories = () => {
                 />
               </Link>
               <Link
-                href="/search?category=all"
+                href="/explore"
                 className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-0 flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:bg-black/20 duration-500"
               >
                 <div className="flex justify-end mt-4 sm:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
