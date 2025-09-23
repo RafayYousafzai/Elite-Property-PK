@@ -123,7 +123,7 @@ const Categories = () => {
               </Link>
             </div>
           </div>{" "}
-          <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
+          <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0 hidden md:block">
             <div className="relative rounded-2xl overflow-hidden group">
               <Link href="/explore">
                 <Image

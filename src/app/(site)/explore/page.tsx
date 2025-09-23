@@ -208,7 +208,7 @@ export default function SearchPage() {
                     <p className="text-slate-600 dark:text-slate-400">
                       <span className="font-semibold text-primary transition-all duration-200">
                         {isLoading || isPending ? (
-                          <span className="inline-block w-8 h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></span>
+                          <span className="inline-block w-8 h-4 bg-slate-200 dark:bg-transparent rounded animate-pulse"></span>
                         ) : (
                           filteredProperties.length
                         )}
@@ -393,7 +393,7 @@ export default function SearchPage() {
                 ) : (
                   <div className="animate-in fade-in duration-300">
                     {viewMode === "list" ? (
-                      <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 px-2">
+                      <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 px-2 pb-20">
                         {filteredProperties.map(({ property, type }, index) => (
                           <div
                             key={`${type}-${property.slug}-${index}`}
