@@ -144,6 +144,7 @@ export const ParallaxScroll = ({
                   height="400"
                   width="400"
                   alt={property.name}
+                  unoptimized={true}
                 />
                 {/* Property Name (Always Visible) */}
                 <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
@@ -178,6 +179,7 @@ export const ParallaxScroll = ({
                   height="400"
                   width="400"
                   alt={property.name}
+                  unoptimized={true}
                 />
                 {/* Property Name (Always Visible) */}
                 <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
@@ -213,6 +215,7 @@ export const ParallaxScroll = ({
                     height="400"
                     width="400"
                     alt={property.name}
+                    unoptimized={true}
                   />
                   {/* Property Name (Always Visible) */}
                   <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
