@@ -214,7 +214,7 @@ const FeaturedProperty: React.FC = () => {
             <div className="flex gap-10">
               <Link
                 href="/contactus"
-                className="py-4 px-8 bg-primary hover:bg-dark duration-300 rounded-none text-white"
+                className="py-4 px-8  bg-primary hover:bg-dark duration-300 rounded-full text-white"
               >
                 Get in touch
               </Link>

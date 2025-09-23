@@ -100,18 +100,18 @@ export const ParallaxScroll = ({
               onClick={() => handleClick(property.slug)}
               style={{ y: translateFirst }}
               key={"grid-1" + idx}
-              className="group relative cursor-pointer"
+              className="group relative cursor-pointer "
             >
               <div className="relative overflow-hidden">
                 <Image
                   src={property.images[0].src}
-                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   alt={property.name}
                 />
                 {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                       <p className="text-sm  mb-1">{property.location}</p>{" "}
@@ -134,18 +134,18 @@ export const ParallaxScroll = ({
               onClick={() => handleClick(property.slug)}
               style={{ y: isSmallScreen ? translateFirst : translateSecond }}
               key={"grid-2" + idx}
-              className="group relative cursor-pointer"
+              className="group relative cursor-pointer "
             >
               <div className="relative overflow-hidden">
                 <Image
                   src={property.images[0].src}
-                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   alt={property.name}
                 />
                 {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                       <p className="text-sm  mb-1">{property.location}</p>{" "}
@@ -168,18 +168,18 @@ export const ParallaxScroll = ({
               onClick={() => handleClick(property.slug)}
               style={{ y: translateThird }}
               key={"grid-3" + idx}
-              className="group relative cursor-pointer"
+              className="group relative cursor-pointer "
             >
               <div className="relative overflow-hidden">
                 <Image
                   src={property.images[0].src}
-                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   alt={property.name}
                 />
                 {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                       <p className="text-sm  mb-1">{property.location}</p>{" "}
@@ -203,18 +203,18 @@ export const ParallaxScroll = ({
                 onClick={() => handleClick(property.slug)}
                 style={{ y: isSmallScreen ? translateFirst : translateSecond }}
                 key={"grid-2" + idx}
-                className="group relative cursor-pointer"
+                className="group relative cursor-pointer "
               >
                 <div className="relative overflow-hidden">
                   <Image
                     src={property.images[0].src}
-                    className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                    className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                     height="400"
                     width="400"
                     alt={property.name}
                   />
                   {/* Property Name (Always Visible) */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent">
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
                     <div className="absolute bottom-4 left-4 text-white ">
                       <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                         <p className="text-sm  mb-1">{property.location}</p>{" "}

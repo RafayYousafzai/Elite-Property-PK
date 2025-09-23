@@ -12,7 +12,7 @@ const BlogCard: FC<{ blog: Blog }> = ({ blog }) => {
       aria-label="blog cover 5xl:h-full 5xl:inline-block"
       className="gap-4 group"
     >
-      <div className="overflow-hidden rounded-none flex-shrink-0">
+      <div className="overflow-hidden rounded-2xl flex-shrink-0">
         <Image
           src={coverImage!}
           alt="image"

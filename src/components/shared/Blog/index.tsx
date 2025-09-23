@@ -62,7 +62,7 @@ const BlogSmall: React.FC = () => {
           </div>
           <Link
             href="/blogs"
-            className="bg-dark dark:bg-white text-white dark:text-dark py-4 px-8 rounded-none hover:bg-primary duration-300"
+            className="bg-dark dark:bg-white text-white dark:text-dark py-4 px-8 rounded-full hover:bg-primary duration-300"
             aria-label="Read all blog articles"
           >
             Read all articles

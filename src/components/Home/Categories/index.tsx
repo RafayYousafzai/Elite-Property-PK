@@ -42,13 +42,13 @@ const Categories = () => {
             </p>
             <Link
               href="/explore"
-              className="inline-block py-3 sm:py-4 px-6 sm:px-8 bg-primary text-sm sm:text-base leading-4 text-white rounded-NONE font-semibold mt-6 sm:mt-8 hover:bg-dark duration-300 transition-colors"
+              className="inline-block py-3 sm:py-4 px-6 sm:px-8 bg-primary text-sm sm:text-base leading-4 text-white rounded-full font-semibold mt-6 sm:mt-8 hover:bg-dark duration-300 transition-colors"
             >
               View properties
             </Link>
           </div>
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
-            <div className="relative rounded-none overflow-hidden group">
+            <div className="relative rounded-2xl overflow-hidden group">
               <Link href="/residential-homes">
                 <Image
                   src="/images/categories/villas.jpg"
@@ -86,7 +86,7 @@ const Categories = () => {
             </div>
           </div>
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
-            <div className="relative rounded-none overflow-hidden group">
+            <div className="relative rounded-2xl overflow-hidden group">
               <Link href="/explore?type=plots">
                 <Image
                   src="/images/categories/plots.png"
@@ -124,7 +124,7 @@ const Categories = () => {
             </div>
           </div>{" "}
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
-            <div className="relative rounded-none overflow-hidden group">
+            <div className="relative rounded-2xl overflow-hidden group">
               <Link href="/explore">
                 <Image
                   src="/images/categories/building.png"
