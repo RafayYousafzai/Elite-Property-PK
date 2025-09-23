@@ -57,6 +57,7 @@ const AboutCTA = () => {
           alt="Luxury development"
           fill
           className="object-cover"
+          unoptimized={true}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95"></div>

@@ -21,6 +21,7 @@ const AboutHero = () => {
           fill
           className="object-cover"
           priority
+          unoptimized={true}
         />
         {/* Primary Dark Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/70 to-black/80"></div>

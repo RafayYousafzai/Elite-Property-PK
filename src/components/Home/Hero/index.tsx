@@ -14,6 +14,7 @@ const Hero: React.FC = () => {
           fill
           priority
           className="object-cover object-center"
+          unoptimized={true}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
