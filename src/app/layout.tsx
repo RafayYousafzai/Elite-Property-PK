@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import SessionProviderComp from "@/components/nextauth/SessionProvider";
 import { Providers } from "./providers";
+import { Suspense } from "react";
 
 const font = Bricolage_Grotesque({ subsets: ["latin"] });
 
@@ -32,9 +33,11 @@ export default function RootLayout({
             defaultTheme="light"
           >
             <Providers>
-              <Header />
-              {children}
-              <Footer />
+              <Suspense fallback={null}>
+                <Header />
+                {children}
+                <Footer />
+              </Suspense>
             </Providers>
           </ThemeProvider>
         </SessionProviderComp>

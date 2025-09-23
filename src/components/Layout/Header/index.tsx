@@ -81,7 +81,7 @@ const Header: React.FC = () => {
     };
   }, [handleScroll]);
 
-  const isHomepage = pathname === "/";
+  const isHomepage = pathname === "/" || pathname === "/about";
 
   return (
     <header
