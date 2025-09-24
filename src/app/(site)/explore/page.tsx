@@ -18,8 +18,7 @@ import {
 } from "lucide-react";
 import { properties } from "@/app/api/property";
 import type { Property, SearchFilters } from "@/types/property";
-import { Input } from "@/components/ui/input";
-import { Chip, Button, ButtonGroup } from "@heroui/react";
+import { Chip, Button, ButtonGroup, Input } from "@heroui/react";
 import PropertyCard from "@/components/Home/Properties/Card/Card";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 import { useSearchParams } from "next/navigation";
@@ -244,12 +243,17 @@ export default function SearchPage() {
                 <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                   {/* Search Input */}
                   <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 transition-colors duration-200" />
+                    {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 transition-colors duration-200" /> */}
                     <Input
+                      startContent={
+                        <Search className="h-5 w-5 text-slate-400" />
+                      }
+                      fullWidth
+                      size="lg"
                       placeholder="Search by location, name, or property type..."
-                      value={filters.searchQuery}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      className="pl-10 h-12 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-primary/20 text-slate-900 dark:text-white placeholder:text-slate-500 transition-all duration-200"
+                      // value={fijfkdls;alters.searchQuery}
+                      onValueChange={(value) => handleSearchChange(value)}
+                      className="h-12   "
                     />
                   </div>
 
