@@ -12,8 +12,9 @@ import { Button, Drawer, DrawerBody, DrawerContent } from "@heroui/react";
 // Navigation configuration - edit this array to modify navigation items
 const navigationItems = [
   { name: "Home", href: "/" },
-  { name: "Plots", href: "/explore?type=plots" },
-  { name: "Apartments", href: "/explore?type=homes" },
+  // { name: "Plots", href: "/explore?type=plots" },
+  { name: "Homes", href: "/explore?type=homes" },
+  { name: "Apartments", href: "/explore?type=apartments" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contactus" },
   { name: "Blogs", href: "/blogs" },

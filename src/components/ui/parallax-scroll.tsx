@@ -6,21 +6,21 @@ import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
 import { cn } from "@/lib/utils";
-import { PropertyHomes } from "@/types/properyHomes";
 import Image from "next/image";
-import { propertyHomes } from "@/app/api/propertyhomes";
 import { useRouter } from "next/navigation";
+import { properties } from "@/app/api/property";
+import { Property } from "@/types/property";
 
 export const ParallaxScroll = ({
   className,
-  items = propertyHomes,
+  items = properties,
   isLessColls = false,
 }: {
   className?: string;
-  items: PropertyHomes[];
+  items: Property[];
   isLessColls?: boolean;
 }) => {
-  const properties: PropertyHomes[] = items;
+  const properties: Property[] = items;
   const router = useRouter();
 
   const [isSmallScreen, setIsSmallScreen] = useState(false);

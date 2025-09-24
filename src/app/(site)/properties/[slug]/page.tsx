@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { propertyHomes } from "@/app/api/propertyhomes";
+import { properties } from "@/app/api/property";
 import { useParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 import { testimonials } from "@/app/api/testimonial";
@@ -8,11 +8,10 @@ import Link from "next/link";
 import Image from "next/image";
 import PhotoSphereViewer from "@/components/shared/PhotoSphereViewer";
 import ImageGallery from "@/components/shared/ImageGallery";
-import { LucideView, ViewIcon } from "lucide-react";
 export default function Details() {
   const { slug } = useParams();
 
-  const item = propertyHomes.find((item) => item.slug === slug);
+  const item = properties.find((item) => item.slug === slug);
   console.log(item);
 
   return (

@@ -5,16 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Bed, Bath, Maximize, Eye } from "lucide-react";
 import Image from "next/image";
-import { PropertyHomes } from "@/types/properyHomes";
+import { Property } from "@/types/property";
 
 interface PropertyCardProps {
-  property: PropertyHomes;
-  type: "home" | "plot";
+  property: Property;
+  type: "home" | "apartment" | "plot";
 }
 
 export default function PropertyCard({ property, type }: PropertyCardProps) {
-  const isHome = type === "home";
-  const homeProperty = property as PropertyHomes;
+  const isHome = type === "home" || type === "apartment";
 
   return (
     <Card className="property-card-hover bg-card border-border overflow-hidden group">
@@ -57,15 +56,15 @@ export default function PropertyCard({ property, type }: PropertyCardProps) {
         </div>
 
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          {isHome && (
+          {isHome && property.beds && property.baths && (
             <>
               <div className="flex items-center gap-1">
                 <Bed className="h-4 w-4" />
-                <span>{homeProperty.beds} beds</span>
+                <span>{property.beds} beds</span>
               </div>
               <div className="flex items-center gap-1">
                 <Bath className="h-4 w-4" />
-                <span>{homeProperty.baths} baths</span>
+                <span>{property.baths} baths</span>
               </div>
             </>
           )}

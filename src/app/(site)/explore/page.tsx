@@ -16,15 +16,11 @@ import {
   Search,
   SlidersHorizontal,
 } from "lucide-react";
-import { propertyHomes } from "@/app/api/propertyhomes";
-import { propertyPlots } from "@/app/api/plotshomes";
+import { properties } from "@/app/api/property";
 import type { Property, SearchFilters } from "@/types/property";
-import type { PropertyHomes } from "@/types/properyHomes";
-import type { PlotsHomes } from "@/types/plotsHomes";
 import { Input } from "@/components/ui/input";
 import { Chip, Button, ButtonGroup } from "@heroui/react";
 import PropertyCard from "@/components/Home/Properties/Card/Card";
-import PlotCard from "@/components/Home/Plots/Card/Card";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 import { useSearchParams } from "next/navigation";
 
@@ -61,6 +57,8 @@ export default function SearchPage() {
       const newPropertyType =
         typeParam === "homes"
           ? "homes"
+          : typeParam === "apartments"
+          ? "apartments"
           : typeParam === "plots"
           ? "plots"
           : "all";
@@ -87,18 +85,20 @@ export default function SearchPage() {
     }
   }, [mobileFiltersOpen]);
 
-  const allProperties: Array<{ property: Property; type: "home" | "plot" }> =
-    useMemo(() => {
-      const homes = propertyHomes.map((p) => ({
-        property: p,
-        type: "home" as const,
-      }));
-      const plots = propertyPlots.map((p) => ({
-        property: p,
-        type: "plot" as const,
-      }));
-      return [...homes, ...plots];
-    }, []);
+  const allProperties: Array<{
+    property: Property;
+    type: "home" | "apartment" | "plot";
+  }> = useMemo(() => {
+    return properties.map((p) => ({
+      property: p,
+      type:
+        p.propertyType === "plot"
+          ? ("plot" as const)
+          : p.propertyType === "apartment"
+          ? ("apartment" as const)
+          : ("home" as const),
+    }));
+  }, []);
 
   const filteredProperties = useMemo(() => {
     setIsLoading(true);
@@ -107,6 +107,8 @@ export default function SearchPage() {
       // Property type filter
       if (filters.propertyType !== "all") {
         if (filters.propertyType === "homes" && type !== "home") return false;
+        if (filters.propertyType === "apartments" && type !== "apartment")
+          return false;
         if (filters.propertyType === "plots" && type !== "plot") return false;
       }
 
@@ -119,16 +121,14 @@ export default function SearchPage() {
       if (property.area < filters.minArea || property.area > filters.maxArea)
         return false;
 
-      // Beds filter (only for homes)
-      if (filters.beds && type === "home") {
-        const homeProperty = property as PropertyHomes;
-        if (homeProperty.beds < filters.beds) return false;
+      // Beds filter (only for homes and apartments)
+      if (filters.beds && (type === "home" || type === "apartment")) {
+        if (!property.beds || property.beds < filters.beds) return false;
       }
 
-      // Baths filter (only for homes)
-      if (filters.baths && type === "home") {
-        const homeProperty = property as PropertyHomes;
-        if (homeProperty.baths < filters.baths) return false;
+      // Baths filter (only for homes and apartments)
+      if (filters.baths && (type === "home" || type === "apartment")) {
+        if (!property.baths || property.baths < filters.baths) return false;
       }
 
       // Search query filter
@@ -254,7 +254,7 @@ export default function SearchPage() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2 ">
+                  <div className="flex gap-2 md:hidden">
                     {/* Mobile Filter Button */}
                     <Button
                       variant="flat"
@@ -400,19 +400,15 @@ export default function SearchPage() {
                             className="animate-in fade-in duration-200"
                             style={{ animationDelay: `${index * 50}ms` }}
                           >
-                            {type === "home" ? (
-                              <PropertyCard item={property as PropertyHomes} />
-                            ) : (
-                              <PlotCard item={property as PlotsHomes} />
-                            )}
+                            <PropertyCard item={property} />
                           </div>
                         ))}
                       </div>
                     ) : (
                       <ParallaxScroll
-                        items={filteredProperties
-                          .filter(({ type }) => type === "home")
-                          .map(({ property }) => property as PropertyHomes)}
+                        items={filteredProperties.map(
+                          ({ property }) => property
+                        )}
                         isLessColls={true}
                       />
                     )}

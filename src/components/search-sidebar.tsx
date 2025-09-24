@@ -102,7 +102,8 @@ export default function SearchSidebar({
               {[
                 { value: "all", label: "All Properties" },
                 { value: "homes", label: "Homes" },
-                { value: "plots", label: "Plots" },
+                { value: "apartments", label: "Apartments" },
+                // { value: "plots", label: "Plots" },
               ].map((type) => (
                 <Chip
                   key={type.value}
@@ -160,7 +161,7 @@ export default function SearchSidebar({
             </div>
           </div>
 
-          {/* Beds & Baths (only for homes) */}
+          {/* Beds & Baths (only for homes and apartments) */}
           {filters.propertyType !== "plots" && (
             <>
               {/* Bedrooms */}

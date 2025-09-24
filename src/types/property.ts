@@ -1,33 +1,22 @@
-export interface PropertyHome {
+export type Property = {
   name: string;
   slug: string;
   location: string;
   rate: string;
-  beds: number;
-  baths: number;
+  images: PropertyImage[];
   area: number;
-  photoSphere: string;
-  images: Array<{
-    src: string;
-  }>;
-}
+  beds?: number; // Only for homes
+  baths?: number; // Only for homes
+  photoSphere?: string; // Optional for all
+  propertyType: "house" | "apartment" | "plot";
+};
 
-export interface PropertyPlot {
-  name: string;
-  slug: string;
-  location: string;
-  rate: string;
-  area: number;
-  photoSphere: string;
-  images: Array<{
-    src: string;
-  }>;
+interface PropertyImage {
+  src: string;
 }
-
-export type Property = PropertyHome | PropertyPlot;
 
 export interface SearchFilters {
-  propertyType: "all" | "homes" | "plots";
+  propertyType: "all" | "homes" | "apartments" | "plots";
   priceRange: [number, number];
   beds?: number;
   baths?: number;
