@@ -8,9 +8,17 @@ import GetInTouch from "@/components/Home/GetInTouch";
 import FAQ from "@/components/Home/FAQs";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 import Services from "@/components/Home/Services";
-import { properties } from "./api/property";
+import { properties } from "../api/property";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient(cookies());
+  // const { data: properties } = await supabase
+  //   .from("properties")
+  //   .select("*")
+  //   .limit(10);
+  // console.log(properties);
   return (
     <main>
       <Hero />
