@@ -15,27 +15,30 @@ import {
   ListFilter,
   Search,
   SlidersHorizontal,
+  AlertCircle,
+  RefreshCw,
 } from "lucide-react";
-import { properties } from "@/app/api/property";
-import type { Property, SearchFilters } from "@/types/property";
+import type { SearchFilters } from "@/types/property";
 import { Chip, Button, ButtonGroup, Input } from "@heroui/react";
 import PropertyCard from "@/components/Home/Properties/Card/Card";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 import { useSearchParams } from "next/navigation";
-
-const PropertySkeleton = () => (
-  <div className="animate-pulse">
-    <div className="bg-slate-200 dark:bg-slate-700 rounded-lg h-64 mb-4"></div>
-    <div className="space-y-2">
-      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
-      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
-    </div>
-  </div>
-);
+import { useProperties } from "@/hooks/useProperties";
+import toast from "react-hot-toast";
+import { PropertyListSkeleton } from "@/components/ui/property-skeleton";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type");
+
+  // Use the custom hook for Supabase integration
+  const {
+    filteredProperties,
+    isLoading: dataLoading,
+    error: dataError,
+    refetch,
+    applyFilters,
+  } = useProperties();
 
   // Initialize filters with URL parameter if present
   const [filters, setFilters] = useState<SearchFilters>(() => {
@@ -84,66 +87,39 @@ export default function SearchPage() {
     }
   }, [mobileFiltersOpen]);
 
-  const allProperties: Array<{
-    property: Property;
-    type: "home" | "apartment" | "plot";
-  }> = useMemo(() => {
-    return properties.map((p) => ({
-      property: p,
+  // Apply filters whenever filters change
+  useEffect(() => {
+    const applyFiltersAsync = async () => {
+      setIsLoading(true);
+      try {
+        await applyFilters(filters);
+      } catch (error) {
+        console.error("Error applying filters:", error);
+        toast.error("Failed to apply filters");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    applyFiltersAsync();
+  }, [filters, applyFilters]);
+
+  // Transform database properties to match the expected structure
+  const transformedProperties = useMemo(() => {
+    return filteredProperties.map((property) => ({
+      property: {
+        ...property,
+        propertyType: property.property_type, // Transform for compatibility
+        photoSphere: property.photo_sphere, // Transform for compatibility
+      },
       type:
-        p.propertyType === "plot"
+        property.property_type === "plot"
           ? ("plot" as const)
-          : p.propertyType === "apartment"
+          : property.property_type === "apartment"
           ? ("apartment" as const)
           : ("home" as const),
     }));
-  }, []);
-
-  const filteredProperties = useMemo(() => {
-    setIsLoading(true);
-
-    const filtered = allProperties.filter(({ property, type }) => {
-      // Property type filter
-      if (filters.propertyType !== "all") {
-        if (filters.propertyType === "homes" && type !== "home") return false;
-        if (filters.propertyType === "apartments" && type !== "apartment")
-          return false;
-        if (filters.propertyType === "plots" && type !== "plot") return false;
-      }
-
-      // Price filter
-      const price = Number.parseInt(property.rate);
-      if (price < filters.priceRange[0] || price > filters.priceRange[1])
-        return false;
-
-      // Area filter
-      if (property.area < filters.minArea || property.area > filters.maxArea)
-        return false;
-
-      // Beds filter (only for homes and apartments)
-      if (filters.beds && (type === "home" || type === "apartment")) {
-        if (!property.beds || property.beds < filters.beds) return false;
-      }
-
-      // Baths filter (only for homes and apartments)
-      if (filters.baths && (type === "home" || type === "apartment")) {
-        if (!property.baths || property.baths < filters.baths) return false;
-      }
-
-      // Search query filter
-      if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
-        const matchesName = property.name.toLowerCase().includes(query);
-        const matchesLocation = property.location.toLowerCase().includes(query);
-        if (!matchesName && !matchesLocation) return false;
-      }
-
-      return true;
-    });
-
-    setTimeout(() => setIsLoading(false), 100);
-    return filtered;
-  }, [allProperties, filters]);
+  }, [filteredProperties]);
 
   const handleClearFilters = useCallback(() => {
     startTransition(() => {
@@ -172,6 +148,30 @@ export default function SearchPage() {
   const handleViewModeChange = useCallback((mode: "grid" | "list") => {
     setViewMode(mode);
   }, []);
+
+  // Handle data error
+  if (dataError) {
+    return (
+      <div className="min-h-screen mt-20 md:mt-32 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+            Error Loading Properties
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400 max-w-md">
+            {dataError}
+          </p>
+          <Button
+            color="primary"
+            onClick={refetch}
+            startContent={<RefreshCw className="w-4 h-4" />}
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen mt-20 md:mt-32">
@@ -206,10 +206,10 @@ export default function SearchPage() {
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">
                       <span className="font-semibold text-primary transition-all duration-200">
-                        {isLoading || isPending ? (
+                        {isLoading || isPending || dataLoading ? (
                           <span className="inline-block w-8 h-4 bg-slate-200 dark:bg-transparent rounded animate-pulse"></span>
                         ) : (
-                          filteredProperties.length
+                          transformedProperties.length
                         )}
                       </span>{" "}
                       properties available
@@ -243,7 +243,6 @@ export default function SearchPage() {
                 <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                   {/* Search Input */}
                   <div className="flex-1 relative">
-                    {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 transition-colors duration-200" /> */}
                     <Input
                       startContent={
                         <Search className="h-5 w-5 text-slate-400" />
@@ -251,7 +250,6 @@ export default function SearchPage() {
                       fullWidth
                       size="lg"
                       placeholder="Search by location, name, or property type..."
-                      // value={fijfkdls;alters.searchQuery}
                       onValueChange={(value) => handleSearchChange(value)}
                       className="h-12   "
                     />
@@ -374,7 +372,10 @@ export default function SearchPage() {
 
           {/* Properties Grid */}
           <div className="transition-all duration-300">
-            {filteredProperties.length === 0 && !isLoading && !isPending ? (
+            {transformedProperties.length === 0 &&
+            !isLoading &&
+            !isPending &&
+            !dataLoading ? (
               <div className="text-center py-12 animate-in fade-in duration-500">
                 <div className="text-muted-foreground text-lg mb-2">
                   No properties found
@@ -388,29 +389,27 @@ export default function SearchPage() {
               </div>
             ) : (
               <>
-                {isLoading || isPending ? (
-                  <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 px-10 py-6">
-                    {Array.from({ length: 8 }).map((_, index) => (
-                      <PropertySkeleton key={index} />
-                    ))}
-                  </div>
+                {isLoading || isPending || dataLoading ? (
+                  <PropertyListSkeleton count={8} />
                 ) : (
                   <div className="animate-in fade-in duration-300">
                     {viewMode === "list" ? (
                       <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 px-2 pb-20">
-                        {filteredProperties.map(({ property, type }, index) => (
-                          <div
-                            key={`${type}-${property.slug}-${index}`}
-                            className="animate-in fade-in duration-200"
-                            style={{ animationDelay: `${index * 50}ms` }}
-                          >
-                            <PropertyCard item={property} />
-                          </div>
-                        ))}
+                        {transformedProperties.map(
+                          ({ property, type }, index) => (
+                            <div
+                              key={`${type}-${property.slug}-${index}`}
+                              className="animate-in fade-in duration-200"
+                              style={{ animationDelay: `${index * 50}ms` }}
+                            >
+                              <PropertyCard item={property} />
+                            </div>
+                          )
+                        )}
                       </div>
                     ) : (
                       <ParallaxScroll
-                        items={filteredProperties.map(
+                        items={transformedProperties.map(
                           ({ property }) => property
                         )}
                         isLessColls={true}
@@ -470,7 +469,7 @@ export default function SearchPage() {
                   onClick={() => setMobileFiltersOpen(false)}
                   className="w-full transition-all duration-200"
                 >
-                  Apply Filters ({filteredProperties.length} results)
+                  Apply Filters ({transformedProperties.length} results)
                 </Button>
                 <Button
                   color="danger"
