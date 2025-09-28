@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.10",
     "@heroui/react": "^2.8.4",
     "@iconify/react": "^5.2.0",
     "@photo-sphere-viewer/core": "^5.14.0",
