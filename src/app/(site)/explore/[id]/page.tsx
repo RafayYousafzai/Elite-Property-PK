@@ -1,17 +1,80 @@
 "use client";
-import React from "react";
-import { properties } from "@/app/api/property";
+import React, { useState, useEffect } from "react";
+import { getPropertyBySlug } from "@/lib/supabase/properties";
+import { Property } from "@/types/property";
 import { useParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 import { testimonials } from "@/app/api/testimonial";
 import Link from "next/link";
 import Image from "next/image";
 import ImageCarousel from "@/components/shared/ImageCarousel";
-export default function Details() {
-  const { slug } = useParams();
 
-  const item = properties.find((item) => item.slug === slug);
-  console.log(item);
+export default function Details() {
+  const { id } = useParams();
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProperty = async () => {
+      if (!id || typeof id !== "string") {
+        setError("Invalid property ID");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const propertyData = await getPropertyBySlug(id);
+        if (propertyData) {
+          setProperty(propertyData);
+        } else {
+          setError("Property not found");
+        }
+      } catch (err) {
+        console.error("Error fetching property:", err);
+        setError("Failed to load property");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperty();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <section className="!pt-44 pb-20 relative">
+        <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !property) {
+    return (
+      <section className="!pt-44 pb-20 relative">
+        <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-dark dark:text-white mb-4">
+              Property Not Found
+            </h1>
+            <p className="text-dark/50 dark:text-white/50 mb-8">
+              {error || "The property you're looking for doesn't exist."}
+            </p>
+            <Link
+              href="/explore"
+              className="py-4 px-8 bg-primary text-white rounded-full hover:bg-dark duration-300"
+            >
+              Back to Properties
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="!pt-44 pb-20 relative">
@@ -19,7 +82,7 @@ export default function Details() {
         <div className="grid grid-cols-12 items-end gap-6">
           <div className="lg:col-span-8 col-span-12">
             <h1 className="lg:text-52 text-40 font-semibold text-dark dark:text-white">
-              {item?.name}
+              {property?.name}
             </h1>
             <div className="flex gap-2.5">
               <Icon
@@ -29,23 +92,23 @@ export default function Details() {
                 className="text-dark/50 dark:text-white/50"
               />
               <p className="text-dark/50 dark:text-white/50 text-xm">
-                {item?.location}
+                {property?.location}
               </p>
             </div>
           </div>
-          {item?.beds && item?.baths && item?.area && (
+          {property?.beds && property?.baths && property?.area && (
             <div className="lg:col-span-4 col-span-12">
               <div className="flex">
                 <div className="flex flex-col gap-2 border-e border-black/10 dark:border-white/20 pr-2 xs:pr-4 mobile:pr-8">
                   <Icon icon={"solar:bed-linear"} width={20} height={20} />
                   <p className="text-sm mobile:text-base font-normal text-black dark:text-white">
-                    {item?.beds} Bedrooms
+                    {property?.beds} Bedrooms
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 border-e border-black/10 dark:border-white/20 px-2 xs:px-4 mobile:px-8">
                   <Icon icon={"solar:bath-linear"} width={20} height={20} />
                   <p className="text-sm mobile:text-base font-normal text-black dark:text-white">
-                    {item?.baths} Bathrooms
+                    {property?.baths} Bathrooms
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 pl-2 xs:pl-4 mobile:pl-8">
@@ -55,7 +118,7 @@ export default function Details() {
                     height={20}
                   />
                   <p className="text-sm mobile:text-base font-normal text-black dark:text-white">
-                    {item?.area}m<sup>2</sup>
+                    {property?.area}m<sup>2</sup>
                   </p>
                 </div>
               </div>
@@ -64,8 +127,8 @@ export default function Details() {
         </div>
         {/* Professional Image Carousel with 360° Viewer */}
         <ImageCarousel
-          images={item?.images || []}
-          photoSphere={item?.photoSphere}
+          images={property?.images || []}
+          photoSphere={property?.photo_sphere || undefined}
         />
         <div className="grid grid-cols-12 gap-8 mt-32 md:mt-10">
           <div className="lg:col-span-8 col-span-12">
@@ -157,18 +220,24 @@ export default function Details() {
               </div>
             </div>
             <div className="flex flex-col gap-5">
-              <p className="text-dark dark:text-white text-xm ">
-                Nestled in the heart of miami, the modern luxe villa at 20 s
-                aurora ave offers a perfect blend of contemporary elegance and
-                smart-home innovation. priced at $570000, this 560 ft² residence
-                features 4 spacious bedrooms, 3 luxurious bathrooms, and
-                expansive living areas designed for comfort and style. built in
-                2025, the home boasts energy-efficient systems, abundant natural
-                light, and state-of-the-art security features. outdoor spaces
-                include two stylish bar areas, perfect for entertaining 8+
-                guests. enjoy the ultimate in modern living with premium
-                amenities and a prime location.
-              </p>
+              {property?.description ? (
+                <div className="text-dark dark:text-white text-xm whitespace-pre-line">
+                  {property?.description}
+                </div>
+              ) : (
+                <p className="text-dark dark:text-white text-xm ">
+                  Nestled in the heart of miami, the modern luxe villa at 20 s
+                  aurora ave offers a perfect blend of contemporary elegance and
+                  smart-home innovation. priced at $570000, this 560 ft²
+                  residence features 4 spacious bedrooms, 3 luxurious bathrooms,
+                  and expansive living areas designed for comfort and style.
+                  built in 2025, the home boasts energy-efficient systems,
+                  abundant natural light, and state-of-the-art security
+                  features. outdoor spaces include two stylish bar areas,
+                  perfect for entertaining 8+ guests. enjoy the ultimate in
+                  modern living with premium amenities and a prime location.
+                </p>
+              )}
               <p className="text-dark dark:text-white text-xm ">
                 Step inside to discover an open-concept layout that seamlessly
                 connects the kitchen, dining, and living spaces. the gourmet
@@ -275,7 +344,7 @@ export default function Details() {
           <div className="lg:col-span-4 col-span-12">
             <div className="bg-primary/10 p-8 rounded-2xl relative z-10 overflow-hidden md:mt-8">
               <h4 className="text-dark text-3xl font-medium dark:text-white">
-                {item?.rate}
+                {property?.rate}
               </h4>
               <p className="text-sm text-dark/50 dark:text-white">
                 Discounted Price

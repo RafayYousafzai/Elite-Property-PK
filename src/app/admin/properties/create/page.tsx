@@ -21,6 +21,8 @@ interface PropertyFormData {
   photo_sphere?: string;
   property_type: "house" | "apartment" | "plot";
   images: PropertyImage[];
+  description?: string;
+  is_featured: boolean;
 }
 
 export default function CreatePropertyPage() {
@@ -35,6 +37,8 @@ export default function CreatePropertyPage() {
     photo_sphere: "",
     property_type: "house",
     images: [],
+    description: "",
+    is_featured: false,
   });
   const [imageInput, setImageInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -272,6 +276,51 @@ export default function CreatePropertyPage() {
                   }))
                 }
               />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Property Description
+              </label>
+              <textarea
+                rows={4}
+                placeholder="Enter a detailed description of the property..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.description || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked={formData.is_featured}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      is_featured: e.target.checked,
+                    }))
+                  }
+                />
+                <label
+                  htmlFor="featured"
+                  className="flex items-center text-sm font-medium text-gray-700"
+                >
+                  <span className="text-yellow-500 mr-1">⭐</span>
+                  Featured Property
+                </label>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Featured properties will be highlighted in the listings
+              </p>
             </div>
           </div>
 

@@ -10,6 +10,8 @@ export type Property = {
   baths?: number | null; // Only for homes
   photo_sphere?: string | null; // Optional for all
   property_type: "house" | "apartment" | "plot";
+  description?: string | null; // Property description
+  is_featured?: boolean; // Featured property flag
   created_at?: string;
   updated_at?: string;
 };
@@ -27,6 +29,8 @@ export type DatabaseProperty = {
   photo_sphere: string | null;
   property_type: "house" | "apartment" | "plot";
   images: PropertyImage[];
+  description: string | null;
+  is_featured: boolean;
   created_at: string;
   updated_at: string;
 };

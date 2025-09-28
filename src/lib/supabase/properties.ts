@@ -17,6 +17,8 @@ export const transformDatabaseProperty = (
     photo_sphere: dbProperty.photo_sphere,
     property_type: dbProperty.property_type,
     images: dbProperty.images || [],
+    description: dbProperty.description,
+    is_featured: dbProperty.is_featured,
     created_at: dbProperty.created_at,
     updated_at: dbProperty.updated_at,
   };
@@ -193,5 +195,30 @@ export async function getPropertiesCount(): Promise<{
       apartments: 0,
       plots: 0,
     };
+  }
+}
+
+// Function to update property featured status
+export async function updatePropertyFeaturedStatus(
+  id: string,
+  is_featured: boolean
+): Promise<boolean> {
+  try {
+    const supabase = createBrowserClient();
+
+    const { error } = await supabase
+      .from("properties")
+      .update({ is_featured })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating property featured status:", error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error in updatePropertyFeaturedStatus:", error);
+    return false;
   }
 }

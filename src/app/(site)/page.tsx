@@ -6,15 +6,19 @@ import Testimonial from "@/components/Home/Testimonial";
 import BlogSmall from "@/components/shared/Blog";
 import GetInTouch from "@/components/Home/GetInTouch";
 import FAQ from "@/components/Home/FAQs";
-// import { ParallaxScroll } from "@/components/ui/parallax-scroll";
+import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 import Services from "@/components/Home/Services";
+import { getProperties } from "@/lib/supabase/properties-server";
 
 export default async function Home() {
+  // Fetch properties from Supabase
+  const properties = await getProperties();
+
   return (
     <main>
       <Hero />
       <Categories />
-      {/* <ParallaxScroll items={properties} /> */}
+      <ParallaxScroll items={properties} />
       <Services />
       <FeaturedProperty />
       <BlogSmall />
