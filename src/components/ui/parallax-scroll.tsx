@@ -55,7 +55,7 @@ export const ParallaxScroll = ({
   const fourthPart = !isLessColls ? properties.slice(3 * chunkSize) : [];
 
   const handleClick = (slug: string) => {
-    router.push(`/properties/${slug}`);
+    router.push(`/explore/${slug}`);
   };
 
   return (

@@ -2,6 +2,8 @@
 
 import React from "react";
 import { MapPin, Phone, Mail, Clock, Navigation, Icon } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 const LocationMap = () => {
   const officeLocation = {
@@ -158,15 +160,26 @@ const LocationMap = () => {
                 </div>
               </button>
 
-              <button
-                onClick={handleGetDirections}
-                className="flex-1 cursor-pointer text-white font-semibold py-4 px-8 rounded-xl bg-primary transition-all duration-300 transform hover:scale-101 shadow-lg"
+              <Link
+                href="https://wa.me/923211234567"
+                target="_blank"
+                className=""
               >
-                <div className="flex items-center justify-center gap-2">
-                  <Navigation className="w-5 h-5" />
-                  Get Directions
-                </div>
-              </button>
+                <button
+                  // onClick={handleGetDirections}
+                  className="flex-1 cursor-pointer text-white font-semibold py-4 px-8 rounded-xl bg-primary transition-all duration-300 transform hover:scale-101 shadow-lg"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Image
+                      src="/icons/whatsapp.png"
+                      alt="WhatsApp"
+                      width={20}
+                      height={20}
+                    />
+                    WhatsApp
+                  </div>
+                </button>
+              </Link>
             </div>
 
             {/* Additional Info */}

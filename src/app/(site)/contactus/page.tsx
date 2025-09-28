@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function ContactUs() {
   return (
     <div className="container max-w-8xl mx-auto px-5 2xl:px-0 pt-32 md:pt-44 pb-14 md:pb-28">
-      <div className="mb-16">
+      {/* <div className="mb-16">
         <div className="flex gap-2.5 items-center justify-center mb-3">
           <span>
             <Icon
@@ -34,7 +34,6 @@ export default function ContactUs() {
           </p>
         </div>
       </div>
-      {/* form */}
       <div className="border border-black/10 dark:border-white/10 rounded-2xl p-4 shadow-xl dark:shadow-white/10">
         <div className="flex flex-col lg:flex-row lg:items-center gap-12">
           <div className="relative w-fit">
@@ -128,10 +127,10 @@ export default function ContactUs() {
             </form>
           </div>
         </div>
-      </div>
+      </div> */}
+      {/* <br />
       <br />
-      <br />
-      <br />
+      <br /> */}
       <LocationMap />
     </div>
   );
