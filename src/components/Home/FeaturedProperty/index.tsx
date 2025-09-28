@@ -2,7 +2,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { featuredProprty } from "@/app/api/featuredproperty";
+import { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
 import {
   Carousel,
@@ -11,10 +11,16 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 
-const FeaturedProperty: React.FC = () => {
+interface FeaturedPropertyProps {
+  properties: Property[];
+}
+
+const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
   const [api, setApi] = React.useState<CarouselApi | undefined>(undefined);
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
+  const [currentPropertyIndex, setCurrentPropertyIndex] = React.useState(0);
+
   React.useEffect(() => {
     if (!api) {
       return;
@@ -33,6 +39,27 @@ const FeaturedProperty: React.FC = () => {
     }
   };
 
+  // If no properties, show fallback message
+  if (!properties || properties.length === 0) {
+    return (
+      <section>
+        <div className="container max-w-8xl mx-auto px-5 2xl:px-0">
+          <div className="text-center">
+            <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white mb-4">
+              No Featured Properties Available
+            </h2>
+            <p className="text-dark/50 dark:text-white/50">
+              Check back soon for our latest featured properties!
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Get the current property to display
+  const currentProperty = properties[currentPropertyIndex] || properties[0];
+
   return (
     <section>
       <div className="container max-w-8xl mx-auto px-5 2xl:px-0">
@@ -44,9 +71,30 @@ const FeaturedProperty: React.FC = () => {
             />
             Featured property
           </p>
+          {/* Navigation for multiple properties */}
+          {properties.length > 1 && (
+            <div className="flex mt-3">
+              <div className="flex gap-2">
+                {properties.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentPropertyIndex(index)}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 ${
+                      currentPropertyIndex === index
+                        ? "bg-primary text-white"
+                        : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                    }`}
+                  >
+                    Property {index + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white">
-            Modern luxe villa
+            {currentProperty.name}
           </h2>
+
           <div className="flex items-center gap-2.5">
             <Icon
               icon="ph:map-pin"
@@ -55,7 +103,7 @@ const FeaturedProperty: React.FC = () => {
               className="text-dark/50 dark:text-white/50"
             />
             <p className="text-dark/50 dark:text-white/50 text-base">
-              20 S Aurora Ave, Miami
+              {currentProperty.location}
             </p>
           </div>
         </div>
@@ -68,26 +116,37 @@ const FeaturedProperty: React.FC = () => {
               }}
             >
               <CarouselContent>
-                {featuredProprty.map((item, index) => (
-                  <CarouselItem key={index}>
-                    <Image
-                      src={item.scr}
-                      alt={item.alt}
-                      width={680}
-                      height={530}
-                      className="rounded-none w-none h-[350px] object-cover md:h-540"
-                      unoptimized={true}
-                    />
+                {currentProperty.images && currentProperty.images.length > 0 ? (
+                  currentProperty.images.map((image, index) => (
+                    <CarouselItem key={index}>
+                      <Image
+                        src={image.src}
+                        alt={currentProperty.name}
+                        width={680}
+                        height={530}
+                        className="rounded-2xl w-none h-[350px] object-cover md:h-540"
+                        unoptimized={true}
+                      />
+                    </CarouselItem>
+                  ))
+                ) : (
+                  <CarouselItem>
+                    <div className="rounded-2xl w-full h-[350px] md:h-540 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                      <Icon
+                        icon="ph:house-simple-fill"
+                        className="text-6xl text-gray-400"
+                      />
+                    </div>
                   </CarouselItem>
-                ))}
+                )}
               </CarouselContent>
             </Carousel>
-            <div className="absolute left-2/5 bg-dark/50 rounded-none py-2.5 bottom-10 flex justify-center mt-4 gap-2.5 px-2.5">
+            <div className="absolute left-2/5 bg-dark/50 rounded-2xl py-2.5 bottom-10 flex justify-center mt-4 gap-2.5 px-2.5">
               {Array.from({ length: count }).map((_, index) => (
                 <button
                   key={index}
                   onClick={() => handleDotClick(index)}
-                  className={`w-2.5 h-2.5 rounded-none ${
+                  className={`w-2.5 h-2.5 rounded-2xl ${
                     current === index + 1 ? "bg-white" : "bg-white/50"
                   }`}
                 />
@@ -103,8 +162,28 @@ const FeaturedProperty: React.FC = () => {
                 />
                 Featured property
               </p>
+              {/* Navigation for multiple properties */}
+              {properties.length > 1 && (
+                <div className="flex mt-3">
+                  <div className="flex gap-2">
+                    {properties.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentPropertyIndex(index)}
+                        className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 ${
+                          currentPropertyIndex === index
+                            ? "bg-primary text-white"
+                            : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                        }`}
+                      >
+                        Property {index + 1}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white">
-                Modern luxe villa
+                {currentProperty.name}
               </h2>
               <div className="flex items-center gap-2.5">
                 <Icon
@@ -114,60 +193,61 @@ const FeaturedProperty: React.FC = () => {
                   className="text-dark/50 dark:text-white/50"
                 />
                 <p className="text-dark/50 dark:text-white/50 text-base">
-                  20 S Aurora Ave, Miami
+                  {currentProperty.location}
                 </p>
               </div>
             </div>
             <p className="text-base text-dark/50 dark:text-white/50">
-              Experience luxury living at modern luxe villa, located at 20 S
-              Aurora Ave, Miami. Priced at $1,650,500, this 560 ft² smart home
-              offers 4 bedrooms, 3 bathrooms, and spacious living areas. Enjoy
-              energy efficiency, natural light, security systems, outdoor
-              spaces, and 2 bar areas—perfect for 8+ guests. Built in 2025.
+              {currentProperty.description ||
+                `Experience luxury living at ${currentProperty.name}, located at ${currentProperty.location}. This ${currentProperty.area} ft² ${currentProperty.property_type} offers modern amenities and spacious living areas.`}
             </p>
             <div className="grid grid-cols-2 gap-10">
-              <div className="flex items-center gap-4">
-                <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
-                  <Image
-                    src={"/images/hero/sofa.svg"}
-                    alt="sofa"
-                    width={24}
-                    height={24}
-                    className="block dark:hidden"
-                    unoptimized={true}
-                  />
-                  <Image
-                    src={"/images/hero/dark-sofa.svg"}
-                    alt="sofa"
-                    width={24}
-                    height={24}
-                    className="hidden dark:block"
-                    unoptimized={true}
-                  />
+              {currentProperty.beds && (
+                <div className="flex items-center gap-4">
+                  <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
+                    <Image
+                      src={"/images/hero/sofa.svg"}
+                      alt="sofa"
+                      width={24}
+                      height={24}
+                      className="block dark:hidden"
+                      unoptimized={true}
+                    />
+                    <Image
+                      src={"/images/hero/dark-sofa.svg"}
+                      alt="sofa"
+                      width={24}
+                      height={24}
+                      className="hidden dark:block"
+                      unoptimized={true}
+                    />
+                  </div>
+                  <h6 className="">{currentProperty.beds} Bedrooms</h6>
                 </div>
-                <h6 className="">4 Bedrooms</h6>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
-                  <Image
-                    src={"/images/hero/tube.svg"}
-                    alt="tube"
-                    width={24}
-                    height={24}
-                    className="block dark:hidden"
-                    unoptimized={true}
-                  />
-                  <Image
-                    src={"/images/hero/dark-tube.svg"}
-                    alt="tube"
-                    width={24}
-                    height={24}
-                    className="hidden dark:block"
-                    unoptimized={true}
-                  />
+              )}
+              {currentProperty.baths && (
+                <div className="flex items-center gap-4">
+                  <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
+                    <Image
+                      src={"/images/hero/tube.svg"}
+                      alt="tube"
+                      width={24}
+                      height={24}
+                      className="block dark:hidden"
+                      unoptimized={true}
+                    />
+                    <Image
+                      src={"/images/hero/dark-tube.svg"}
+                      alt="tube"
+                      width={24}
+                      height={24}
+                      className="hidden dark:block"
+                      unoptimized={true}
+                    />
+                  </div>
+                  <h6 className="">{currentProperty.baths} Bathrooms</h6>
                 </div>
-                <h6 className="">3 Bathrooms</h6>
-              </div>
+              )}
               <div className="flex items-center gap-4">
                 <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
                   <Image
@@ -208,7 +288,7 @@ const FeaturedProperty: React.FC = () => {
                     unoptimized={true}
                   />
                 </div>
-                <h6 className="">2 Bar areas</h6>
+                <h6 className="">{currentProperty.area} ft² area</h6>
               </div>
             </div>
             <div className="flex gap-10">
@@ -220,7 +300,7 @@ const FeaturedProperty: React.FC = () => {
               </Link>
               <div>
                 <h4 className="text-3xl text-dark dark:text-white font-medium">
-                  $1,650,500
+                  {currentProperty.rate}
                 </h4>
                 <p className="text-base text-dark/50">Discounted price</p>
               </div>

@@ -27,7 +27,7 @@ const GetInTouch: React.FC = () => {
                 together.
               </h2>
               <Link
-                href="#"
+                href="/contactus"
                 className="bg-white py-4 px-8 rounded-none text-dark hover:bg-dark hover:text-white duration-300"
               >
                 Get In Touch

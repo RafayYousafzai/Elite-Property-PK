@@ -408,12 +408,14 @@ export default function SearchPage() {
                         )}
                       </div>
                     ) : (
-                      <ParallaxScroll
-                        items={transformedProperties.map(
-                          ({ property }) => property
-                        )}
-                        isLessColls={true}
-                      />
+                      <div className="pt-20">
+                        <ParallaxScroll
+                          items={transformedProperties.map(
+                            ({ property }) => property
+                          )}
+                          isLessColls={true}
+                        />
+                      </div>
                     )}
                   </div>
                 )}

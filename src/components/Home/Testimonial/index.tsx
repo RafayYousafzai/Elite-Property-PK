@@ -1,5 +1,6 @@
 "use client";
 
+import { testimonials } from "@/app/api/testimonial"; // ✅ import once
 import {
   ThreeDScrollTriggerContainer,
   ThreeDScrollTriggerRow,
@@ -17,11 +18,11 @@ const Card = ({
 }) => {
   return (
     <div
-      className={`bg-slate-50 dark:bg-neutral-900 rounded-none p-6 max-w-md m-2 transition-colors shrink-0 ${className}`}
+      className={`bg-slate-50 dark:bg-neutral-900  p-6 max-w-md m-2 transition-colors shrink-0 h-52 rounded-2xl ${className}`}
       style={style}
     >
       <div className="flex items-center">
-        <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
+        <Avatar src={image} />
         <div className="ml-4">
           <h3 className="font-semibold text-black dark:text-white text-sm">
             {name}
@@ -37,16 +38,6 @@ const Card = ({
 };
 
 export default function Testimonials() {
-  const testimonialData = [
-    {
-      name: "Amira Hassan",
-      company: "FinEdge Consulting",
-      image: "/path/to/profile-pic.jpg",
-      feedback:
-        "The security features are outstanding. Multi-layer protection ensures our business transactions remain private and protected.",
-    },
-  ];
-
   return (
     <>
       <div className="mb-16 flex flex-col gap-3 ">
@@ -72,51 +63,60 @@ export default function Testimonials() {
         </p>
       </div>
 
-      <ThreeDScrollTriggerContainer>
-        <ThreeDScrollTriggerRow baseVelocity={5} direction={1}>
-          {testimonialData.slice(0, 3).map((testimonial, index) => (
-            <div key={`row1-${index}`}>
+      {/* Row 1 */}
+      <div>
+        <ThreeDScrollTriggerContainer>
+          <ThreeDScrollTriggerRow baseVelocity={3} direction={1}>
+            {testimonials.slice(0, 15).map((t, i) => (
+              <div key={`row1-${i}`}>
+                <Card
+                  name={t.name}
+                  company={t.position} // ✅ mapped correctly
+                  image={t.image}
+                  feedback={t.review}
+                  className="inline-block"
+                />
+              </div>
+            ))}
+          </ThreeDScrollTriggerRow>
+        </ThreeDScrollTriggerContainer>
+      </div>
+
+      {/* Row 2 */}
+      {/* <ThreeDScrollTriggerContainer>
+        <ThreeDScrollTriggerRow baseVelocity={3} direction={-1}>
+          {testimonials.slice(10, 20).map((t, i) => (
+            <div key={`row2-${i}`}>
               <Card
-                name={testimonial.name}
-                company={testimonial.company}
-                image={testimonial.image}
-                feedback={testimonial.feedback}
+                name={t.name}
+                company={t.position}
+                image={t.image}
+                feedback={t.review}
                 className="inline-block"
               />
             </div>
           ))}
         </ThreeDScrollTriggerRow>
-      </ThreeDScrollTriggerContainer>
-      <ThreeDScrollTriggerContainer>
-        <ThreeDScrollTriggerRow baseVelocity={5} direction={-1}>
-          {testimonialData.slice(0, 3).map((testimonial, index) => (
-            <div key={`row1-${index}`}>
-              <Card
-                name={testimonial.name}
-                company={testimonial.company}
-                image={testimonial.image}
-                feedback={testimonial.feedback}
-                className="inline-block"
-              />
-            </div>
-          ))}
-        </ThreeDScrollTriggerRow>
-      </ThreeDScrollTriggerContainer>
-      <ThreeDScrollTriggerContainer>
-        <ThreeDScrollTriggerRow baseVelocity={5} direction={1}>
-          {testimonialData.slice(0, 3).map((testimonial, index) => (
-            <div key={`row1-${index}`}>
-              <Card
-                name={testimonial.name}
-                company={testimonial.company}
-                image={testimonial.image}
-                feedback={testimonial.feedback}
-                className="inline-block"
-              />
-            </div>
-          ))}
-        </ThreeDScrollTriggerRow>
-      </ThreeDScrollTriggerContainer>
+      </ThreeDScrollTriggerContainer> */}
+
+      {/* Row 3 */}
+      <div>
+        <ThreeDScrollTriggerContainer>
+          <ThreeDScrollTriggerRow baseVelocity={3} direction={1}>
+            {testimonials.slice(15, 30).map((t, i) => (
+              <div key={`row3-${i}`}>
+                <Card
+                  name={t.name}
+                  company={t.position}
+                  image={t.image}
+                  feedback={t.review}
+                  className="inline-block"
+                />
+              </div>
+            ))}
+          </ThreeDScrollTriggerRow>
+        </ThreeDScrollTriggerContainer>
+      </div>
     </>
   );
 }

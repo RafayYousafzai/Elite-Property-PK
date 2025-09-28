@@ -100,7 +100,7 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center w-full">
           <div className="flex-shrink-0">
             <Link href="/">
-              <Image
+              {/* <Image
                 src={"/images/header/dark-logo.svg"}
                 alt="logo"
                 width={300}
@@ -131,7 +131,18 @@ const Header: React.FC = () => {
                     ? "dark:block hidden"
                     : "dark:block hidden"
                 }`}
-              />
+              /> */}
+              <h1
+                className={`text-3xl font-semibold mt-2 ${
+                  isHomepage
+                    ? sticky
+                      ? "text-dark dark:text-white"
+                      : "text-white"
+                    : "text-dark dark:text-white"
+                }`}
+              >
+                Homely
+              </h1>
             </Link>
           </div>
 

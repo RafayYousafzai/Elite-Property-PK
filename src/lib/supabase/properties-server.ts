@@ -49,3 +49,26 @@ export async function getPropertyBySlugServer(
     return null;
   }
 }
+
+// Server-side function to fetch featured properties only
+export async function getFeaturedProperties(): Promise<Property[]> {
+  try {
+    const supabase = await createServerClient(cookies());
+
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*")
+      .eq("is_featured", true) // 👈 only fetch featured properties
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching featured properties:", error);
+      return [];
+    }
+
+    return data.map(transformDatabaseProperty);
+  } catch (error) {
+    console.error("Error in getFeaturedProperties:", error);
+    return [];
+  }
+}

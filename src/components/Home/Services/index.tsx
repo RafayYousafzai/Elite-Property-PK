@@ -7,38 +7,38 @@ const Services = () => {
   const services = [
     {
       icon: "ph:house-simple-fill",
-      title: "Plot Sales & Consultation",
+      title: "Plot Sales & Advice",
       description:
-        "Secure prime residential and commercial plots in DHA Islamabad. Our expert guidance ensures you invest in the right location for long-term growth and prestige.",
-      features: ["Prime Locations", "Expert Guidance", "Long-term Growth"],
+        "Buy residential or commercial plots in DHA Islamabad with confidence. We guide you to the best locations for value and growth.",
+      features: ["Prime Locations", "Clear Guidance", "Safe Investment"],
     },
     {
       icon: "ph:buildings-fill",
-      title: "Luxury Apartment Sales",
+      title: "Apartments for Sale",
       description:
-        "Find your dream home among modern, stylish apartments designed for comfort, elegance, and secure community living.",
-      features: ["Modern Design", "Premium Amenities", "Secure Living"],
+        "Find modern apartments with comfort, style, and secure community living in DHA Islamabad.",
+      features: ["Modern Style", "Great Facilities", "Safe Living"],
     },
     {
       icon: "ph:trend-up-fill",
-      title: "Investment Advisory",
+      title: "Investment Guidance",
       description:
-        "Maximize your returns with our tailored property investment strategies. From short-term opportunities to long-term growth, we help you make the smart move.",
-      features: ["High Returns", "Smart Strategy", "Portfolio Growth"],
+        "Want to grow your money? We help you choose the right property deals, whether for quick returns or long-term gains.",
+      features: ["High Returns", "Smart Deals", "Steady Growth"],
     },
     {
       icon: "ph:gear-fill",
-      title: "Property Management Assistance",
+      title: "Property Management",
       description:
-        "From paperwork to possession, we simplify every step. Our team ensures a smooth, transparent, and stress-free process.",
-      features: ["Complete Support", "Transparent Process", "Stress-free"],
+        "From paperwork to possession, we handle the tough parts so you can relax. Simple, transparent, and stress-free.",
+      features: ["Full Support", "Clear Process", "No Stress"],
     },
     {
       icon: "ph:globe-hemisphere-west-fill",
-      title: "Overseas Client Support",
+      title: "Overseas Client Help",
       description:
-        "Living abroad? No worries. We offer dedicated services for overseas Pakistanis to buy, invest, and manage properties in DHA Islamabad with confidence.",
-      features: ["Remote Support", "Trusted Service", "Global Reach"],
+        "Living abroad? We make it easy to buy, sell, or invest in DHA Islamabad from anywhere in the world.",
+      features: ["Remote Support", "Trusted Team", "Easy Process"],
     },
   ];
 

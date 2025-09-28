@@ -34,25 +34,28 @@ const Categories = () => {
               Categories
             </p>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-52 mt-3 sm:mt-4 mb-2 font-medium leading-[1.2] text-dark dark:text-white">
-              Explore best properties with expert services.
+              Find the right property for you
             </h2>
             <p className="text-dark/50 dark:text-white/50 text-base sm:text-lg leading-[1.4] sm:leading-[1.3] max-w-full">
-              Discover a diverse range of premium properties, from luxurious
-              apartments to spacious villas, tailored to your needs
+              Explore houses, apartments, and plots in DHA Islamabad. Whether
+              you want to buy, sell, or invest, we make the process simple and
+              clear.
             </p>
             <Link
               href="/explore"
               className="inline-block py-3 sm:py-4 px-6 sm:px-8 bg-primary text-sm sm:text-base leading-4 text-white rounded-full font-semibold mt-6 sm:mt-8 hover:bg-dark duration-300 transition-colors"
             >
-              View properties
+              View Properties
             </Link>
           </div>
+
+          {/* Apartments */}
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
             <div className="relative rounded-2xl overflow-hidden group">
               <Link href="/residential-homes">
                 <Image
                   src="/images/categories/villas.jpg"
-                  alt="villas"
+                  alt="apartments"
                   width={680}
                   height={386}
                   className="w-full h-[350px] md:h-auto object-cover"
@@ -75,22 +78,24 @@ const Categories = () => {
                 </div>
                 <div className="flex flex-col gap-2 sm:gap-2.5">
                   <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-medium">
-                    Appartment
+                    Apartments
                   </h3>
                   <p className="text-white/80 text-sm sm:text-base leading-5 sm:leading-6">
-                    Experience elegance and comfort with our exclusive luxury
-                    villas, designed for sophisticated living.
+                    Modern apartments in prime DHA locations, perfect for small
+                    families or smart investments.
                   </p>
                 </div>
               </Link>
             </div>
           </div>
+
+          {/* Plots */}
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
             <div className="relative rounded-2xl overflow-hidden group">
               <Link href="/explore?type=plots">
                 <Image
                   src="/images/categories/plots.png"
-                  alt="villas"
+                  alt="plots"
                   width={680}
                   height={386}
                   className="w-full h-[350px] md:h-auto object-cover"
@@ -116,19 +121,21 @@ const Categories = () => {
                     Plots
                   </h3>
                   <p className="text-white/80 text-sm sm:text-base leading-5 sm:leading-6">
-                    Experience elegance and comfort with our exclusive luxury
-                    villas, designed for sophisticated living.
+                    Secure your future with residential and commercial plots in
+                    top DHA phases.
                   </p>
                 </div>
               </Link>
             </div>
-          </div>{" "}
+          </div>
+
+          {/* Explore All */}
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0 hidden md:block">
             <div className="relative rounded-2xl overflow-hidden group">
               <Link href="/explore">
                 <Image
                   src="/images/categories/building.png"
-                  alt="villas"
+                  alt="explore all"
                   width={680}
                   height={386}
                   className="w-full h-[350px] md:h-auto object-cover"
@@ -151,10 +158,11 @@ const Categories = () => {
                 </div>
                 <div className="flex flex-col gap-2 sm:gap-2.5">
                   <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-medium">
-                    Explore All.{" "}
+                    Explore All
                   </h3>
                   <p className="text-white/80 text-sm sm:text-base leading-5 sm:leading-6">
-                    See all the available properties and find your dream home
+                    Browse all available listings and find the property that
+                    matches your needs.
                   </p>
                 </div>
               </Link>

@@ -28,17 +28,16 @@ const Hero: React.FC = () => {
             <div className="space-y-8">
               <div className="space-y-6">
                 <h1 className="text-6xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.9] tracking-tight text-balance">
-                  Live{" "}
+                  Your Dream{" "}
                   <span className="bg-primary bg-clip-text text-transparent">
-                    Luxury
+                    Home
                   </span>
                   .
                 </h1>
                 <p className="text-lg sm:text-xl lg:text-2xl text-white/90 leading-relaxed max-w-2xl text-pretty font-light">
-                  Discover exclusive plots and luxury apartments in DHA
-                  Islamabad with Arham Real Estate. Secure investments, modern
-                  living, and timeless elegance all in one prestigious
-                  community.
+                  At Arham Real Estate, we help you buy, sell, or rent houses
+                  and plots in DHA Islamabad. Simple process, honest advice, and
+                  the right place for your family or investment.
                 </p>
               </div>
 
@@ -65,15 +64,15 @@ const Hero: React.FC = () => {
                 <div className="grid grid-cols-2 gap-8">
                   <div className="text-center space-y-2">
                     <p className="text-3xl lg:text-4xl font-bold text-white">
-                      500+
+                      100+
                     </p>
                     <p className="text-sm lg:text-base text-white/70 font-medium">
-                      Premium Properties
+                      Properties
                     </p>
                   </div>
                   <div className="text-center space-y-2">
                     <p className="text-3xl lg:text-4xl font-bold text-white">
-                      $2.5B+
+                      $2.5K+
                     </p>
                     <p className="text-sm lg:text-base text-white/70 font-medium">
                       Properties Sold
@@ -81,7 +80,7 @@ const Hero: React.FC = () => {
                   </div>
                   <div className="text-center space-y-2">
                     <p className="text-3xl lg:text-4xl font-bold text-white">
-                      15+
+                      7+
                     </p>
                     <p className="text-sm lg:text-base text-white/70 font-medium">
                       Years Experience

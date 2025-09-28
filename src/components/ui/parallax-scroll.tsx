@@ -46,11 +46,13 @@ export const ParallaxScroll = ({
   const translateSecond = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const translateThird = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
-  const third = Math.ceil(properties.length / 3);
+  const parts = isLessColls ? 3 : 4;
+  const chunkSize = Math.ceil(properties.length / parts);
 
-  const firstPart = properties.slice(0, third);
-  const secondPart = properties.slice(third, 2 * third);
-  const thirdPart = properties.slice(2 * third);
+  const firstPart = properties.slice(0, chunkSize);
+  const secondPart = properties.slice(chunkSize, 2 * chunkSize);
+  const thirdPart = properties.slice(2 * chunkSize, 3 * chunkSize);
+  const fourthPart = !isLessColls ? properties.slice(3 * chunkSize) : [];
 
   const handleClick = (slug: string) => {
     router.push(`/properties/${slug}`);
@@ -201,7 +203,7 @@ export const ParallaxScroll = ({
         {/* Fourth Part */}
         {!isLessColls && (
           <div className="grid gap-10 md:-mt-16 ">
-            {secondPart.map((property, idx) => (
+            {fourthPart.map((property, idx) => (
               <motion.div
                 onClick={() => handleClick(property.slug)}
                 style={{ y: isSmallScreen ? translateFirst : translateSecond }}

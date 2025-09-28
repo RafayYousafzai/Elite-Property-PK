@@ -8,6 +8,7 @@ import { testimonials } from "@/app/api/testimonial";
 import Link from "next/link";
 import Image from "next/image";
 import ImageCarousel from "@/components/shared/ImageCarousel";
+import GoogleMap from "@/components/shared/GoogleMap";
 
 export default function Details() {
   const { id } = useParams();
@@ -226,19 +227,10 @@ export default function Details() {
                 </div>
               ) : (
                 <p className="text-dark dark:text-white text-xm ">
-                  Nestled in the heart of miami, the modern luxe villa at 20 s
-                  aurora ave offers a perfect blend of contemporary elegance and
-                  smart-home innovation. priced at $570000, this 560 ft²
-                  residence features 4 spacious bedrooms, 3 luxurious bathrooms,
-                  and expansive living areas designed for comfort and style.
-                  built in 2025, the home boasts energy-efficient systems,
-                  abundant natural light, and state-of-the-art security
-                  features. outdoor spaces include two stylish bar areas,
-                  perfect for entertaining 8+ guests. enjoy the ultimate in
-                  modern living with premium amenities and a prime location.
+                  Description not available.
                 </p>
               )}
-              <p className="text-dark dark:text-white text-xm ">
+              {/* <p className="text-dark dark:text-white text-xm ">
                 Step inside to discover an open-concept layout that seamlessly
                 connects the kitchen, dining, and living spaces. the gourmet
                 kitchen is equipped with top-of-the-line appliances, sleek
@@ -259,7 +251,7 @@ export default function Details() {
                 Outdoor living is equally impressive, with a beautifully
                 landscaped backyard, multiple lounge areas, and two fully
                 equipped bar spaces.
-              </p>
+              </p> */}
             </div>
             <div className="py-8 mt-8 border-t border-dark/5 dark:border-white/15">
               <h3 className="text-xl font-medium">What this property offers</h3>
@@ -332,14 +324,19 @@ export default function Details() {
                 </div>
               </div>
             </div>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d938779.7831767448!2d71.05098621661072!3d23.20271516446136!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e82dd003ff749%3A0x359e803f537cea25!2sGANESH%20GLORY%2C%20Gota%2C%20Ahmedabad%2C%20Gujarat%20382481!5e0!3m2!1sen!2sin!4v1715676641521!5m2!1sen!2sin"
-              width="1114"
-              height="400"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="rounded-2xl w-full"
-            ></iframe>
+            {property?.location ? (
+              <GoogleMap
+                address={property.location}
+                height="400"
+                className="w-full"
+              />
+            ) : (
+              <div className="w-full h-[400px] bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center">
+                <p className="text-gray-500 dark:text-gray-400">
+                  Location not available
+                </p>
+              </div>
+            )}
           </div>
           <div className="lg:col-span-4 col-span-12">
             <div className="bg-primary/10 p-8 rounded-2xl relative z-10 overflow-hidden md:mt-8">
