@@ -106,7 +106,7 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden">
                 <Image
-                  src={property.images[0].src}
+                  src={property.images[0]}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
@@ -141,7 +141,7 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden">
                 <Image
-                  src={property.images[0].src}
+                  src={property.images[0]}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
@@ -176,7 +176,7 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden">
                 <Image
-                  src={property.images[0].src}
+                  src={property.images[0]}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
@@ -212,7 +212,7 @@ export const ParallaxScroll = ({
               >
                 <div className="relative overflow-hidden">
                   <Image
-                    src={property.images[0].src}
+                    src={property.images[0]}
                     className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                     height="400"
                     width="400"

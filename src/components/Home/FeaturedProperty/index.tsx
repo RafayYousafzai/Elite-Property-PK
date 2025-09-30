@@ -120,7 +120,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                   currentProperty.images.map((image, index) => (
                     <CarouselItem key={index}>
                       <Image
-                        src={image.src}
+                        src={image}
                         alt={currentProperty.name}
                         width={680}
                         height={530}
