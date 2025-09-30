@@ -1,20 +1,21 @@
 "use client";
 
 import DashboardLayout from "@/components/Admin/DashboardLayout";
-import LocationAutocomplete from "@/components/shared/LocationAutocomplete";
+// import PropertyForm, {
+//   PropertyFormData,
+// } from "@/components/Admin/PropertyForm";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import {
-  PhotoIcon,
-  PlusIcon,
-  XMarkIcon,
-  LinkIcon,
   CloudArrowUpIcon,
-  HomeIcon,
   PencilIcon,
+  PhotoIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { LinkIcon } from "lucide-react";
+import Image from "next/image";
+import LocationAutocomplete from "@/components/shared/LocationAutocomplete";
 
 interface PropertyImage {
   src: string;
@@ -106,10 +107,11 @@ export default function EditPropertyPage() {
     setFormData((prev) => ({
       ...prev,
       name,
-      slug: name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, ""),
+      slug:
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "") + Math.random().toString(36).substring(2, 8),
     }));
   };
 
@@ -572,6 +574,7 @@ export default function EditPropertyPage() {
                       className="w-full h-24 object-cover rounded-lg"
                       width={96}
                       height={96}
+                      unoptimized
                     />
                     <button
                       type="button"
