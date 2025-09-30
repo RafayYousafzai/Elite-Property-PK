@@ -19,7 +19,7 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
                 alt={name}
                 width={440}
                 height={300}
-                className="w-full rounded-t-2xl group-hover:brightness-50 group-hover:scale-125 transition duration-300 delay-75"
+                className="w-full h-72 object-cover rounded-t-2xl group-hover:brightness-50 group-hover:scale-125 transition duration-300 delay-75"
                 unoptimized={true}
               />
             )}
