@@ -26,7 +26,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   };
 
   const lightboxSlides = images.map((image) => ({
-    src: image.src,
+    src: image,
   }));
 
   const renderImageGrid = () => {
@@ -40,7 +40,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
               onClick={() => openLightbox(0)}
             >
               <Image
-                src={images[0].src}
+                src={images[0]}
                 alt="Main Property Image"
                 width={400}
                 height={500}
@@ -59,7 +59,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
               onClick={() => openLightbox(1)}
             >
               <Image
-                src={images[1].src}
+                src={images[1]}
                 alt="Property Image 2"
                 width={400}
                 height={500}
@@ -78,7 +78,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
               onClick={() => openLightbox(2)}
             >
               <Image
-                src={images[2].src}
+                src={images[2]}
                 alt="Property Image 3"
                 width={400}
                 height={500}
@@ -97,7 +97,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
               onClick={() => openLightbox(3)}
             >
               <Image
-                src={images[3].src}
+                src={images[3]}
                 alt="Property Image 4"
                 width={400}
                 height={500}

@@ -206,7 +206,7 @@ export default function PropertyForm({
           const uploadedUrl = await uploadImageToStorage(image.file);
           uploadedImageUrls.push(uploadedUrl);
         } else if (image.type === "url") {
-          uploadedImageUrls.push(image.src);
+          uploadedImageUrls.push(image);
         }
       }
 
@@ -637,7 +637,7 @@ export default function PropertyForm({
                 <div key={index} className="relative group">
                   <div className="relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
                     <Image
-                      src={image.src}
+                      src={image}
                       alt={`Property image ${index + 1}`}
                       className="w-full h-24 object-cover group-hover:scale-110 transition-transform duration-200"
                       width={96}

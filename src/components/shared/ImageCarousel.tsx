@@ -59,7 +59,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   };
 
   const lightboxSlides = images.map((image) => ({
-    src: image.src,
+    src: image,
   }));
 
   if (!images || images.length === 0) {
@@ -138,7 +138,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
               onClick={() => openLightbox(currentIndex)}
             >
               <Image
-                src={images[currentIndex].src}
+                src={images[currentIndex]}
                 alt={`Property Image ${currentIndex + 1}`}
                 width={800}
                 height={500}
@@ -207,7 +207,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                     }`}
                   >
                     <Image
-                      src={image.src}
+                      src={image}
                       alt={`Thumbnail ${index + 1}`}
                       width={80}
                       height={60}

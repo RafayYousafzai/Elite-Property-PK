@@ -20,7 +20,7 @@ export default function PropertyCard({ property, type }: PropertyCardProps) {
       <div className="relative overflow-hidden">
         <Image
           src={
-            property.images[0]?.src ||
+            property.images[0] ||
             "/placeholder.svg?height=250&width=400&query=luxury property"
           }
           alt={property.name}
