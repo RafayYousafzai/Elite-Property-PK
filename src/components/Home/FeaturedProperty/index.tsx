@@ -300,7 +300,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
               </Link>
               <div>
                 <h4 className="text-3xl text-dark dark:text-white font-medium">
-                  {currentProperty.rate}
+                  Rs. {currentProperty.rate}
                 </h4>
                 <p className="text-base text-dark/50">Discounted price</p>
               </div>

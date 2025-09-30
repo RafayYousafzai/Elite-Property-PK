@@ -341,7 +341,7 @@ export default function Details() {
           <div className="lg:col-span-4 col-span-12">
             <div className="bg-primary/10 p-8 rounded-2xl relative z-10 overflow-hidden md:mt-8">
               <h4 className="text-dark text-3xl font-medium dark:text-white">
-                {property?.rate}
+                Rs. {property?.rate}
               </h4>
               <p className="text-sm text-dark/50 dark:text-white">
                 Discounted Price
