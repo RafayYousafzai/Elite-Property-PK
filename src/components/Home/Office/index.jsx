@@ -76,7 +76,7 @@ const LocationMap = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold text-gray-900">
-                      Homely Real Estate
+                      Elite Property Real Estate
                     </h4>
                     <p className="text-sm text-gray-600">
                       Premium Property Solutions

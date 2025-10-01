@@ -141,7 +141,7 @@ const Header: React.FC = () => {
                     : "text-dark dark:text-white"
                 }`}
               >
-                Homely
+                Elite Property
               </h1>
             </Link>
           </div>

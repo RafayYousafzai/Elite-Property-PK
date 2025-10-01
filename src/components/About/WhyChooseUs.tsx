@@ -90,7 +90,9 @@ const WhyChooseUs = () => {
         <div className="text-center mb-20 animate-fade-in">
           <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-6 border border-white/20">
             <Icon icon="ph:lightning-fill" className="text-2xl text-primary" />
-            <span className="text-white font-semibold">Why Choose Homely</span>
+            <span className="text-white font-semibold">
+              Why Choose Elite Property
+            </span>
           </div>
           <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6">
             Unmatched Excellence in

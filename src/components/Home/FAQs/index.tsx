@@ -31,7 +31,7 @@ const FAQ: React.FC = () => {
               FAQs
             </p>
             <h2 className="lg:text-52 text-40 leading-[1.2] font-medium text-dark dark:text-white">
-              Everything about Homely homes
+              Everything about Elite Property homes
             </h2>
             <p className="text-dark/50 dark:text-white/50 pr-20">
               We know that buying, selling, or investing in real estate can be
@@ -47,7 +47,7 @@ const FAQ: React.FC = () => {
               >
                 <AccordionItem value="item-1">
                   <AccordionTrigger>
-                    1. Can I personalize my homely home?
+                    1. Can I personalize my Elite Property home?
                   </AccordionTrigger>
                   <AccordionContent>
                     Discover a diverse range of premium properties, from
@@ -57,7 +57,7 @@ const FAQ: React.FC = () => {
                 </AccordionItem>
                 <AccordionItem value="item-2">
                   <AccordionTrigger>
-                    2. Where can I find homely homes?
+                    2. Where can I find Elite Property homes?
                   </AccordionTrigger>
                   <AccordionContent>
                     Discover a diverse range of premium properties, from
@@ -67,7 +67,7 @@ const FAQ: React.FC = () => {
                 </AccordionItem>
                 <AccordionItem value="item-3">
                   <AccordionTrigger>
-                    3. What steps to buy a homely?
+                    3. What steps to buy a Elite Property?
                   </AccordionTrigger>
                   <AccordionContent>
                     Discover a diverse range of premium properties, from

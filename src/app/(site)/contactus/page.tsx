@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import LocationMap from "@/components/Home/Office";
 export const metadata: Metadata = {
-  title: "Contact Us | Homely",
+  title: "Contact Us | Elite Property",
 };
 
 export default function ContactUs() {
