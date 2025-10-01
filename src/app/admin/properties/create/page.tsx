@@ -4,10 +4,10 @@ import DashboardLayout from "@/components/Admin/DashboardLayout";
 import PropertyForm, {
   PropertyFormData,
 } from "@/components/Admin/PropertyForm";
-import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HomeIcon } from "@heroicons/react/24/outline";
+import { createProperty } from "../actions";
 
 // Force dynamic rendering for admin pages
 export const dynamic = "force-dynamic";
@@ -17,7 +17,6 @@ export default function CreatePropertyPage() {
   const [error, setError] = useState("");
 
   const router = useRouter();
-  const supabase = createClient();
 
   const handleSubmit = async (
     formData: PropertyFormData,
@@ -30,10 +29,14 @@ export default function CreatePropertyPage() {
       // Prepare data for database - store only image URLs
       const propertyData = {
         name: formData.name,
-        slug: formData.slug + Math.random().toString(36).substring(2, 8), // Ensure unique slug
+        slug: formData.slug,
         location: formData.location,
         rate: formData.rate,
         area: formData.area,
+        area_sqft: formData.area_sqft,
+        area_sqyards: formData.area_sqyards,
+        area_marla: formData.area_marla,
+        area_kanal: formData.area_kanal,
         beds: formData.beds,
         baths: formData.baths,
         photo_sphere: formData.photo_sphere,
@@ -43,15 +46,13 @@ export default function CreatePropertyPage() {
         is_featured: formData.is_featured,
       };
 
-      const { error } = await supabase
-        .from("properties")
-        .insert([propertyData])
-        .select();
+      const result = await createProperty(propertyData);
 
-      if (error) {
-        setError(error.message);
+      if (!result.success) {
+        setError(result.error || "Failed to create property");
       } else {
         router.push("/admin/properties");
+        router.refresh();
       }
     } catch {
       setError("An unexpected error occurred");

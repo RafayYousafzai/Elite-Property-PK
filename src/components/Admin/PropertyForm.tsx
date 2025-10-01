@@ -24,6 +24,10 @@ export interface PropertyFormData {
   location: string;
   rate: string;
   area: number;
+  area_sqft?: number;
+  area_sqyards?: number;
+  area_marla?: number;
+  area_kanal?: number;
   beds?: number;
   baths?: number;
   photo_sphere?: string;
@@ -57,6 +61,10 @@ export default function PropertyForm({
     location: "",
     rate: "",
     area: 0,
+    area_sqft: undefined,
+    area_sqyards: undefined,
+    area_marla: undefined,
+    area_kanal: undefined,
     beds: undefined,
     baths: undefined,
     photo_sphere: "",
@@ -206,7 +214,7 @@ export default function PropertyForm({
           const uploadedUrl = await uploadImageToStorage(image.file);
           uploadedImageUrls.push(uploadedUrl);
         } else if (image.type === "url") {
-          uploadedImageUrls.push(image);
+          uploadedImageUrls.push(image.src);
         }
       }
 
@@ -324,6 +332,81 @@ export default function PropertyForm({
             }
             placeholder="Enter area in sq ft"
           />
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Primary area measurement (required)
+          </p>
+        </div>
+
+        {/* Additional Area Units */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            Additional Area Units (Optional)
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                Square Yards
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                value={formData.area_sqyards || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    area_sqyards: parseFloat(e.target.value) || undefined,
+                  }))
+                }
+                placeholder="0"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                Marla
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                value={formData.area_marla || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    area_marla: parseFloat(e.target.value) || undefined,
+                  }))
+                }
+                placeholder="0"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                Kanal
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                value={formData.area_kanal || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    area_kanal: parseFloat(e.target.value) || undefined,
+                  }))
+                }
+                placeholder="0"
+              />
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            💡 Conversion reference: 1 Kanal = 20 Marla = 5,445 sq ft | 1 Marla
+            = 272.25 sq ft = 30.25 sq yards
+          </p>
         </div>
 
         <div>
@@ -636,13 +719,23 @@ export default function PropertyForm({
               {formData.images.map((image, index) => (
                 <div key={index} className="relative group">
                   <div className="relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
-                    <Image
-                      src={image}
-                      alt={`Property image ${index + 1}`}
-                      className="w-full h-24 object-cover group-hover:scale-110 transition-transform duration-200"
-                      width={96}
-                      height={96}
-                    />
+                    {image.type === "file" && image.src.startsWith("data:") ? (
+                      // Use regular img tag for base64 data URLs (preview before upload)
+                      <img
+                        src={image.src}
+                        alt={`Property image ${index + 1}`}
+                        className="w-full h-24 object-cover group-hover:scale-110 transition-transform duration-200"
+                      />
+                    ) : (
+                      // Use Next.js Image component for actual URLs
+                      <Image
+                        src={image.src}
+                        alt={`Property image ${index + 1}`}
+                        className="w-full h-24 object-cover group-hover:scale-110 transition-transform duration-200"
+                        width={96}
+                        height={96}
+                      />
+                    )}
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200"></div>
                     <button
                       type="button"

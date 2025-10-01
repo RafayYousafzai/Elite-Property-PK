@@ -49,6 +49,13 @@ export default function PropertiesList({
     );
   };
 
+  const handleDeleteProperty = (propertyId: string) => {
+    // Remove the property from the local state immediately for instant UI update
+    setProperties((prev) =>
+      prev.filter((property) => property.id !== propertyId)
+    );
+  };
+
   const getPropertyTypeIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case "house":
@@ -93,7 +100,7 @@ export default function PropertiesList({
                         <Image
                           className="h-20 w-20 lg:h-24 lg:w-24 rounded-xl object-cover ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-500 transition-all duration-200"
                           src={
-                            property.images[0] ||
+                            property.images[0]?.src ||
                             "/images/properties/property1/image-2.jpg"
                           }
                           alt={property.name}
@@ -189,7 +196,10 @@ export default function PropertiesList({
                     Edit
                   </Link>
 
-                  <DeletePropertyButton propertyId={property.id} />
+                  <DeletePropertyButton
+                    propertyId={property.id}
+                    onDelete={() => handleDeleteProperty(property.id)}
+                  />
                 </div>
               </div>
             </div>

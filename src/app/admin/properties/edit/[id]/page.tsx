@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { PencilIcon } from "@heroicons/react/24/outline";
+import { updateProperty } from "../../actions";
 
 // Force dynamic rendering for admin pages
 export const dynamic = "force-dynamic";
@@ -49,6 +50,10 @@ export default function EditPropertyPage() {
             location: data.location || "",
             rate: data.rate || "",
             area: data.area || 0,
+            area_sqft: data.area_sqft,
+            area_sqyards: data.area_sqyards,
+            area_marla: data.area_marla,
+            area_kanal: data.area_kanal,
             beds: data.beds,
             baths: data.baths,
             photo_sphere: data.photo_sphere || "",
@@ -85,6 +90,10 @@ export default function EditPropertyPage() {
         location: formData.location,
         rate: formData.rate,
         area: formData.area,
+        area_sqft: formData.area_sqft,
+        area_sqyards: formData.area_sqyards,
+        area_marla: formData.area_marla,
+        area_kanal: formData.area_kanal,
         beds: formData.beds,
         baths: formData.baths,
         photo_sphere: formData.photo_sphere,
@@ -94,15 +103,13 @@ export default function EditPropertyPage() {
         is_featured: formData.is_featured,
       };
 
-      const { error } = await supabase
-        .from("properties")
-        .update(propertyData)
-        .eq("id", propertyId);
+      const result = await updateProperty(propertyId, propertyData);
 
-      if (error) {
-        setError(error.message);
+      if (!result.success) {
+        setError(result.error || "Failed to update property");
       } else {
         router.push("/admin/properties");
+        router.refresh();
       }
     } catch {
       setError("An unexpected error occurred");

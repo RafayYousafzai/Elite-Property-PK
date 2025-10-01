@@ -1,35 +1,38 @@
 "use client";
 
-import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { deleteProperty } from "@/app/admin/properties/actions";
 
 interface DeletePropertyButtonProps {
   propertyId: string;
+  onDelete?: () => void;
 }
 
 export default function DeletePropertyButton({
   propertyId,
+  onDelete,
 }: DeletePropertyButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
   const handleDelete = async () => {
     setIsDeleting(true);
 
     try {
-      const { error } = await supabase
-        .from("properties")
-        .delete()
-        .eq("id", propertyId);
+      const result = await deleteProperty(propertyId);
 
-      if (error) {
-        console.error("Error deleting property:", error);
-        alert("Error deleting property");
+      if (!result.success) {
+        console.error("Error deleting property:", result.error);
+        alert(result.error || "Error deleting property");
       } else {
+        // Call the onDelete callback to update parent component state
+        if (onDelete) {
+          onDelete();
+        }
+        // Also refresh the router to update server-side data
         router.refresh();
       }
     } catch (error) {
