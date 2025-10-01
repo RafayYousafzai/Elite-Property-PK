@@ -6,6 +6,10 @@ export type Property = {
   rate: string;
   images: PropertyImage[];
   area: number;
+  area_sqft?: number | null;
+  area_sqyards?: number | null;
+  area_marla?: number | null;
+  area_kanal?: number | null;
   beds?: number | null; // Only for homes
   baths?: number | null; // Only for homes
   photo_sphere?: string | null; // Optional for all
@@ -24,6 +28,10 @@ export type DatabaseProperty = {
   location: string;
   rate: string;
   area: number;
+  area_sqft?: number | null;
+  area_sqyards?: number | null;
+  area_marla?: number | null;
+  area_kanal?: number | null;
   beds: number | null;
   baths: number | null;
   photo_sphere: string | null;

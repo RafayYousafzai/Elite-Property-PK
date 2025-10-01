@@ -26,6 +26,8 @@ export default function Details() {
 
       try {
         const propertyData = await getPropertyBySlug(id);
+        console.log(propertyData);
+
         if (propertyData) {
           setProperty(propertyData);
         } else {
@@ -99,7 +101,7 @@ export default function Details() {
           </div>
           {property?.beds && property?.baths && property?.area && (
             <div className="lg:col-span-4 col-span-12">
-              <div className="flex">
+              <div className="flex flex-wrap gap-4">
                 <div className="flex flex-col gap-2 border-e border-black/10 dark:border-white/20 pr-2 xs:pr-4 mobile:pr-8">
                   <Icon icon={"solar:bed-linear"} width={20} height={20} />
                   <p className="text-sm mobile:text-base font-normal text-black dark:text-white">
@@ -119,7 +121,7 @@ export default function Details() {
                     height={20}
                   />
                   <p className="text-sm mobile:text-base font-normal text-black dark:text-white">
-                    {property?.area}m<sup>2</sup>
+                    {property?.area} sq ft
                   </p>
                 </div>
               </div>
@@ -220,6 +222,89 @@ export default function Details() {
                 </div>
               </div>
             </div>
+
+            {/* Area Details Section */}
+            <div className="py-8 my-8 border-y border-dark/10 dark:border-white/20">
+              <h3 className="text-xl font-medium mb-6">Area Measurements</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {property?.area && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Icon
+                        icon="mdi:ruler-square"
+                        width={20}
+                        height={20}
+                        className="text-primary"
+                      />
+                      <p className="text-sm text-dark/50 dark:text-white/50">
+                        Square Feet
+                      </p>
+                    </div>
+                    <p className="text-lg font-semibold text-dark dark:text-white">
+                      {property.area.toLocaleString()} sq ft
+                    </p>
+                  </div>
+                )}
+
+                {property?.area_sqyards && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Icon
+                        icon="mdi:square-outline"
+                        width={20}
+                        height={20}
+                        className="text-primary"
+                      />
+                      <p className="text-sm text-dark/50 dark:text-white/50">
+                        Square Yards
+                      </p>
+                    </div>
+                    <p className="text-lg font-semibold text-dark dark:text-white">
+                      {property.area_sqyards.toLocaleString()} sq yd
+                    </p>
+                  </div>
+                )}
+
+                {property?.area_marla && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Icon
+                        icon="mdi:land-plots"
+                        width={20}
+                        height={20}
+                        className="text-primary"
+                      />
+                      <p className="text-sm text-dark/50 dark:text-white/50">
+                        Marla
+                      </p>
+                    </div>
+                    <p className="text-lg font-semibold text-dark dark:text-white">
+                      {property.area_marla.toLocaleString()} Marla
+                    </p>
+                  </div>
+                )}
+
+                {property?.area_kanal && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Icon
+                        icon="mdi:land-fields"
+                        width={20}
+                        height={20}
+                        className="text-primary"
+                      />
+                      <p className="text-sm text-dark/50 dark:text-white/50">
+                        Kanal
+                      </p>
+                    </div>
+                    <p className="text-lg font-semibold text-dark dark:text-white">
+                      {property.area_kanal.toLocaleString()} Kanal
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex flex-col gap-5">
               {property?.description ? (
                 <div className="text-dark dark:text-white text-xm whitespace-pre-line">
