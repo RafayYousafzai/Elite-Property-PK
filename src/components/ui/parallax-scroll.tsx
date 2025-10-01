@@ -78,14 +78,14 @@ export const ParallaxScroll = ({
               />
             </span>
             <p className="text-base font-semibold text-dark/75 dark:text-white/75">
-              Apartments
+              Featured Properties
             </p>
           </div>
           <h2 className="text-40 lg:text-52 font-medium text-black dark:text-white text-center tracking-tight leading-11 mb-2">
-            Discover inspiring designed apartments.
+            Inspiring designed homes & apartments.
           </h2>
           <p className="text-xm font-normal text-black/50 dark:text-white/50 text-center">
-            Curated apartments where elegance, style, and comfort unite.
+            Curated homes & apartments where elegance, style, and comfort unite.
           </p>
         </div>
       )}

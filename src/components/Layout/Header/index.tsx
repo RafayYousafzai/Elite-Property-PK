@@ -132,7 +132,17 @@ const Header: React.FC = () => {
                     : "dark:block hidden"
                 }`}
               /> */}
-              <h1
+
+              <Image
+                src={"/elite-logo-brown.png"}
+                alt="logo"
+                width={600}
+                height={600}
+                unoptimized={true}
+                className={`h-[60px] w-auto object-contain sm:w-32 md:w-40  `}
+              />
+
+              {/* <h1
                 className={`text-3xl font-semibold mt-2 ${
                   isHomepage
                     ? sticky
@@ -141,8 +151,8 @@ const Header: React.FC = () => {
                     : "text-dark dark:text-white"
                 }`}
               >
-                Elite Property
-              </h1>
+                Homely
+              </h1> */}
             </Link>
           </div>
 

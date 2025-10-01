@@ -33,12 +33,6 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
     });
   }, [api]);
 
-  const handleDotClick = (index: number) => {
-    if (api) {
-      api.scrollTo(index);
-    }
-  };
-
   // If no properties, show fallback message
   if (!properties || properties.length === 0) {
     return (
@@ -91,7 +85,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
               </div>
             </div>
           )}
-          <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white">
+          <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white line-clamp-2">
             {currentProperty.name}
           </h2>
 
@@ -120,7 +114,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                   currentProperty.images.map((image, index) => (
                     <CarouselItem key={index}>
                       <Image
-                        src={image}
+                        src={typeof image === "string" ? image : image.src}
                         alt={currentProperty.name}
                         width={680}
                         height={530}
@@ -141,17 +135,13 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                 )}
               </CarouselContent>
             </Carousel>
-            <div className="absolute left-2/5 bg-dark/50 rounded-2xl py-2.5 bottom-10 flex justify-center mt-4 gap-2.5 px-2.5">
-              {Array.from({ length: count }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleDotClick(index)}
-                  className={`w-2.5 h-2.5 rounded-2xl ${
-                    current === index + 1 ? "bg-white" : "bg-white/50"
-                  }`}
-                />
-              ))}
-            </div>
+            {count > 0 && (
+              <div className="absolute left-1/2 transform -translate-x-1/2 bg-dark/70 rounded-full py-2 px-4 bottom-6">
+                <p className="text-white text-sm font-medium">
+                  {current} / {count}
+                </p>
+              </div>
+            )}
           </div>
           <div className="flex flex-col gap-10">
             <div className="md:block hidden ">
@@ -182,7 +172,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                   </div>
                 </div>
               )}
-              <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white">
+              <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white line-clamp-2">
                 {currentProperty.name}
               </h2>
               <div className="flex items-center gap-2.5">
@@ -197,7 +187,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                 </p>
               </div>
             </div>
-            <p className="text-base text-dark/50 dark:text-white/50">
+            <p className="text-base text-dark/50 dark:text-white/50 line-clamp-3">
               {currentProperty.description ||
                 `Experience luxury living at ${currentProperty.name}, located at ${currentProperty.location}. This ${currentProperty.area} ft² ${currentProperty.property_type} offers modern amenities and spacious living areas.`}
             </p>
