@@ -1,197 +1,148 @@
 "use client";
 
-import LocationAutocomplete from "@/components/shared/LocationAutocomplete";
-import { createClient } from "@/utils/supabase/client";
+import type React from "react";
 import { useState } from "react";
-import Image from "next/image";
 import {
-  PhotoIcon,
-  PlusIcon,
-  XMarkIcon,
-  LinkIcon,
-  CloudArrowUpIcon,
-} from "@heroicons/react/24/outline";
+  Button,
+  Input,
+  Textarea,
+  RadioGroup,
+  Radio,
+  Tabs,
+  Tab,
+  Select,
+  SelectItem,
+  Switch,
+  Chip,
+  Card,
+  CardBody,
+  Image,
+} from "@heroui/react";
+import { Upload, X, Plus } from "lucide-react";
+import LocationAutocomplete from "../shared/LocationAutocomplete";
+import FeaturesAmenitiesModal from "./features-amenities-modal";
 
-interface PropertyImage {
-  src: string;
-  type?: "url" | "file";
-  file?: File;
-}
-
-export interface PropertyFormData {
-  name: string;
-  slug: string;
+interface PropertyFormData {
+  purpose: "Sell" | "Rent";
+  propertyType: string;
+  propertyCategory: "Home" | "Plots" | "Commercial";
+  city: string;
   location: string;
-  rate: string;
-  area: number;
-  area_sqft?: number;
-  area_sqyards?: number;
-  area_marla?: number;
-  area_kanal?: number;
-  beds?: number;
-  baths?: number;
-  photo_sphere?: string;
-  property_type: "house" | "apartment" | "plot";
-  images: PropertyImage[];
-  description?: string;
-  is_featured: boolean;
-  sphereFile?: File; // Add this for 360 image file
+  areaSize: number;
+  areaUnit: "Marla" | "Sq Ft" | "Sq Yd" | "Kanal";
+  price: string;
+  installmentAvailable: boolean;
+  advanceAmount?: number;
+  noOfInstallments?: number;
+  monthlyInstallments?: number;
+  bedrooms?: string;
+  bathrooms?: string;
+  amenities: Record<string, string | number | boolean>;
+  title: string;
+  description: string;
+  images: File[];
+  videoUrl: string;
 }
 
-interface PropertyFormProps {
-  initialData?: Partial<PropertyFormData>;
-  onSubmit: (data: PropertyFormData, uploadedImages: string[]) => Promise<void>;
-  submitLabel: string;
-  loading: boolean;
-  error: string;
-  onCancel?: () => void;
-}
+const propertyTypes = {
+  Home: [
+    "House",
+    "Flat",
+    "Upper Portion",
+    "Lower Portion",
+    "Farm House",
+    "Room",
+    "Penthouse",
+  ],
+  Plots: [
+    "Residential Plot",
+    "Commercial Plot",
+    "Agricultural Land",
+    "Industrial Land",
+    "Plot File",
+    "Plot Form",
+  ],
+  Commercial: ["Office", "Shop", "Warehouse", "Factory", "Building", "Other"],
+};
 
-export default function PropertyForm({
-  initialData,
-  onSubmit,
-  submitLabel,
-  loading,
-  error,
-  onCancel,
-}: PropertyFormProps) {
+const cities = [
+  "Karachi",
+  "Lahore",
+  "Islamabad",
+  "Rawalpindi",
+  "Faisalabad",
+  "Multan",
+  "Peshawar",
+  "Quetta",
+];
+const locations = [
+  "DHA Phase 5",
+  "Bahria Town",
+  "Gulberg",
+  "Model Town",
+  "Clifton",
+  "F-7",
+  "G-11",
+];
+const bedroomOptions = [
+  "Studio",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "10+",
+];
+const bathroomOptions = ["1", "2", "3", "4", "5", "6", "6+"];
+const commonAmenities = [
+  "Parking",
+  "Electricity Backup",
+  "Waste Disposal",
+  "Elevator",
+  "Security Staff",
+  "CCTV Security",
+  "Lawn",
+  "Garden",
+  "Swimming Pool",
+  "Gym",
+];
+
+export default function PropertyForm() {
   const [formData, setFormData] = useState<PropertyFormData>({
-    name: "",
-    slug: "",
+    purpose: "Sell",
+    propertyType: "",
+    propertyCategory: "Home",
+    city: "",
     location: "",
-    rate: "",
-    area: 0,
-    area_sqft: undefined,
-    area_sqyards: undefined,
-    area_marla: undefined,
-    area_kanal: undefined,
-    beds: undefined,
-    baths: undefined,
-    photo_sphere: "",
-    property_type: "house",
-    images: [],
+    areaSize: 0,
+    areaUnit: "Marla",
+    price: "",
+    installmentAvailable: false,
+    amenities: {},
+    title: "",
     description: "",
-    is_featured: false,
-    ...initialData,
+    images: [],
+    videoUrl: "",
   });
 
-  const [imageInput, setImageInput] = useState("");
-  const [imageInputType, setImageInputType] = useState<"url" | "file">("url");
-  const [sphereInputType, setSphereInputType] = useState<"url" | "file">("url");
-  const [uploading, setUploading] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
-  const supabase = createClient();
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setFormData((prev) => ({ ...prev, images: [...prev.images, ...files] }));
 
-  // Auto-generate slug from name
-  const handleNameChange = (name: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      name,
-      slug: name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, ""),
-    }));
-  };
-
-  const uploadImageToStorage = async (file: File): Promise<string> => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Math.random()
-      .toString(36)
-      .substring(2)}-${Date.now()}.${fileExt}`;
-    const filePath = `properties/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("property-images")
-      .upload(filePath, file);
-
-    if (uploadError) {
-      throw new Error(`Upload failed: ${uploadError.message}`);
-    }
-
-    const { data } = supabase.storage
-      .from("property-images")
-      .getPublicUrl(filePath);
-
-    return data.publicUrl;
-  };
-
-  const upload360ImageToStorage = async (file: File): Promise<string> => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `360-${Math.random()
-      .toString(36)
-      .substring(2)}-${Date.now()}.${fileExt}`;
-    const filePath = `360-images/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("property-images")
-      .upload(filePath, file);
-
-    if (uploadError) {
-      throw new Error(`360 image upload failed: ${uploadError.message}`);
-    }
-
-    const { data } = supabase.storage
-      .from("property-images")
-      .getPublicUrl(filePath);
-
-    return data.publicUrl;
-  };
-
-  const addImage = () => {
-    if (imageInput.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        images: [...prev.images, { src: imageInput.trim(), type: "url" }],
-      }));
-      setImageInput("");
-    }
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            setFormData((prev) => ({
-              ...prev,
-              images: [
-                ...prev.images,
-                {
-                  src: event.target!.result as string,
-                  type: "file",
-                  file: file,
-                },
-              ],
-            }));
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-    // Clear the input
-    e.target.value = "";
-  };
-
-  const handleSphereFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    files.forEach((file) => {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setFormData((prev) => ({
-            ...prev,
-            photo_sphere: event.target!.result as string,
-            sphereFile: file,
-          }));
-        }
+      reader.onloadend = () => {
+        setImagePreviews((prev) => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
-    }
-    // Clear the input
-    e.target.value = "";
+    });
   };
 
   const removeImage = (index: number) => {
@@ -199,615 +150,433 @@ export default function PropertyForm({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setUploading(true);
-
-    try {
-      // Upload images to storage
-      const uploadedImageUrls: string[] = [];
-
-      for (const image of formData.images) {
-        if (image.type === "file" && image.file) {
-          const uploadedUrl = await uploadImageToStorage(image.file);
-          uploadedImageUrls.push(uploadedUrl);
-        } else if (image.type === "url") {
-          uploadedImageUrls.push(image.src);
-        }
-      }
-
-      // Upload 360 image if it's a file
-      let sphereUrl = formData.photo_sphere;
-      if (formData.sphereFile) {
-        sphereUrl = await upload360ImageToStorage(formData.sphereFile);
-      }
-
-      // Prepare final form data
-      const finalFormData = {
-        ...formData,
-        photo_sphere: sphereUrl,
-        images: uploadedImageUrls.map((url) => ({
-          src: url,
-          type: "url" as const,
-        })),
-      };
-
-      await onSubmit(finalFormData, uploadedImageUrls);
-    } catch (error) {
-      console.error("Form submission error:", error);
-    } finally {
-      setUploading(false);
-    }
+    console.log("Form submitted:", formData);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-8 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 px-8 py-10 rounded-2xl"
-    >
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
-          {error}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form onSubmit={handleSubmit} className="max-w-6xl mx-auto space-y-12 p-8">
+      {/* Location and Purpose Section */}
+      <div className="space-y-8">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Property Name *
-          </label>
-          <input
-            type="text"
-            required
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            value={formData.name}
-            onChange={(e) => handleNameChange(e.target.value)}
-            placeholder="Enter property name"
-          />
+          <h2 className="text-3xl font-bold mb-2">Location & Purpose</h2>
+          <div className="h-1 w-20 bg-primary rounded-full" />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Slug *
-          </label>
-          <input
-            type="text"
-            required
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            value={formData.slug}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, slug: e.target.value }))
-            }
-            placeholder="property-slug"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Location *
-          </label>
-          <LocationAutocomplete
-            value={formData.location}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, location: value }))
-            }
-            placeholder="Enter property location"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Rate *
-          </label>
-          <input
-            type="text"
-            required
-            placeholder="e.g., 570,000"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            value={formData.rate}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, rate: e.target.value }))
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Area (sq ft) *
-          </label>
-          <input
-            type="number"
-            required
-            min="1"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            value={formData.area || ""}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                area: parseInt(e.target.value) || 0,
-              }))
-            }
-            placeholder="Enter area in sq ft"
-          />
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            Primary area measurement (required)
-          </p>
-        </div>
-
-        {/* Additional Area Units */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            Additional Area Units (Optional)
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                Square Yards
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                value={formData.area_sqyards || ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    area_sqyards: parseFloat(e.target.value) || undefined,
-                  }))
-                }
-                placeholder="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                Marla
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                value={formData.area_marla || ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    area_marla: parseFloat(e.target.value) || undefined,
-                  }))
-                }
-                placeholder="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                Kanal
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                value={formData.area_kanal || ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    area_kanal: parseFloat(e.target.value) || undefined,
-                  }))
-                }
-                placeholder="0"
-              />
-            </div>
-          </div>
-          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            💡 Conversion reference: 1 Kanal = 20 Marla = 5,445 sq ft | 1 Marla
-            = 272.25 sq ft = 30.25 sq yards
-          </p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Property Type *
-          </label>
-          <select
-            required
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            value={formData.property_type}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                property_type: e.target.value as "house" | "apartment" | "plot",
-              }))
-            }
-          >
-            <option value="house">🏠 House</option>
-            <option value="apartment">🏢 Apartment</option>
-            <option value="plot">📍 Plot</option>
-          </select>
-        </div>
-
-        {(formData.property_type === "house" ||
-          formData.property_type === "apartment") && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Bedrooms
-              </label>
-              <input
-                type="number"
-                min="0"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                value={formData.beds || ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    beds: parseInt(e.target.value) || undefined,
-                  }))
-                }
-                placeholder="Number of bedrooms"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Bathrooms
-              </label>
-              <input
-                type="number"
-                min="0"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                value={formData.baths || ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    baths: parseInt(e.target.value) || undefined,
-                  }))
-                }
-                placeholder="Number of bathrooms"
-              />
-            </div>
-          </>
-        )}
-
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            360° Photo Sphere
-          </label>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Add a 360° panoramic image by uploading a file or providing a URL.
-          </p>
-
-          {/* Toggle between URL and File upload for 360 sphere */}
-          <div className="flex space-x-4 mb-4">
-            <button
-              type="button"
-              onClick={() => setSphereInputType("url")}
-              className={`flex items-center px-4 py-2 rounded-lg border transition-all ${
-                sphereInputType === "url"
-                  ? "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300"
-                  : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
-              }`}
-            >
-              <LinkIcon className="h-4 w-4 mr-2" />
-              URL
-            </button>
-            <button
-              type="button"
-              onClick={() => setSphereInputType("file")}
-              className={`flex items-center px-4 py-2 rounded-lg border transition-all ${
-                sphereInputType === "file"
-                  ? "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300"
-                  : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
-              }`}
-            >
-              <CloudArrowUpIcon className="h-4 w-4 mr-2" />
-              Upload
-            </button>
-          </div>
-
-          {/* URL Input for 360 sphere */}
-          {sphereInputType === "url" && (
-            <input
-              type="url"
-              placeholder="https://example.com/360-photo.jpg"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
-              value={formData.photo_sphere || ""}
-              onChange={(e) =>
+        <Card className="p-4">
+          <CardBody className="space-y-8">
+            <RadioGroup
+              label={
+                <span className="text-lg font-semibold">Select Purpose *</span>
+              }
+              orientation="horizontal"
+              value={formData.purpose}
+              onValueChange={(value: string) =>
                 setFormData((prev) => ({
                   ...prev,
-                  photo_sphere: e.target.value,
+                  purpose: value as "Sell" | "Rent",
                 }))
               }
-            />
-          )}
+              className="gap-6"
+            >
+              <Radio
+                value="Sell"
+                classNames={{ label: "text-base font-medium" }}
+              >
+                Sell
+              </Radio>
+              <Radio
+                value="Rent"
+                classNames={{ label: "text-base font-medium" }}
+              >
+                Rent
+              </Radio>
+            </RadioGroup>
 
-          {/* File Upload for 360 sphere */}
-          {sphereInputType === "file" && (
-            <div>
-              <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-purple-300 dark:border-purple-600 border-dashed rounded-lg cursor-pointer bg-purple-50 dark:bg-purple-900/10 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <PhotoIcon className="w-8 h-8 mb-2 text-purple-500 dark:text-purple-400" />
-                    <p className="mb-2 text-sm text-purple-600 dark:text-purple-400">
-                      <span className="font-semibold">
-                        Click to upload 360° image
-                      </span>{" "}
-                      or drag and drop
-                    </p>
-                    <p className="text-xs text-purple-500 dark:text-purple-400">
-                      Panoramic JPG, PNG or WebP (Recommended: 4K resolution)
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleSphereFileUpload}
-                  />
-                </label>
-              </div>
-              {formData.photo_sphere && (
-                <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <PhotoIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                      <span className="text-sm text-purple-700 dark:text-purple-300 font-medium">
-                        360° image ready to upload
-                      </span>
+            <div className="space-y-4">
+              <label className="text-lg font-semibold text-foreground-500">
+                Select Property Type *
+              </label>
+              <Tabs
+                aria-label="Property Types"
+                fullWidth
+                size="lg"
+                selectedKey={formData.propertyCategory}
+                onSelectionChange={(key) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    propertyCategory: key as "Home" | "Plots" | "Commercial",
+                    propertyType: "",
+                  }))
+                }
+              >
+                {(["Home", "Plots", "Commercial"] as const).map((category) => (
+                  <Tab key={category} title={category}>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                      {propertyTypes[category].map((type) => (
+                        <Button
+                          key={type}
+                          variant={
+                            formData.propertyType === type ? "shadow" : "flat"
+                          }
+                          color={
+                            formData.propertyType === type
+                              ? "primary"
+                              : "default"
+                          }
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              propertyType: type,
+                            }))
+                          }
+                          className="h-14 text-base font-medium"
+                        >
+                          {type}
+                        </Button>
+                      ))}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          photo_sphere: "",
-                          sphereFile: undefined,
-                        }))
-                      }
-                      className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 transition-colors"
-                    >
-                      <XMarkIcon className="h-4 w-4" />
-                    </button>
-                  </div>
+                  </Tab>
+                ))}
+              </Tabs>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <Select
+                label="City *"
+                placeholder="Select city"
+                selectedKeys={formData.city ? [formData.city] : []}
+                onSelectionChange={(keys) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    city: Array.from(keys)[0] as string,
+                  }))
+                }
+                size="lg"
+              >
+                {cities.map((city) => (
+                  <SelectItem key={city}>{city}</SelectItem>
+                ))}
+              </Select>
+
+              <LocationAutocomplete
+                value={formData.location}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, location: value }))
+                }
+                className=""
+                placeholder="Enter property location"
+                required
+              />
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Price and Area Section */}
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-3xl font-bold mb-2">Price & Area</h2>
+          <div className="h-1 w-20 bg-primary rounded-full" />
+        </div>
+
+        <Card className="p-4">
+          <CardBody className="space-y-8">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="flex gap-3 items-end">
+                <Input
+                  type="number"
+                  label="Area Size *"
+                  placeholder="Enter area"
+                  value={String(formData.areaSize || "")}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      areaSize: Number(value),
+                    }))
+                  }
+                  size="lg"
+                />
+                <Select
+                  aria-label="Area Unit"
+                  selectedKeys={[formData.areaUnit]}
+                  onSelectionChange={(keys) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      areaUnit: Array.from(keys)[0] as any,
+                    }))
+                  }
+                  size="lg"
+                  label="Type"
+                  className="w-48"
+                >
+                  <SelectItem key="Marla">Marla</SelectItem>
+                  <SelectItem key="Sq Ft">Sq Ft</SelectItem>
+                  <SelectItem key="Sq Yd">Sq Yd</SelectItem>
+                  <SelectItem key="Kanal">Kanal</SelectItem>
+                </Select>
+              </div>
+              <Input
+                type="text"
+                label="Price (PKR) *"
+                placeholder="Enter price"
+                value={formData.price}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, price: value }))
+                }
+                size="lg"
+              />
+            </div>
+
+            <div className="space-y-6">
+              <Switch
+                isSelected={formData.installmentAvailable}
+                onValueChange={(isSelected) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    installmentAvailable: isSelected,
+                  }))
+                }
+              >
+                <span className="text-base font-semibold">
+                  Installment Available
+                </span>
+              </Switch>
+
+              {formData.installmentAvailable && (
+                <div className="grid md:grid-cols-3 gap-6 pl-6 border-l-4 border-primary/50">
+                  <Input
+                    type="number"
+                    label="Advance Amount"
+                    placeholder="0"
+                    value={String(formData.advanceAmount || "")}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        advanceAmount: Number(value),
+                      }))
+                    }
+                    size="lg"
+                  />
+                  <Input
+                    type="number"
+                    label="No of Installments"
+                    placeholder="0"
+                    value={String(formData.noOfInstallments || "")}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        noOfInstallments: Number(value),
+                      }))
+                    }
+                    size="lg"
+                  />
+                  <Input
+                    type="number"
+                    label="Monthly Installments"
+                    placeholder="0"
+                    value={String(formData.monthlyInstallments || "")}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        monthlyInstallments: Number(value),
+                      }))
+                    }
+                    size="lg"
+                  />
                 </div>
               )}
             </div>
-          )}
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Property Description
-          </label>
-          <textarea
-            rows={4}
-            placeholder="Enter a detailed description of the property..."
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-            value={formData.description || ""}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                description: e.target.value,
-              }))
-            }
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <div className="flex items-center space-x-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-            <input
-              type="checkbox"
-              id="featured"
-              className="w-5 h-5 text-yellow-600 border-yellow-300 rounded focus:ring-yellow-500 dark:border-yellow-700 dark:bg-yellow-900"
-              checked={formData.is_featured}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  is_featured: e.target.checked,
-                }))
-              }
-            />
-            <label
-              htmlFor="featured"
-              className="flex items-center text-sm font-medium text-yellow-800 dark:text-yellow-200"
-            >
-              <span className="text-yellow-500 mr-2">⭐</span>
-              Featured Property
-            </label>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            Featured properties will be highlighted in the listings and get more
-            visibility
-          </p>
-        </div>
+          </CardBody>
+        </Card>
       </div>
 
-      {/* Images Section */}
-      <div className="space-y-6">
+      {/* Features and Amenities Section */}
+      <div className="space-y-8">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            Property Images
-          </label>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Add images by uploading files or providing URLs. Files will be
-            automatically uploaded to Supabase storage.
-          </p>
-
-          {/* Toggle between URL and File upload */}
-          <div className="flex space-x-4 mb-4">
-            <button
-              type="button"
-              onClick={() => setImageInputType("url")}
-              className={`flex items-center px-4 py-2 rounded-lg border transition-all ${
-                imageInputType === "url"
-                  ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
-                  : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
-              }`}
-            >
-              <LinkIcon className="h-5 w-5 mr-2" />
-              Add by URL
-            </button>
-            <button
-              type="button"
-              onClick={() => setImageInputType("file")}
-              className={`flex items-center px-4 py-2 rounded-lg border transition-all ${
-                imageInputType === "file"
-                  ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
-                  : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
-              }`}
-            >
-              <CloudArrowUpIcon className="h-5 w-5 mr-2" />
-              Upload Files
-            </button>
-          </div>
-
-          {/* URL Input */}
-          {imageInputType === "url" && (
-            <div className="flex space-x-3 mb-4">
-              <input
-                type="url"
-                placeholder="https://example.com/image.jpg"
-                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                value={imageInput}
-                onChange={(e) => setImageInput(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={addImage}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg shadow-sm transition-all duration-200 transform hover:scale-105 flex items-center"
-              >
-                <PlusIcon className="h-5 w-5 mr-2" />
-                Add Image
-              </button>
-            </div>
-          )}
-
-          {/* File Upload */}
-          {imageInputType === "file" && (
-            <div className="mb-4">
-              <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <PhotoIcon className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
-                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                      <span className="font-semibold">Click to upload</span> or
-                      drag and drop
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      PNG, JPG, JPEG or WebP (MAX. 10MB each)
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    className="hidden"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                  />
-                </label>
+          <h2 className="text-3xl font-bold mb-2">Features & Amenities</h2>
+          <div className="h-1 w-20 bg-primary rounded-full" />
+        </div>
+        <Card className="p-4">
+          <CardBody className="space-y-8">
+            <div className="space-y-4">
+              <label className="text-lg font-semibold text-foreground-500">
+                Bedrooms
+              </label>
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                {bedroomOptions.map((option) => (
+                  <Button
+                    key={option}
+                    variant={formData.bedrooms === option ? "shadow" : "flat"}
+                    color={formData.bedrooms === option ? "primary" : "default"}
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, bedrooms: option }))
+                    }
+                    className="h-12 text-base font-medium"
+                  >
+                    {option}
+                  </Button>
+                ))}
               </div>
             </div>
-          )}
-
-          {/* Images Grid */}
-          {formData.images.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {formData.images.map((image, index) => (
-                <div key={index} className="relative group">
-                  <div className="relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
-                    {image.type === "file" && image.src.startsWith("data:") ? (
-                      // Use regular img tag for base64 data URLs (preview before upload)
-                      <img
-                        src={image.src}
-                        alt={`Property image ${index + 1}`}
-                        className="w-full h-24 object-cover group-hover:scale-110 transition-transform duration-200"
-                      />
-                    ) : (
-                      // Use Next.js Image component for actual URLs
-                      <Image
-                        src={image.src}
-                        alt={`Property image ${index + 1}`}
-                        className="w-full h-24 object-cover group-hover:scale-110 transition-transform duration-200"
-                        width={96}
-                        height={96}
-                      />
-                    )}
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200"></div>
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition-all duration-200 transform hover:scale-110"
-                    >
-                      <XMarkIcon className="h-4 w-4" />
-                    </button>
-                    {/* Image type indicator */}
-                    <div className="absolute bottom-1 left-1">
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                          image.type === "file"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                            : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                        }`}
-                      >
-                        {image.type === "file" ? (
-                          <CloudArrowUpIcon className="h-3 w-3 mr-1" />
-                        ) : (
-                          <LinkIcon className="h-3 w-3 mr-1" />
-                        )}
-                        {image.type === "file" ? "File" : "URL"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-4">
+              <label className="text-lg font-semibold text-foreground-500">
+                Bathrooms
+              </label>
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                {bathroomOptions.map((option) => (
+                  <Button
+                    key={option}
+                    variant={formData.bathrooms === option ? "shadow" : "flat"}
+                    color={
+                      formData.bathrooms === option ? "primary" : "default"
+                    }
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, bathrooms: option }))
+                    }
+                    className="h-12 text-base font-medium"
+                  >
+                    {option}
+                  </Button>
+                ))}
+              </div>
             </div>
-          )}
-
-          {formData.images.length === 0 && (
-            <div className="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-              <PhotoIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">
-                No images added yet
-              </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">
-                Add images using the options above
-              </p>
+            <div className="space-y-4 flex justify-between">
+              <label className="text-lg font-semibold text-foreground-500">
+                Amenities
+              </label>
+              <div className="flex gap-3">
+                <FeaturesAmenitiesModal
+                  onSave={(values) =>
+                    setFormData((prev) => ({ ...prev, amenities: values }))
+                  }
+                  selectedAmenities={formData.amenities}
+                />
+              </div>
             </div>
-          )}
-        </div>
+          </CardBody>
+        </Card>
       </div>
 
-      <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
-            Cancel
-          </button>
-        )}
-        <button
+      {/* Ad Information Section */}
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-3xl font-bold mb-2">Ad Information</h2>
+          <div className="h-1 w-20 bg-primary rounded-full" />
+        </div>
+        <Card className="p-4">
+          <CardBody className="space-y-6">
+            <Input
+              label="Property Title *"
+              placeholder="e.g. Beautiful 3 Bedroom House in DHA Phase 5"
+              value={formData.title}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, title: value }))
+              }
+              size="lg"
+            />
+            <Textarea
+              label="Description"
+              placeholder="Describe your property, its features, and the surrounding area..."
+              value={formData.description}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, description: value }))
+              }
+              minRows={6}
+              size="lg"
+            />
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Property Images and Videos Section */}
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-3xl font-bold mb-2">Images & Videos</h2>
+          <div className="h-1 w-20 bg-primary rounded-full" />
+        </div>
+
+        <Card className="p-4">
+          <CardBody className="space-y-8">
+            <div className="space-y-4">
+              <label className="text-lg font-semibold text-foreground-500">
+                Property Images
+              </label>
+              <div className="bg-default-100 rounded-xl p-12 text-center hover:bg-default-200 transition-colors">
+                <input
+                  type="file"
+                  multiple
+                  accept=".jpg,.png"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label htmlFor="image-upload" className="cursor-pointer">
+                  <Upload className="h-16 w-16 mx-auto mb-4 text-primary" />
+                  <p className="text-lg font-semibold mb-2">
+                    Click to upload images
+                  </p>
+                  <p className="text-sm text-foreground-500">
+                    JPG or PNG (Max 5MB each)
+                  </p>
+                </label>
+              </div>
+
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <Image
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-40 object-cover"
+                      />
+                      <Button
+                        isIconOnly
+                        color="danger"
+                        size="sm"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <Input
+              type="url"
+              label="Video URL (Optional)"
+              placeholder="Paste YouTube video link"
+              value={formData.videoUrl}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, videoUrl: value }))
+              }
+              size="lg"
+            />
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Submit Buttons */}
+      <div className="flex justify-end gap-4 pt-8">
+        <Button variant="flat" size="lg" className="h-14 px-8 text-base">
+          Save as Draft
+        </Button>
+        <Button
           type="submit"
-          disabled={loading || uploading}
-          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg shadow-sm transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center"
+          color="primary"
+          size="lg"
+          className="h-14 px-12 text-base font-semibold"
         >
-          {loading || uploading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-              {uploading ? "Uploading..." : "Processing..."}
-            </>
-          ) : (
-            <>
-              <PlusIcon className="h-5 w-5 mr-2" />
-              {submitLabel}
-            </>
-          )}
-        </button>
+          Submit Property
+        </Button>
       </div>
     </form>
   );

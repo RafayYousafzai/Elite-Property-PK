@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 
+import { Input, Spinner } from "@heroui/react";
+
 interface LocationAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
@@ -15,7 +17,7 @@ export default function LocationAutocomplete({
   value,
   onChange,
   placeholder = "Enter location",
-  className = "",
+  className = "h-full",
   required = false,
 }: LocationAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -59,21 +61,19 @@ export default function LocationAutocomplete({
   }, [onChange]);
 
   return (
-    <div className="relative">
-      <input
+    <div className="relative w-full ">
+      <Input
+        label="Location"
+        size="lg"
         ref={inputRef}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-        required={required}
+        className={className}
+        isRequired={required}
+        endContent={!isLoaded && <Spinner size="sm" color="primary" />}
       />
-      {!isLoaded && (
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-        </div>
-      )}
     </div>
   );
 }
