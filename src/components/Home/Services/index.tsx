@@ -2,6 +2,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
+import Link from "next/link";
 
 const Services = () => {
   const services = [
@@ -161,7 +162,7 @@ const Services = () => {
               solution for you
             </p>
             <button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-105">
-              Get Started Today
+              <Link href="/contactus">Get Started Today</Link>
             </button>
           </div>
         </div>
