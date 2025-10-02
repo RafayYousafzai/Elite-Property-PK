@@ -20,30 +20,43 @@ export default function CreatePropertyPage() {
 
   const handleSubmit = async (
     formData: PropertyFormData,
-    uploadedImages: string[]
+    uploadedImages: string[],
+    photo_sphere: string | undefined
   ) => {
     setLoading(true);
     setError("");
+    console.log(formData, "formData");
 
     try {
-      // Prepare data for database - store only image URLs
+      // Map frontend data → DB schema
       const propertyData = {
-        name: formData.name,
-        slug: formData.slug,
+        name: formData.title,
         location: formData.location,
-        rate: formData.rate,
-        area: formData.area,
-        area_sqft: formData.area_sqft,
-        area_sqyards: formData.area_sqyards,
-        area_marla: formData.area_marla,
-        area_kanal: formData.area_kanal,
-        beds: formData.beds,
-        baths: formData.baths,
-        photo_sphere: formData.photo_sphere,
-        property_type: formData.property_type,
-        images: uploadedImages, // Store only URLs in database
+        rate: Number(formData.price) || 0,
+        area: Number(formData.areaSize) || 0,
+        photo_sphere: photo_sphere,
+        property_type: (formData.propertyType || "plot").toLowerCase() as
+          | "house"
+          | "apartment"
+          | "plot"
+          | "commercial plot",
+        images: uploadedImages,
         description: formData.description,
-        is_featured: formData.is_featured,
+        is_featured: false,
+
+        // New fields
+        purpose: formData.purpose,
+        property_category: formData.propertyCategory,
+        city: formData.city,
+        area_unit: formData.areaUnit,
+        installment_available: formData.installmentAvailable,
+        video_url: formData.videoUrl,
+        advance_amount: formData.advanceAmount || null,
+        no_of_installments: formData.noOfInstallments || null,
+        monthly_installments: formData.monthlyInstallments || null,
+
+        // JSON fields
+        features: formData.amenities || {},
       };
 
       const result = await createProperty(propertyData);
@@ -54,7 +67,8 @@ export default function CreatePropertyPage() {
         router.push("/admin/properties");
         router.refresh();
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);

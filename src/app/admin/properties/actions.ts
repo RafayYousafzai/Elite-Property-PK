@@ -4,23 +4,38 @@ import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
+// Updated schema interface
 export interface PropertyData {
   name: string;
-  slug: string;
   location: string;
-  rate: string;
+  rate: number;
   area: number;
-  area_sqft?: number;
-  area_sqyards?: number;
-  area_marla?: number;
-  area_kanal?: number;
-  beds?: number;
-  baths?: number;
+  beds?: number | null;
+  baths?: number | null;
   photo_sphere?: string;
-  property_type: "house" | "apartment" | "plot";
+  property_type: "house" | "apartment" | "plot" | "commercial plot";
   images: string[];
   description?: string;
   is_featured: boolean;
+
+  // New fields
+  purpose?: string;
+  property_category?: string;
+  city?: string;
+  area_unit?: string;
+  installment_available?: boolean;
+  video_url?: string;
+  advance_amount?: number | null;
+  no_of_installments?: number | null;
+  monthly_installments?: number | null;
+  features?: object;
+}
+
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 export async function createProperty(propertyData: PropertyData) {
@@ -40,11 +55,11 @@ export async function createProperty(propertyData: PropertyData) {
       };
     }
 
-    // Add unique suffix to slug to ensure uniqueness
+    // Create unique slug from name
+    const baseSlug = generateSlug(propertyData.name);
     const uniqueSlug =
-      propertyData.slug + "-" + Math.random().toString(36).substring(2, 8);
+      baseSlug + "-" + Math.random().toString(36).substring(2, 8);
 
-    // Prepare data with unique slug
     const dataToInsert = {
       ...propertyData,
       slug: uniqueSlug,
@@ -64,7 +79,7 @@ export async function createProperty(propertyData: PropertyData) {
       };
     }
 
-    // Revalidate the properties page cache
+    // Revalidate cache
     revalidatePath("/admin/properties");
     revalidatePath("/properties");
 
@@ -80,7 +95,6 @@ export async function createProperty(propertyData: PropertyData) {
     };
   }
 }
-
 export async function updateProperty(id: string, propertyData: PropertyData) {
   try {
     const supabase = await createClient(cookies());
@@ -98,9 +112,24 @@ export async function updateProperty(id: string, propertyData: PropertyData) {
       };
     }
 
+    // Generate slug if name is updated
+    let updatedSlug: string | undefined;
+    if (propertyData.name) {
+      const baseSlug = propertyData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      updatedSlug = baseSlug + "-" + Math.random().toString(36).substring(2, 8);
+    }
+
+    const dataToUpdate = {
+      ...propertyData,
+      ...(updatedSlug ? { slug: updatedSlug } : {}),
+    };
+
     const { data, error } = await supabase
       .from("properties")
-      .update(propertyData)
+      .update(dataToUpdate)
       .eq("id", id)
       .select()
       .single();
@@ -113,10 +142,12 @@ export async function updateProperty(id: string, propertyData: PropertyData) {
       };
     }
 
-    // Revalidate the properties page cache
+    // Revalidate pages
     revalidatePath("/admin/properties");
     revalidatePath("/properties");
-    revalidatePath(`/properties/${propertyData.slug}`);
+    if (updatedSlug) {
+      revalidatePath(`/properties/${updatedSlug}`);
+    }
 
     return {
       success: true,
