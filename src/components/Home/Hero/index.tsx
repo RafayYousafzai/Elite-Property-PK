@@ -27,17 +27,18 @@ const Hero: React.FC = () => {
             {/* Text Content */}
             <div className="space-y-8">
               <div className="space-y-6">
-                <h1 className="text-6xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.9] tracking-tight text-balance">
-                  Your Dream{" "}
+                <h1 className="text-6xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.9] tracking-tight">
+                  Live Elite by
                   <span className="bg-primary bg-clip-text text-transparent">
-                    Home
+                    {" "}
+                    Elite
                   </span>
                   .
                 </h1>
                 <p className="text-lg sm:text-xl lg:text-2xl text-white/90 leading-relaxed max-w-2xl text-pretty font-light">
-                  At Arham Real Estate, we help you buy, sell, or rent houses
-                  and plots in DHA Islamabad. Simple process, honest advice, and
-                  the right place for your family or investment.
+                  At Elite Property, we help you buy, sell, or rent houses and
+                  plots in DHA Islamabad. Simple process, honest advice, and the
+                  right place for your family or investment.
                 </p>
               </div>
 
@@ -45,16 +46,16 @@ const Hero: React.FC = () => {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold rounded-none transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25"
                 >
                   <Link href="/contactus">Get in Touch</Link>
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white cursor-pointer hover:text-card-foreground px-8 py-6 text-lg font-semibold rounded-none transition-all duration-300 hover:scale-105"
+                  className="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white cursor-pointer hover:text-card-foreground px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105"
                 >
-                  View Properties
+                  <Link href="/explore">View Properties</Link>
                 </Button>
               </div>
             </div>

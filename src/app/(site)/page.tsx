@@ -14,6 +14,8 @@ import {
 } from "@/lib/supabase/properties-server";
 import VideoShowcase from "@/components/shared/video-showcase";
 import LocationMap from "@/components/Home/Office";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export default async function Home() {
   // Fetch properties from Supabase
@@ -26,22 +28,25 @@ export default async function Home() {
       <Categories />
       <ParallaxScroll items={properties} />
       <Services />
+
       <VideoShowcase
         videos={[
           {
             id: "1",
-            title: "Why DHA Islamabad is the Best Investment",
-            description: "Learn why DHA remains the top choice for investors.",
-            youtubeId: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            title: "Solar powered 5 bed designer residence in DHA Phase 2.",
+            description:
+              "A stunning 5-bedroom designer residence powered by solar energy, located in the prestigious DHA Phase 2.",
+            youtubeId: "https://youtu.be/0niH-x7L3Zk?si=k_-76bAIiX-YsbQE",
             category: "Investment Insights",
             highlightText: "Smart property decisions.",
           },
           {
             id: "2",
-            title: "Luxury Villas Tour",
+            title:
+              "Elite Lounge Podcast Ep 2 | Real Estate, RECA & Realtor Insights",
             description:
-              "Step inside modern luxury homes designed for families.",
-            youtubeId: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "Dive into the world of real estate with Sheraz Saleem, exploring market trends, investment strategies, and the future of property in this insightful podcast episode.",
+            youtubeId: "https://youtu.be/kFCfQoVB90Q?si=QFJh23B7qRy3MzQj",
             // category: "Property Tours",
             highlightText: "Exclusive lifestyle access.",
           },

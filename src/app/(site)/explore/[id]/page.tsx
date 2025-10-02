@@ -44,6 +44,8 @@ export default function Details() {
     fetchProperty();
   }, [id]);
 
+  console.log(property);
+
   if (loading) {
     return (
       <section className="!pt-44 pb-20 relative">

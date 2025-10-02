@@ -10,7 +10,7 @@ const Footer = () => {
           <p className="text-white text-sm lg:max-w-1/5">
             Stay updated with the latest news, promotions, and exclusive offers.
           </p>
-          <div className="flex lg:flex-row flex-col items-center lg:gap-10 gap-3">
+          {/* <div className="flex lg:flex-row flex-col items-center lg:gap-10 gap-3">
             <div className="flex gap-2 lg:order-1 order-2 flex-wrap">
               <input
                 type="email"
@@ -25,17 +25,23 @@ const Footer = () => {
               By subscribing, you agree to receive our promotional emails. You
               can unsubscribe at any time.
             </p>
-          </div>
+          </div> */}
           <div className="flex items-center gap-6">
-            <Link href="#">
+            <Link
+              target="_blank"
+              href="https://www.tiktok.com/@elitepropertiespk"
+            >
               <Icon
-                icon="ph:x-logo-bold"
+                icon="ph:tiktok-logo-bold"
                 width={24}
                 height={24}
                 className="text-white hover:text-[#f77f00] duration-300"
               />
             </Link>
-            <Link href="#">
+            <Link
+              target="_blank"
+              href="https://www.facebook.com/elitepropexch/"
+            >
               <Icon
                 icon="ph:facebook-logo-bold"
                 width={24}
@@ -43,7 +49,10 @@ const Footer = () => {
                 className="text-white hover:text-[#f77f00] duration-300"
               />
             </Link>
-            <Link href="#">
+            <Link
+              target="_blank"
+              href="https://www.instagram.com/elitepropertyexchange/"
+            >
               <Icon
                 icon="ph:instagram-logo-bold"
                 width={24}
@@ -97,7 +106,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="flex justify-between md:flex-nowrap flex-wrap items-center py-6 gap-6">
-          <p className="text-white text-sm ">©2025 - Design & Developed</p>
+          <p className="text-white text-sm ">©2025 - Elite Property</p>
           <div className="flex gap-8 items-center">
             <Link href="#" className="text-white hover:text-[#f77f00] text-sm">
               Terms of service

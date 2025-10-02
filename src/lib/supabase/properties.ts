@@ -12,6 +12,10 @@ export const transformDatabaseProperty = (
     location: dbProperty.location,
     rate: dbProperty.rate,
     area: dbProperty.area,
+    area_sqyards: dbProperty.area_sqyards,
+    area_marla: dbProperty.area_marla,
+    area_kanal: dbProperty.area_kanal,
+
     beds: dbProperty.beds,
     baths: dbProperty.baths,
     photo_sphere: dbProperty.photo_sphere,

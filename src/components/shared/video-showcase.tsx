@@ -1,5 +1,8 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+
 interface VideoItem {
   id: string;
   title: string;
@@ -35,6 +38,29 @@ export default function VideoShowcase({
     <div
       className={`container max-w-8xl mx-auto px-5 2xl:px-0 mt-24 ${className}`}
     >
+      <div className="my-20 flex justify-center">
+        <Link
+          href="https://www.youtube.com/@elitepropertypk"
+          target="_blank"
+          className="group relative flex items-center gap-4 rounded-full border border-zinc-200 bg-gradient-to-r from-red-500 to-red-600 px-6 py-3 shadow-lg shadow-black/10 backdrop-blur-md transition-all duration-500 hover:scale-105 hover:from-red-600 hover:to-red-500 dark:border-red-800 dark:shadow-black/30"
+        >
+          <span className="text-base font-medium text-white">
+            Visit our YouTube Channel
+          </span>
+
+          {/* Divider */}
+          <span className="h-6 w-[1px] bg-white/50"></span>
+
+          {/* Icon wrapper */}
+          <div className="relative flex size-8 items-center justify-center overflow-hidden rounded-full bg-white transition-all duration-500 group-hover:rotate-360">
+            <ArrowRight className="size-4 text-red-600 transition-transform duration-500 group-hover:translate-x-1" />
+          </div>
+
+          {/* Glow effect on hover */}
+          <span className="absolute inset-0 rounded-full bg-red-400/30 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100"></span>
+        </Link>
+      </div>
+
       <div className="mx-auto">
         {/* Empty fallback */}
         {videos.length === 0 && (

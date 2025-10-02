@@ -11,7 +11,7 @@ import { Button, Drawer, DrawerBody, DrawerContent } from "@heroui/react";
 
 // Navigation configuration - edit this array to modify navigation items
 const navigationItems = [
-  { name: "Home", href: "/" },
+  // { name: "Home", href: "/" },
   // { name: "Plots", href: "/explore?type=plots" },
   { name: "Homes", href: "/explore?type=homes" },
   { name: "Apartments", href: "/explore?type=apartments" },
@@ -198,7 +198,7 @@ const Header: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2 md:gap-6 flex-shrink-0">
-            <Button
+            {/* <Button
               isIconOnly
               className="bg-transparent hover:cursor-pointer p-1 sm:p-2"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -221,7 +221,7 @@ const Header: React.FC = () => {
                 height={24}
                 className="sm:w-8 sm:h-8 dark:block hidden text-white"
               />
-            </Button>
+            </Button> */}
 
             <div className={`hidden md:block`}>
               <Link

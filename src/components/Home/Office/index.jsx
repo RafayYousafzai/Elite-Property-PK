@@ -1,9 +1,18 @@
 "use client";
 
 import React from "react";
-import { MapPin, Phone, Mail, Clock, Navigation, Icon } from "lucide-react";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Navigation,
+  Facebook,
+  Instagram,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { FaTiktok } from "react-icons/fa";
 
 const LocationMap = () => {
   const officeLocation = {
@@ -96,53 +105,128 @@ const LocationMap = () => {
 
           {/* Contact Information */}
           <div className="space-y-8">
-            <div className="bg-slate-50 rounded-2xl p-8  ">
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-lg flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Office Address
-                    </h4>
-                    <p className="text-gray-600">{officeLocation.address}</p>
-                  </div>
-                </div>
+            <div className="relative group">
+              {/* Luxury gradient background with subtle animation */}
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-100/50 via-yellow-50/30 to-orange-100/50 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <Phone className="w-6 h-6 text-white" />
+              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-amber-100/50">
+                <div className="grid grid-cols-1 gap-6">
+                  {/* Office Address */}
+                  <div className="flex items-center gap-4 group/item">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl blur-md opacity-50 group-hover/item:opacity-75 transition-opacity"></div>
+                      <div className="relative w-12 h-12 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover/item:scale-110 transition-transform duration-300">
+                        <MapPin className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900 mb-1 text-sm">
+                        Office Address
+                      </h4>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {officeLocation.address}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Phone Number
-                    </h4>
-                    <p className="text-gray-600">{officeLocation.phone}</p>
-                  </div>
-                </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-orange-600 rounded-lg flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Email Address
-                    </h4>
-                    <p className="text-gray-600">{officeLocation.email}</p>
-                  </div>
-                </div>
+                  {/* Phone & Email Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3 group/item">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl blur-md opacity-50 group-hover/item:opacity-75 transition-opacity"></div>
+                        <div className="relative w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover/item:scale-110 transition-transform duration-300">
+                          <Phone className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-xs mb-0.5">
+                          Phone
+                        </h4>
+                        <p className="text-gray-600 text-sm">
+                          {officeLocation.phone}
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-600 to-amber-600 rounded-lg flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-white" />
+                    <div className="flex items-center gap-3 group/item">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl blur-md opacity-50 group-hover/item:opacity-75 transition-opacity"></div>
+                        <div className="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover/item:scale-110 transition-transform duration-300">
+                          <Mail className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-xs mb-0.5">
+                          Email
+                        </h4>
+                        <p className="text-gray-600 text-sm">
+                          {officeLocation.email}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Office Hours
-                    </h4>
-                    <p className="text-gray-600">{officeLocation.hours}</p>
+
+                  {/* Office Hours & Social Media Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3 group/item">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl blur-md opacity-50 group-hover/item:opacity-75 transition-opacity"></div>
+                        <div className="relative w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover/item:scale-110 transition-transform duration-300">
+                          <Clock className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-xs mb-0.5">
+                          Hours
+                        </h4>
+                        <p className="text-gray-600 text-sm">
+                          {officeLocation.hours}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Social Media Links */}
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 text-xs mb-2">
+                          Follow Us
+                        </h4>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href="https://www.facebook.com/elitepropexch/"
+                            target="_blank"
+                            className="group/social relative"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg blur-md opacity-0 group-hover/social:opacity-75 transition-opacity"></div>
+                            <div className="relative w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300">
+                              <Facebook className="w-4 h-4 text-white" />
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="https://www.instagram.com/elitepropertyexchange/"
+                            target="_blank"
+                            className="group/social relative"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-br from-pink-600 via-purple-600 to-orange-500 rounded-lg blur-md opacity-0 group-hover/social:opacity-75 transition-opacity"></div>
+                            <div className="relative w-9 h-9 bg-gradient-to-br from-pink-600 via-purple-600 to-orange-500 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300">
+                              <Instagram className="w-4 h-4 text-white" />
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="https://www.tiktok.com/@elitepropertiespk"
+                            target="_blank"
+                            className="group/social relative"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg blur-md opacity-0 group-hover/social:opacity-75 transition-opacity"></div>
+                            <div className="relative w-9 h-9 bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300">
+                              <FaTiktok className="w-4 h-4 text-white" />
+                            </div>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

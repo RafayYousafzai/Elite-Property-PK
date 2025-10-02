@@ -52,7 +52,7 @@ const Categories = () => {
           {/* Apartments */}
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
             <div className="relative rounded-2xl overflow-hidden group">
-              <Link href="/residential-homes">
+              <Link href="/explore?type=apartments">
                 <Image
                   src="/images/categories/villas.jpg"
                   alt="apartments"
@@ -63,7 +63,7 @@ const Categories = () => {
                 />
               </Link>
               <Link
-                href="/explore?type=homes"
+                href="/explore?type=apartments"
                 className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-0 flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:bg-black/20 duration-500"
               >
                 <div className="flex justify-end mt-4 sm:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -92,7 +92,7 @@ const Categories = () => {
           {/* Plots */}
           <div className="lg:col-span-6 col-span-12 mb-6 lg:mb-0">
             <div className="relative rounded-2xl overflow-hidden group">
-              <Link href="/explore?type=plots">
+              <Link href="/explore?type=homes">
                 <Image
                   src="/images/categories/plots.png"
                   alt="plots"
@@ -103,7 +103,7 @@ const Categories = () => {
                 />
               </Link>
               <Link
-                href="/explore?type=plots"
+                href="/explore?type=homes"
                 className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-0 flex flex-col justify-between pl-4 sm:pl-6 lg:pl-10 pb-4 sm:pb-6 lg:pb-10 pr-4 sm:pr-6 lg:pr-0 group-hover:bg-black/20 duration-500"
               >
                 <div className="flex justify-end mt-4 sm:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -118,10 +118,10 @@ const Categories = () => {
                 </div>
                 <div className="flex flex-col gap-2 sm:gap-2.5">
                   <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-medium">
-                    Plots
+                    Homes
                   </h3>
                   <p className="text-white/80 text-sm sm:text-base leading-5 sm:leading-6">
-                    Secure your future with residential and commercial plots in
+                    Secure your future with residential and commercial homes in
                     top DHA phases.
                   </p>
                 </div>

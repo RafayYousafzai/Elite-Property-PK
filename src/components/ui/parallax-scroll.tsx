@@ -97,7 +97,7 @@ export const ParallaxScroll = ({
       >
         {/* First Part */}
         <div className="grid gap-10">
-          {firstPart.map((property, idx) => (
+          {thirdPart.map((property, idx) => (
             <motion.div
               onClick={() => handleClick(property.slug)}
               style={{ y: translateFirst }}
@@ -121,7 +121,7 @@ export const ParallaxScroll = ({
                       <p className="text-sm "> {property.area} sqft</p>
                     </div>
 
-                    <h3 className="text-2xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
+                    <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
                       {property.name}
                     </h3>
                   </div>
@@ -156,7 +156,7 @@ export const ParallaxScroll = ({
                       <p className="text-sm "> {property.area} sqft</p>
                     </div>
 
-                    <h3 className="text-2xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
+                    <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
                       {property.name}
                     </h3>
                   </div>
@@ -167,7 +167,7 @@ export const ParallaxScroll = ({
         </div>
         {/* Third Part */}
         <div className="grid gap-10">
-          {thirdPart.map((property, idx) => (
+          {firstPart.map((property, idx) => (
             <motion.div
               onClick={() => handleClick(property.slug)}
               style={{ y: translateThird }}
@@ -191,7 +191,7 @@ export const ParallaxScroll = ({
                       <p className="text-sm "> {property.area} sqft</p>
                     </div>
 
-                    <h3 className="text-2xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
+                    <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
                       {property.name}
                     </h3>
                   </div>
@@ -227,7 +227,7 @@ export const ParallaxScroll = ({
                         <p className="text-sm "> {property.area} sqft</p>
                       </div>
 
-                      <h3 className="text-2xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
+                      <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
                         {property.name}
                       </h3>
                     </div>
