@@ -45,6 +45,7 @@ export interface PropertyFormData {
   images: File[];
   videoUrl: string;
   photo_sphere: File | null;
+  constructed_covered_area?: number;
 }
 
 const propertyTypes = {

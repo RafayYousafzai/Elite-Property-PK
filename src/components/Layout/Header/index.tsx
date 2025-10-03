@@ -225,7 +225,7 @@ const Header: React.FC = () => {
 
             <div className={`hidden md:block`}>
               <Link
-                href="tel:+1-212-456-789"
+                href="tel:+923344111778"
                 className={`text-base text-inherit flex items-center gap-2 transition-colors duration-200 ${
                   isHomepage
                     ? sticky
@@ -235,7 +235,7 @@ const Header: React.FC = () => {
                 }`}
               >
                 <Icon icon={"ph:phone-bold"} width={24} height={24} />
-                +1-212-456-789
+                +923344111778
               </Link>
             </div>
 
@@ -318,12 +318,12 @@ const Header: React.FC = () => {
                       </nav>
                       <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
                         <Link
-                          href="tel:+1-212-456-789"
+                          href="tel:+923344111778"
                           onClick={() => setNavbarOpen(false)}
                           className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-200"
                         >
                           <Icon icon="ph:phone-bold" width={20} height={20} />
-                          <span>+1-212-456-789</span>
+                          <span>+923344111778</span>
                         </Link>
                       </div>
                     </DrawerBody>

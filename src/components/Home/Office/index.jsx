@@ -18,10 +18,11 @@ const LocationMap = () => {
   const officeLocation = {
     lat: 33.7294, // Example coordinates for Islamabad
     lng: 73.0931,
-    address: "Office 123, Commercial Market, DHA Phase 2, Islamabad",
-    phone: "+92 321 1234567",
-    email: "info@homely.com",
-    hours: "Mon - Sat: 9:00 AM - 8:00 PM",
+    address:
+      "2nd Floor, Plaza no 19, Tipu Boulevard, Sector G DHA Phase II, Islamabad",
+    phone: "+923344111778",
+    email: "pk.eliteproperty@gmail.com",
+    hours: "Working Hours 9 Am to 7 Pm 7 Days A Week",
   };
 
   const handleGetDirections = () => {
@@ -245,7 +246,7 @@ const LocationMap = () => {
               </button>
 
               <Link
-                href="https://wa.me/923211234567"
+                href="https://wa.me/+923344111778"
                 target="_blank"
                 className=""
               >
