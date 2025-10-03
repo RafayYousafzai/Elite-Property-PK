@@ -1,5 +1,5 @@
 // -------- Schema ----------
-const amenitiesFormSchema = [
+export const defaultFormSchema = [
   {
     id: "main_features",
     title: "Main Features",
@@ -144,4 +144,47 @@ const amenitiesFormSchema = [
   },
 ];
 
-export default amenitiesFormSchema;
+
+
+// -------- Schema ----------
+export const plotsFormSchema = [
+  {
+    id: "plot_features",
+    title: "Plot Features",
+    fields: [
+      { id: "possession", label: "Possession", type: "boolean" },
+      { id: "corner", label: "Corner", type: "boolean" },
+      { id: "park_facing", label: "Park Facing", type: "boolean" },
+      { id: "disputed", label: "Disputed", type: "boolean" },
+      { id: "file", label: "File", type: "boolean" },
+      { id: "balloted", label: "Balloted", type: "boolean" },
+      { id: "sewerage", label: "Sewerage", type: "boolean" },
+      { id: "electricity", label: "Electricity", type: "boolean" },
+      { id: "water_supply", label: "Water Supply", type: "boolean" },
+      { id: "sui_gas", label: "Sui Gas", type: "boolean" },
+      { id: "boundary_wall", label: "Boundary Wall", type: "boolean" },
+    ],
+  },
+  {
+    id: "nearby_locations",
+    title: "Nearby Locations and Other Facilities",
+    fields: [
+      { id: "nearby_schools", label: "Nearby Schools", type: "text" },
+      { id: "nearby_hospitals", label: "Nearby Hospitals", type: "text" },
+      { id: "nearby_shopping_malls", label: "Nearby Shopping Malls", type: "text" },
+      { id: "nearby_restaurants", label: "Nearby Restaurants", type: "text" },
+      { id: "distance_from_airport", label: "Distance From Airport (kms)", type: "number" },
+      { id: "public_transport_service", label: "Nearby Public Transport Service", type: "text" },
+      { id: "other_nearby_places", label: "Other Nearby Places", type: "text" },
+    ],
+  },
+  {
+    id: "other_facilities",
+    title: "Other Facilities",
+    fields: [
+      { id: "other_facilities", label: "Other Facilities", type: "text" },
+      { id: "security_staff", label: "Security Staff", type: "boolean" },
+    ],
+  },
+];
+

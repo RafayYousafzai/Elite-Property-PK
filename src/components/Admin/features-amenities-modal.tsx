@@ -16,7 +16,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import amenitiesFormSchema from "@/data/formSchema";
+import { defaultFormSchema, plotsFormSchema } from "@/data/formSchema";
 
 type FieldType = "boolean" | "number" | "text" | "select";
 
@@ -36,11 +36,13 @@ export interface CategorySchema {
 interface FeaturesAmenitiesModalProps {
   onSave?: (values: Record<string, string | number | boolean>) => void;
   selectedAmenities?: Record<string, string | number | boolean>;
+  type?: "default" | "plot";
 }
 
 const FeaturesAmenitiesModal: React.FC<FeaturesAmenitiesModalProps> = ({
   onSave,
   selectedAmenities,
+  type = "default",
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [activeTab, setActiveTab] = React.useState("0");
@@ -183,20 +185,35 @@ const FeaturesAmenitiesModal: React.FC<FeaturesAmenitiesModalProps> = ({
                     onSelectionChange={(key) => setActiveTab(String(key))}
                     variant="solid"
                   >
-                    {amenitiesFormSchema.map((cat, idx) => (
-                      <Tab key={String(idx)} title={cat.title}>
-                        <div className="p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {cat.fields?.map((f) =>
-                              renderField({
-                                ...f,
-                                type: f.type as FieldType,
-                              })
-                            )}
-                          </div>
-                        </div>
-                      </Tab>
-                    ))}
+                    {type === "plot"
+                      ? plotsFormSchema.map((cat, idx) => (
+                          <Tab key={String(idx)} title={cat.title}>
+                            <div className="p-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {cat.fields?.map((f) =>
+                                  renderField({
+                                    ...f,
+                                    type: f.type as FieldType,
+                                  })
+                                )}
+                              </div>
+                            </div>
+                          </Tab>
+                        ))
+                      : defaultFormSchema.map((cat, idx) => (
+                          <Tab key={String(idx)} title={cat.title}>
+                            <div className="p-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {cat.fields?.map((f) =>
+                                  renderField({
+                                    ...f,
+                                    type: f.type as FieldType,
+                                  })
+                                )}
+                              </div>
+                            </div>
+                          </Tab>
+                        ))}
                   </Tabs>
                 </Card>
               </ModalBody>

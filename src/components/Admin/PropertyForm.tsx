@@ -184,31 +184,42 @@ export default function PropertyForm({
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const uploadImagesToSupabase = async (images: File[]): Promise<string[]> => {
+  const uploadImagesToSupabase = async (
+    images: (File | string)[]
+  ): Promise<string[]> => {
     const supabase = createClient();
     const uploadedUrls: string[] = [];
 
     for (const image of images) {
-      const fileExt = image.name.split(".").pop();
-      const fileName = `${Math.random()
-        .toString(36)
-        .substring(2)}-${Date.now()}.${fileExt}`;
-      const filePath = `properties/${fileName}`;
-
-      const { error } = await supabase.storage
-        .from("property-images")
-        .upload(filePath, image);
-
-      if (error) {
-        console.error("Error uploading image:", error);
-        throw new Error(`Failed to upload image: ${image.name}`);
+      // Case 1: Already a URL (from DB / initialData)
+      if (typeof image === "string") {
+        uploadedUrls.push(image);
+        continue;
       }
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("property-images").getPublicUrl(filePath);
+      // Case 2: New File
+      if (image instanceof File) {
+        const fileExt = image.name.split(".").pop() ?? "jpg";
+        const fileName = `${Math.random()
+          .toString(36)
+          .substring(2)}-${Date.now()}.${fileExt}`;
+        const filePath = `properties/${fileName}`;
 
-      uploadedUrls.push(publicUrl);
+        const { error } = await supabase.storage
+          .from("property-images")
+          .upload(filePath, image);
+
+        if (error) {
+          console.error("Error uploading image:", error);
+          throw new Error(`Failed to upload image: ${image.name}`);
+        }
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("property-images").getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrl);
+      }
     }
 
     return uploadedUrls;
@@ -684,6 +695,9 @@ export default function PropertyForm({
                   <FeaturesAmenitiesModal
                     onSave={(values) =>
                       setFormData((prev) => ({ ...prev, amenities: values }))
+                    }
+                    type={
+                      formData.propertyCategory === "Plots" ? "plot" : "default"
                     }
                     selectedAmenities={formData.amenities}
                   />
