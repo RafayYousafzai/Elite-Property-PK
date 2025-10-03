@@ -47,7 +47,26 @@ export default async function Home() {
             description:
               "Dive into the world of real estate with Sheraz Saleem, exploring market trends, investment strategies, and the future of property in this insightful podcast episode.",
             youtubeId: "https://youtu.be/kFCfQoVB90Q?si=QFJh23B7qRy3MzQj",
-            // category: "Property Tours",
+            category: "Property Tours",
+            highlightText: "Exclusive lifestyle access.",
+          },
+          {
+            id: "1",
+            title: "Solar powered 5 bed designer residence in DHA Phase 2.",
+            description:
+              "A stunning 5-bedroom designer residence powered by solar energy, located in the prestigious DHA Phase 2.",
+            youtubeId: "https://youtu.be/0niH-x7L3Zk?si=k_-76bAIiX-YsbQE",
+            category: "Investment Insights",
+            highlightText: "Smart property decisions.",
+          },
+          {
+            id: "2",
+            title:
+              "Elite Lounge Podcast Ep 2 | Real Estate, RECA & Realtor Insights",
+            description:
+              "Dive into the world of real estate with Sheraz Saleem, exploring market trends, investment strategies, and the future of property in this insightful podcast episode.",
+            youtubeId: "https://youtu.be/kFCfQoVB90Q?si=QFJh23B7qRy3MzQj",
+            category: "Property Tours",
             highlightText: "Exclusive lifestyle access.",
           },
         ]}
