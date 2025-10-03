@@ -33,6 +33,10 @@ export const transformDatabaseProperty = (
     no_of_installments: dbProperty.no_of_installments,
     monthly_installments: dbProperty.monthly_installments,
     constructed_covered_area: dbProperty.constructed_covered_area,
+    is_sold: dbProperty.is_sold || false,
+    phase: dbProperty.phase,
+    sector: dbProperty.sector,
+    street: dbProperty.street,
   };
 };
 

@@ -35,12 +35,15 @@ export default function CreatePropertyPage() {
         rate: Number(formData.price) || 0,
         area: Number(formData.areaSize) || 0,
         beds:
-          formData.bedrooms && formData.bedrooms !== "Studio"
+          formData.propertyCategory === "Home" &&
+          formData.bedrooms &&
+          formData.bedrooms !== "Studio"
             ? parseInt(formData.bedrooms.replace("+", ""), 10)
             : null,
-        baths: formData.bathrooms
-          ? parseInt(formData.bathrooms.replace("+", ""), 10)
-          : null,
+        baths:
+          formData.propertyCategory === "Home" && formData.bathrooms
+            ? parseInt(formData.bathrooms.replace("+", ""), 10)
+            : null,
         photo_sphere: photo_sphere || null,
         property_type: (formData.propertyType || "plot").toLowerCase(),
         images: uploadedImages,
@@ -66,6 +69,19 @@ export default function CreatePropertyPage() {
         constructed_covered_area: formData.constructed_covered_area
           ? Number(formData.constructed_covered_area)
           : null,
+        is_sold: formData.is_sold || false,
+        phase:
+          formData.propertyCategory === "Plots" && formData.phase
+            ? formData.phase
+            : null,
+        sector:
+          formData.propertyCategory === "Plots" && formData.sector
+            ? formData.sector
+            : null,
+        street:
+          formData.propertyCategory === "Plots" && formData.street
+            ? formData.street
+            : null,
 
         // JSON fields
         features: formData.amenities || {},

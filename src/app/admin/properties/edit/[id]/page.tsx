@@ -45,22 +45,37 @@ export default function EditPropertyPage() {
             : [];
 
           setInitialData({
-            name: data.name || "",
-            slug: data.slug || "",
+            title: data.name || "",
             location: data.location || "",
-            rate: data.rate || "",
-            area: data.area || 0,
-            area_sqft: data.area_sqft,
-            area_sqyards: data.area_sqyards,
-            area_marla: data.area_marla,
-            area_kanal: data.area_kanal,
-            beds: data.beds,
-            baths: data.baths,
-            photo_sphere: data.photo_sphere || "",
-            property_type: data.property_type || "house",
+            price: String(data.rate) || "",
+            areaSize: data.area || 0,
+            areaUnit: data.area_unit || "Marla",
+            bedrooms:
+              data.beds !== null && data.beds !== undefined
+                ? String(data.beds)
+                : undefined,
+            bathrooms:
+              data.baths !== null && data.baths !== undefined
+                ? String(data.baths)
+                : undefined,
+            propertyType: data.property_type || "house",
+            propertyCategory: data.property_category || "Home",
+            city: data.city || "",
+            purpose: data.purpose || "Sell",
             images: images,
             description: data.description || "",
-            is_featured: data.is_featured || false,
+            amenities: data.features || {},
+            videoUrl: data.video_url || "",
+            installmentAvailable: data.installment_available || false,
+            advanceAmount: data.advance_amount || undefined,
+            noOfInstallments: data.no_of_installments || undefined,
+            monthlyInstallments: data.monthly_installments || undefined,
+            constructed_covered_area:
+              data.constructed_covered_area || undefined,
+            is_sold: data.is_sold || false,
+            phase: data.phase || "",
+            sector: data.sector || "",
+            street: data.street || "",
           });
         }
       } catch {
@@ -77,30 +92,70 @@ export default function EditPropertyPage() {
 
   const handleSubmit = async (
     formData: PropertyFormData,
-    uploadedImages: string[]
+    uploadedImages: string[],
+    photo_sphere: string | undefined
   ) => {
     setLoading(true);
     setError("");
 
     try {
-      // Prepare data for database - store only image URLs
+      // Map frontend data → DB schema (same as create page)
       const propertyData = {
-        name: formData.name,
-        slug: formData.slug,
+        name: formData.title,
         location: formData.location,
-        rate: formData.rate,
-        area: formData.area,
-        area_sqft: formData.area_sqft,
-        area_sqyards: formData.area_sqyards,
-        area_marla: formData.area_marla,
-        area_kanal: formData.area_kanal,
-        beds: formData.beds,
-        baths: formData.baths,
-        photo_sphere: formData.photo_sphere,
-        property_type: formData.property_type,
-        images: uploadedImages, // Store only URLs in database
-        description: formData.description,
-        is_featured: formData.is_featured,
+        rate: Number(formData.price) || 0,
+        area: Number(formData.areaSize) || 0,
+        beds:
+          formData.propertyCategory === "Home" &&
+          formData.bedrooms &&
+          formData.bedrooms !== "Studio"
+            ? parseInt(formData.bedrooms.replace("+", ""), 10)
+            : null,
+        baths:
+          formData.propertyCategory === "Home" && formData.bathrooms
+            ? parseInt(formData.bathrooms.replace("+", ""), 10)
+            : null,
+        photo_sphere: photo_sphere || null,
+        property_type: (formData.propertyType || "plot").toLowerCase(),
+        images: uploadedImages,
+        description: formData.description || null,
+        is_featured: false,
+
+        // New fields
+        purpose: formData.purpose || null,
+        property_category: formData.propertyCategory || null,
+        city: formData.city || null,
+        area_unit: formData.areaUnit || null,
+        installment_available: formData.installmentAvailable || false,
+        video_url: formData.videoUrl || null,
+        advance_amount: formData.advanceAmount
+          ? Number(formData.advanceAmount)
+          : null,
+        no_of_installments: formData.noOfInstallments
+          ? Number(formData.noOfInstallments)
+          : null,
+        monthly_installments: formData.monthlyInstallments
+          ? Number(formData.monthlyInstallments)
+          : null,
+        constructed_covered_area: formData.constructed_covered_area
+          ? Number(formData.constructed_covered_area)
+          : null,
+        is_sold: formData.is_sold || false,
+        phase:
+          formData.propertyCategory === "Plots" && formData.phase
+            ? formData.phase
+            : null,
+        sector:
+          formData.propertyCategory === "Plots" && formData.sector
+            ? formData.sector
+            : null,
+        street:
+          formData.propertyCategory === "Plots" && formData.street
+            ? formData.street
+            : null,
+
+        // JSON fields
+        features: formData.amenities || {},
       };
 
       const result = await updateProperty(propertyId, propertyData);

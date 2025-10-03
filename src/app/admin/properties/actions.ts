@@ -30,6 +30,10 @@ export interface PropertyData {
   monthly_installments?: number | null;
   constructed_covered_area?: number | null;
   features?: object;
+  is_sold?: boolean;
+  phase?: string | null;
+  sector?: string | null;
+  street?: string | null;
 }
 
 function generateSlug(name: string): string {

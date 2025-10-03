@@ -26,6 +26,10 @@ export type Property = {
   no_of_installments?: number | null;
   monthly_installments?: number | null;
   constructed_covered_area?: number | null;
+  is_sold?: boolean;
+  phase?: string | null;
+  sector?: string | null;
+  street?: string | null;
 };
 
 // Database type matching your Supabase table
@@ -57,6 +61,10 @@ export type DatabaseProperty = {
   no_of_installments: number | null;
   monthly_installments: number | null;
   constructed_covered_area: number | null;
+  is_sold: boolean | null;
+  phase: string | null;
+  sector: string | null;
+  street: string | null;
 };
 
 interface PropertyImage {

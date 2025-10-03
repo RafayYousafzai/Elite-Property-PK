@@ -46,6 +46,10 @@ export interface PropertyFormData {
   videoUrl: string;
   photo_sphere: File | null;
   constructed_covered_area?: number;
+  is_sold?: boolean;
+  phase?: string;
+  sector?: string;
+  street?: string;
 }
 
 const propertyTypes = {
@@ -133,6 +137,10 @@ export default function PropertyForm({
     videoUrl: "",
     photo_sphere: null,
     constructed_covered_area: 0,
+    is_sold: false,
+    phase: "",
+    sector: "",
+    street: "",
     ...initialData,
   });
 
@@ -475,7 +483,7 @@ export default function PropertyForm({
                   type="number"
                   label="Constructed Covered Area"
                   placeholder="Constructed Covered Area"
-                  value={formData.constructed_covered_area || 0}
+                  value={String(formData.constructed_covered_area || 0)}
                   onValueChange={(value) =>
                     setFormData((prev) => ({
                       ...prev,
@@ -557,51 +565,116 @@ export default function PropertyForm({
           </div>
           <Card className="p-4">
             <CardBody className="space-y-8">
-              <div className="space-y-4">
-                <label className="text-lg font-semibold text-foreground-500">
-                  Bedrooms
-                </label>
-                <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-                  {bedroomOptions.map((option) => (
-                    <Button
-                      key={option}
-                      variant={formData.bedrooms === option ? "shadow" : "flat"}
-                      color={
-                        formData.bedrooms === option ? "primary" : "default"
+              {/* Only show bedrooms and bathrooms for Home category */}
+              {formData.propertyCategory === "Home" && (
+                <>
+                  <div className="space-y-4">
+                    <label className="text-lg font-semibold text-foreground-500">
+                      Bedrooms
+                    </label>
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                      {bedroomOptions.map((option) => (
+                        <Button
+                          key={option}
+                          variant={
+                            formData.bedrooms === option ? "shadow" : "flat"
+                          }
+                          color={
+                            formData.bedrooms === option ? "primary" : "default"
+                          }
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              bedrooms: option,
+                            }))
+                          }
+                          className="h-12 text-base font-medium"
+                        >
+                          {option}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <label className="text-lg font-semibold text-foreground-500">
+                      Bathrooms
+                    </label>
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                      {bathroomOptions.map((option) => (
+                        <Button
+                          key={option}
+                          variant={
+                            formData.bathrooms === option ? "shadow" : "flat"
+                          }
+                          color={
+                            formData.bathrooms === option
+                              ? "primary"
+                              : "default"
+                          }
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              bathrooms: option,
+                            }))
+                          }
+                          className="h-12 text-base font-medium"
+                        >
+                          {option}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Only show phase, sector, street for Plots category */}
+              {formData.propertyCategory === "Plots" && (
+                <div className="space-y-4">
+                  <label className="text-lg font-semibold text-foreground-500">
+                    Plot Details (Optional)
+                  </label>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <Input
+                      label="Phase"
+                      placeholder="e.g. Phase 5"
+                      value={formData.phase || ""}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, phase: value }))
                       }
-                      onClick={() =>
-                        setFormData((prev) => ({ ...prev, bedrooms: option }))
+                      size="lg"
+                    />
+                    <Input
+                      label="Sector"
+                      placeholder="e.g. Sector A"
+                      value={formData.sector || ""}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, sector: value }))
                       }
-                      className="h-12 text-base font-medium"
-                    >
-                      {option}
-                    </Button>
-                  ))}
+                      size="lg"
+                    />
+                    <Input
+                      label="Street"
+                      placeholder="e.g. Street 12"
+                      value={formData.street || ""}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, street: value }))
+                      }
+                      size="lg"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Is Sold Switch */}
               <div className="space-y-4">
-                <label className="text-lg font-semibold text-foreground-500">
-                  Bathrooms
-                </label>
-                <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-                  {bathroomOptions.map((option) => (
-                    <Button
-                      key={option}
-                      variant={
-                        formData.bathrooms === option ? "shadow" : "flat"
-                      }
-                      color={
-                        formData.bathrooms === option ? "primary" : "default"
-                      }
-                      onClick={() =>
-                        setFormData((prev) => ({ ...prev, bathrooms: option }))
-                      }
-                      className="h-12 text-base font-medium"
-                    >
-                      {option}
-                    </Button>
-                  ))}
-                </div>
+                <Switch
+                  isSelected={formData.is_sold || false}
+                  onValueChange={(isSelected) =>
+                    setFormData((prev) => ({ ...prev, is_sold: isSelected }))
+                  }
+                >
+                  <span className="text-base font-semibold">Mark as Sold</span>
+                </Switch>
               </div>
               <div className="space-y-4 flex justify-between">
                 <label className="text-lg font-semibold text-foreground-500">
