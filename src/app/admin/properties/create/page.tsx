@@ -34,30 +34,44 @@ export default function CreatePropertyPage() {
         location: formData.location,
         rate: Number(formData.price) || 0,
         area: Number(formData.areaSize) || 0,
-        photo_sphere: photo_sphere,
-        property_type: (formData.propertyType || "plot").toLowerCase() as
-          | "house"
-          | "apartment"
-          | "plot"
-          | "commercial plot",
+        beds:
+          formData.bedrooms && formData.bedrooms !== "Studio"
+            ? parseInt(formData.bedrooms.replace("+", ""), 10)
+            : null,
+        baths: formData.bathrooms
+          ? parseInt(formData.bathrooms.replace("+", ""), 10)
+          : null,
+        photo_sphere: photo_sphere || null,
+        property_type: (formData.propertyType || "plot").toLowerCase(),
         images: uploadedImages,
-        description: formData.description,
+        description: formData.description || null,
         is_featured: false,
 
         // New fields
-        purpose: formData.purpose,
-        property_category: formData.propertyCategory,
-        city: formData.city,
-        area_unit: formData.areaUnit,
-        installment_available: formData.installmentAvailable,
-        video_url: formData.videoUrl,
-        advance_amount: formData.advanceAmount || null,
-        no_of_installments: formData.noOfInstallments || null,
-        monthly_installments: formData.monthlyInstallments || null,
+        purpose: formData.purpose || null,
+        property_category: formData.propertyCategory || null,
+        city: formData.city || null,
+        area_unit: formData.areaUnit || null,
+        installment_available: formData.installmentAvailable || false,
+        video_url: formData.videoUrl || null,
+        advance_amount: formData.advanceAmount
+          ? Number(formData.advanceAmount)
+          : null,
+        no_of_installments: formData.noOfInstallments
+          ? Number(formData.noOfInstallments)
+          : null,
+        monthly_installments: formData.monthlyInstallments
+          ? Number(formData.monthlyInstallments)
+          : null,
+        constructed_covered_area: formData.constructed_covered_area
+          ? Number(formData.constructed_covered_area)
+          : null,
 
         // JSON fields
         features: formData.amenities || {},
       };
+
+      console.log("Sending property data:", propertyData);
 
       const result = await createProperty(propertyData);
 

@@ -132,6 +132,7 @@ export default function PropertyForm({
     images: [],
     videoUrl: "",
     photo_sphere: null,
+    constructed_covered_area: 0,
     ...initialData,
   });
 
@@ -467,6 +468,19 @@ export default function PropertyForm({
                   value={formData.price}
                   onValueChange={(value) =>
                     setFormData((prev) => ({ ...prev, price: value }))
+                  }
+                  size="lg"
+                />
+                <Input
+                  type="number"
+                  label="Constructed Covered Area"
+                  placeholder="Constructed Covered Area"
+                  value={formData.constructed_covered_area || 0}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      constructed_covered_area: Number(value),
+                    }))
                   }
                   size="lg"
                 />

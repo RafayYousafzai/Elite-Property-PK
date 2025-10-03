@@ -12,10 +12,6 @@ export const transformDatabaseProperty = (
     location: dbProperty.location,
     rate: dbProperty.rate,
     area: dbProperty.area,
-    area_sqyards: dbProperty.area_sqyards,
-    area_marla: dbProperty.area_marla,
-    area_kanal: dbProperty.area_kanal,
-
     beds: dbProperty.beds,
     baths: dbProperty.baths,
     photo_sphere: dbProperty.photo_sphere,
@@ -25,6 +21,18 @@ export const transformDatabaseProperty = (
     is_featured: dbProperty.is_featured,
     created_at: dbProperty.created_at,
     updated_at: dbProperty.updated_at,
+    // New fields
+    features: dbProperty.features || {},
+    purpose: dbProperty.purpose,
+    property_category: dbProperty.property_category,
+    city: dbProperty.city,
+    area_unit: dbProperty.area_unit,
+    installment_available: dbProperty.installment_available || false,
+    video_url: dbProperty.video_url,
+    advance_amount: dbProperty.advance_amount,
+    no_of_installments: dbProperty.no_of_installments,
+    monthly_installments: dbProperty.monthly_installments,
+    constructed_covered_area: dbProperty.constructed_covered_area,
   };
 };
 
@@ -59,23 +67,41 @@ export async function getFilteredProperties(
 
     let query = supabase.from("properties").select("*");
 
-    // Apply property type filter
+    // Apply property type filter - now supports all property types
     if (filters.propertyType !== "all") {
-      let dbPropertyType: string;
       if (filters.propertyType === "homes") {
-        dbPropertyType = "house";
+        // Match all home types
+        query = query.in("property_type", [
+          "house",
+          "flat",
+          "upper portion",
+          "lower portion",
+          "farm house",
+          "room",
+          "penthouse",
+          "apartment", // legacy
+        ]);
       } else if (filters.propertyType === "apartments") {
-        dbPropertyType = "apartment";
-      } else {
-        dbPropertyType = "plot";
+        query = query.in("property_type", ["flat", "apartment", "penthouse"]);
+      } else if (filters.propertyType === "plots") {
+        // Match all plot types
+        query = query.in("property_type", [
+          "residential plot",
+          "commercial plot",
+          "agricultural land",
+          "industrial land",
+          "plot file",
+          "plot form",
+          "plot", // legacy
+        ]);
       }
-      query = query.eq("property_type", dbPropertyType);
     }
 
     // Apply price range filter
     if (filters.priceRange[0] > 0 || filters.priceRange[1] < 1000000) {
-      // Convert rate string to number for comparison
-      // This is a bit tricky with text fields, we'll handle it in post-processing
+      query = query
+        .gte("rate", filters.priceRange[0])
+        .lte("rate", filters.priceRange[1]);
     }
 
     // Apply area filter
@@ -160,6 +186,7 @@ export async function getPropertiesCount(): Promise<{
   houses: number;
   apartments: number;
   plots: number;
+  commercial: number;
 }> {
   try {
     const supabase = createBrowserClient();
@@ -169,20 +196,52 @@ export async function getPropertiesCount(): Promise<{
       { count: houses },
       { count: apartments },
       { count: plots },
+      { count: commercial },
     ] = await Promise.all([
       supabase.from("properties").select("*", { count: "exact", head: true }),
+      // Count all home types
       supabase
         .from("properties")
         .select("*", { count: "exact", head: true })
-        .eq("property_type", "house"),
+        .in("property_type", [
+          "house",
+          "flat",
+          "upper portion",
+          "lower portion",
+          "farm house",
+          "room",
+          "penthouse",
+        ]),
+      // Count apartment types
       supabase
         .from("properties")
         .select("*", { count: "exact", head: true })
-        .eq("property_type", "apartment"),
+        .in("property_type", ["apartment", "flat", "penthouse"]),
+      // Count plot types
       supabase
         .from("properties")
         .select("*", { count: "exact", head: true })
-        .eq("property_type", "plot"),
+        .in("property_type", [
+          "plot",
+          "residential plot",
+          "agricultural land",
+          "industrial land",
+          "plot file",
+          "plot form",
+        ]),
+      // Count commercial types
+      supabase
+        .from("properties")
+        .select("*", { count: "exact", head: true })
+        .in("property_type", [
+          "commercial plot",
+          "office",
+          "shop",
+          "warehouse",
+          "factory",
+          "building",
+          "other",
+        ]),
     ]);
 
     return {
@@ -190,6 +249,7 @@ export async function getPropertiesCount(): Promise<{
       houses: houses || 0,
       apartments: apartments || 0,
       plots: plots || 0,
+      commercial: commercial || 0,
     };
   } catch (error) {
     console.error("Error in getPropertiesCount:", error);
@@ -198,6 +258,7 @@ export async function getPropertiesCount(): Promise<{
       houses: 0,
       apartments: 0,
       plots: 0,
+      commercial: 0,
     };
   }
 }

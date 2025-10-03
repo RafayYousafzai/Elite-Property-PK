@@ -12,22 +12,23 @@ export interface PropertyData {
   area: number;
   beds?: number | null;
   baths?: number | null;
-  photo_sphere?: string;
-  property_type: "house" | "apartment" | "plot" | "commercial plot";
+  photo_sphere?: string | null;
+  property_type: string; // Accept any property type string
   images: string[];
-  description?: string;
+  description?: string | null;
   is_featured: boolean;
 
   // New fields
-  purpose?: string;
-  property_category?: string;
-  city?: string;
-  area_unit?: string;
+  purpose?: string | null;
+  property_category?: string | null;
+  city?: string | null;
+  area_unit?: string | null;
   installment_available?: boolean;
-  video_url?: string;
+  video_url?: string | null;
   advance_amount?: number | null;
   no_of_installments?: number | null;
   monthly_installments?: number | null;
+  constructed_covered_area?: number | null;
   features?: object;
 }
 

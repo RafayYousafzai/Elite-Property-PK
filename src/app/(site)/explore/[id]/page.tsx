@@ -4,9 +4,7 @@ import { getPropertyBySlug } from "@/lib/supabase/properties";
 import { Property } from "@/types/property";
 import { useParams } from "next/navigation";
 import { Icon } from "@iconify/react";
-import { testimonials } from "@/app/api/testimonial";
 import Link from "next/link";
-import Image from "next/image";
 import ImageCarousel from "@/components/shared/ImageCarousel";
 import GoogleMap from "@/components/shared/GoogleMap";
 
@@ -26,8 +24,6 @@ export default function Details() {
 
       try {
         const propertyData = await getPropertyBySlug(id);
-        console.log(propertyData);
-
         if (propertyData) {
           setProperty(propertyData);
         } else {
@@ -44,14 +40,12 @@ export default function Details() {
     fetchProperty();
   }, [id]);
 
-  console.log(property);
-
   if (loading) {
     return (
       <section className="!pt-44 pb-20 relative">
         <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <div className="flex items-center justify-center h-screen">
+            <div className="w-20 h-20 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
           </div>
         </div>
       </section>
@@ -62,7 +56,13 @@ export default function Details() {
     return (
       <section className="!pt-44 pb-20 relative">
         <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
-          <div className="text-center">
+          <div className="text-center py-20">
+            <Icon
+              icon="ph:house-x"
+              width={80}
+              height={80}
+              className="text-dark/20 dark:text-white/20 mx-auto mb-6"
+            />
             <h1 className="text-4xl font-bold text-dark dark:text-white mb-4">
               Property Not Found
             </h1>
@@ -71,7 +71,7 @@ export default function Details() {
             </p>
             <Link
               href="/explore"
-              className="py-4 px-8 bg-primary text-white rounded-full hover:bg-dark duration-300"
+              className="py-4 px-8 bg-primary text-white rounded-full hover:bg-dark duration-300 inline-block"
             >
               Back to Properties
             </Link>
@@ -84,405 +84,400 @@ export default function Details() {
   return (
     <section className="!pt-44 pb-20 relative">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
-        <div className="grid grid-cols-12 items-end gap-6">
+        {/* Header */}
+        <div className="grid grid-cols-12 items-end gap-6 mb-8">
           <div className="lg:col-span-8 col-span-12">
-            <h1 className="lg:text-52 text-40 font-semibold text-dark dark:text-white">
-              {property?.name}
+            <div className="flex items-center gap-3 mb-3 flex-wrap">
+              {property.purpose && (
+                <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                  For {property.purpose}
+                </span>
+              )}
+              {property.property_category && (
+                <span className="px-4 py-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium">
+                  {property.property_category}
+                </span>
+              )}
+              {property.is_featured && (
+                <span className="px-4 py-1.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-full text-sm font-medium">
+                  ⭐ Featured
+                </span>
+              )}
+            </div>
+            <h1 className="lg:text-5xl text-4xl font-bold text-dark dark:text-white mb-4">
+              {property.name}
             </h1>
-            <div className="flex gap-2.5">
+            <div className="flex items-start gap-2.5 mb-2">
               <Icon
                 icon="ph:map-pin"
                 width={24}
                 height={24}
-                className="text-dark/50 dark:text-white/50"
+                className="text-dark/50 dark:text-white/50 flex-shrink-0 mt-1"
               />
-              <p className="text-dark/50 dark:text-white/50 text-xm">
-                {property?.location}
+              <p className="text-dark/60 dark:text-white/60 text-base">
+                {property.location}
               </p>
             </div>
-          </div>
-          {property?.beds && property?.baths && property?.area && (
-            <div className="lg:col-span-4 col-span-12">
-              <div className="flex flex-wrap gap-4">
-                <div className="flex flex-col gap-2 border-e border-black/10 dark:border-white/20 pr-2 xs:pr-4 mobile:pr-8">
-                  <Icon icon={"solar:bed-linear"} width={20} height={20} />
-                  <p className="text-sm mobile:text-base font-normal text-black dark:text-white">
-                    {property?.beds} Bedrooms
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 border-e border-black/10 dark:border-white/20 px-2 xs:px-4 mobile:px-8">
-                  <Icon icon={"solar:bath-linear"} width={20} height={20} />
-                  <p className="text-sm mobile:text-base font-normal text-black dark:text-white">
-                    {property?.baths} Bathrooms
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 pl-2 xs:pl-4 mobile:pl-8">
-                  <Icon
-                    icon={"lineicons:arrow-all-direction"}
-                    width={20}
-                    height={20}
-                  />
-                  <p className="text-sm mobile:text-base font-normal text-black dark:text-white">
-                    {property?.area} sq ft
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        {/* Professional Image Carousel with 360° Viewer */}
-        <ImageCarousel
-          images={property?.images || []}
-          photoSphere={property?.photo_sphere || undefined}
-        />
-        <div className="grid grid-cols-12 gap-8 mt-32 md:mt-10">
-          <div className="lg:col-span-8 col-span-12">
-            <h3 className="text-xl font-medium">Property details</h3>
-            <div className="py-8 my-8 border-y border-dark/10 dark:border-white/20 flex flex-col gap-8">
-              <div className="flex items-center gap-6">
-                <div>
-                  <Image
-                    src="/images/SVGs/property-details.svg"
-                    width={400}
-                    height={500}
-                    alt=""
-                    className="w-8 h-8 dark:hidden"
-                    unoptimized={true}
-                  />
-                  <Image
-                    src="/images/SVGs/property-details-white.svg"
-                    width={400}
-                    height={500}
-                    alt=""
-                    className="w-8 h-8 dark:block hidden"
-                    unoptimized={true}
-                  />
-                </div>
-                <div>
-                  <h3 className="text-dark dark:text-white text-xm">
-                    Property details
-                  </h3>
-                  <p className="text-base text-dark/50 dark:text-white/50">
-                    One of the few homes in the area with a private pool.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-6">
-                <div>
-                  <Image
-                    src="/images/SVGs/smart-home-access.svg"
-                    width={400}
-                    height={500}
-                    alt=""
-                    className="w-8 h-8 dark:hidden"
-                    unoptimized={true}
-                  />
-                  <Image
-                    src="/images/SVGs/smart-home-access-white.svg"
-                    width={400}
-                    height={500}
-                    alt=""
-                    className="w-8 h-8 dark:block hidden"
-                    unoptimized={true}
-                  />
-                </div>
-                <div>
-                  <h3 className="text-dark dark:text-white text-xm">
-                    Smart home access
-                  </h3>
-                  <p className="text-base text-dark/50 dark:text-white/50">
-                    Easily check yourself in with a modern keypad system.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-6">
-                <div>
-                  <Image
-                    src="/images/SVGs/energyefficient.svg"
-                    width={400}
-                    height={500}
-                    alt=""
-                    className="w-8 h-8 dark:hidden"
-                    unoptimized={true}
-                  />
-                  <Image
-                    src="/images/SVGs/energyefficient-white.svg"
-                    width={400}
-                    height={500}
-                    alt=""
-                    className="w-8 h-8 dark:block hidden"
-                    unoptimized={true}
-                  />
-                </div>
-                <div>
-                  <h3 className="text-dark dark:text-white text-xm">
-                    Energy efficient
-                  </h3>
-                  <p className="text-base text-dark/50 dark:text-white/50">
-                    Built in 2025 with sustainable and smart-home features.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Area Details Section */}
-            <div className="py-8 my-8 border-y border-dark/10 dark:border-white/20">
-              <h3 className="text-xl font-medium mb-6">Area Measurements</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {property?.area && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Icon
-                        icon="mdi:ruler-square"
-                        width={20}
-                        height={20}
-                        className="text-primary"
-                      />
-                      <p className="text-sm text-dark/50 dark:text-white/50">
-                        Square Feet
-                      </p>
-                    </div>
-                    <p className="text-lg font-semibold text-dark dark:text-white">
-                      {property.area.toLocaleString()} sq ft
-                    </p>
-                  </div>
-                )}
-
-                {property?.area_sqyards && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Icon
-                        icon="mdi:square-outline"
-                        width={20}
-                        height={20}
-                        className="text-primary"
-                      />
-                      <p className="text-sm text-dark/50 dark:text-white/50">
-                        Square Yards
-                      </p>
-                    </div>
-                    <p className="text-lg font-semibold text-dark dark:text-white">
-                      {property.area_sqyards.toLocaleString()} sq yd
-                    </p>
-                  </div>
-                )}
-
-                {property?.area_marla && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Icon
-                        icon="mdi:land-plots"
-                        width={20}
-                        height={20}
-                        className="text-primary"
-                      />
-                      <p className="text-sm text-dark/50 dark:text-white/50">
-                        Marla
-                      </p>
-                    </div>
-                    <p className="text-lg font-semibold text-dark dark:text-white">
-                      {property.area_marla.toLocaleString()} Marla
-                    </p>
-                  </div>
-                )}
-
-                {property?.area_kanal && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Icon
-                        icon="mdi:land-fields"
-                        width={20}
-                        height={20}
-                        className="text-primary"
-                      />
-                      <p className="text-sm text-dark/50 dark:text-white/50">
-                        Kanal
-                      </p>
-                    </div>
-                    <p className="text-lg font-semibold text-dark dark:text-white">
-                      {property.area_kanal.toLocaleString()} Kanal
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-5">
-              {property?.description ? (
-                <div className="text-dark dark:text-white text-xm whitespace-pre-line">
-                  {property?.description}
-                </div>
-              ) : (
-                <p className="text-dark dark:text-white text-xm ">
-                  Description not available.
-                </p>
-              )}
-              {/* <p className="text-dark dark:text-white text-xm ">
-                Step inside to discover an open-concept layout that seamlessly
-                connects the kitchen, dining, and living spaces. the gourmet
-                kitchen is equipped with top-of-the-line appliances, sleek
-                cabinetry, and a large island perfect for casual dining or meal
-                prep. the sunlit living room offers floor-to-ceiling windows,
-                creating a bright and airy atmosphere while providing stunning
-                views of the outdoor space.
-              </p>
-              <p className="text-dark dark:text-white text-xm ">
-                The primary suite serves as a private retreat with a spa-like
-                ensuite bathroom and a spacious walk-in closet. each additional
-                bedroom is thoughtfully designed with comfort and style in mind,
-                offering ample space and modern finishes. the home’s three
-                bathrooms feature high-end fixtures, custom vanities, and
-                elegant tiling.
-              </p>
-              <p className="text-dark dark:text-white text-xm ">
-                Outdoor living is equally impressive, with a beautifully
-                landscaped backyard, multiple lounge areas, and two fully
-                equipped bar spaces.
-              </p> */}
-            </div>
-            <div className="py-8 mt-8 border-t border-dark/5 dark:border-white/15">
-              <h3 className="text-xl font-medium">What this property offers</h3>
-              <div className="grid grid-cols-3 mt-5 gap-6">
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    icon="ph:aperture"
-                    width={24}
-                    height={24}
-                    className="text-dark dark:text-white"
-                  />
-                  <p className="text-base dark:text-white text-dark">
-                    Smart Home Integration
-                  </p>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    icon="ph:chart-pie-slice"
-                    width={24}
-                    height={24}
-                    className="text-dark dark:text-white"
-                  />
-                  <p className="text-base dark:text-white text-dark">
-                    Spacious Living Areas
-                  </p>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    icon="ph:television-simple"
-                    width={24}
-                    height={24}
-                    className="text-dark dark:text-white"
-                  />
-                  <p className="text-base dark:text-white text-dark">
-                    Energy Efficiency
-                  </p>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    icon="ph:sun"
-                    width={24}
-                    height={24}
-                    className="text-dark dark:text-white"
-                  />
-                  <p className="text-base dark:text-white text-dark">
-                    Natural Light
-                  </p>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    icon="ph:video-camera"
-                    width={24}
-                    height={24}
-                    className="text-dark dark:text-white"
-                  />
-                  <p className="text-base dark:text-white text-dark">
-                    Security Systems
-                  </p>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    icon="ph:cloud"
-                    width={24}
-                    height={24}
-                    className="text-dark dark:text-white"
-                  />
-                  <p className="text-base dark:text-white text-dark">
-                    Outdoor Spaces
-                  </p>
-                </div>
-              </div>
-            </div>
-            {property?.location ? (
-              <GoogleMap
-                address={property.location}
-                height="400"
-                className="w-full"
-              />
-            ) : (
-              <div className="w-full h-[400px] bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center">
-                <p className="text-gray-500 dark:text-gray-400">
-                  Location not available
+            {property.city && (
+              <div className="flex items-center gap-2.5">
+                <Icon
+                  icon="ph:buildings"
+                  width={20}
+                  height={20}
+                  className="text-dark/50 dark:text-white/50"
+                />
+                <p className="text-dark/50 dark:text-white/50 text-sm font-medium">
+                  {property.city}
                 </p>
               </div>
             )}
           </div>
           <div className="lg:col-span-4 col-span-12">
-            <div className="bg-primary/10 p-8 rounded-2xl relative z-10 overflow-hidden md:mt-8">
-              <h4 className="text-dark text-3xl font-medium dark:text-white">
-                Rs. {property?.rate}
+            <div className="bg-gradient-to-br from-primary to-primary/80 p-6 rounded-2xl shadow-lg">
+              <p className="text-white/80 text-sm mb-1">Price</p>
+              <h4 className="text-white text-4xl font-bold mb-2">
+                PKR {Number(property.rate).toLocaleString()}
               </h4>
-              <p className="text-sm text-dark/50 dark:text-white">
-                Discounted Price
-              </p>
-              <Link
-                href="#"
-                className="py-4 px-8 bg-primary text-white rounded-full w-full block text-center hover:bg-dark duration-300 text-base mt-8 hover:cursor-pointer"
-              >
-                Get in touch
-              </Link>
-              <div className="absolute right-0 top-4 -z-[1]">
-                <Image
-                  src="/images/properties/vector.svg"
-                  width={400}
-                  height={500}
-                  alt="vector"
-                  unoptimized={true}
-                />
+              {property.area_unit && (
+                <p className="text-white/80 text-sm">
+                  {property.area} {property.area_unit}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-10">
+          <ImageCarousel
+            images={property.images || []}
+            photoSphere={property.photo_sphere || undefined}
+          />
+        </div>
+
+        <div className="grid grid-cols-12 gap-8">
+          <div className="lg:col-span-8 col-span-12 space-y-8">
+            {/* Overview */}
+            <div className="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-dark/10 dark:border-white/10 shadow-sm">
+              <h3 className="text-2xl font-semibold text-dark dark:text-white mb-6">
+                Property Overview
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {property.beds !== null && (
+                  <div className="flex flex-col items-center text-center p-4 bg-primary/5 dark:bg-primary/10 rounded-xl">
+                    <Icon
+                      icon="ph:bed"
+                      width={32}
+                      height={32}
+                      className="text-primary mb-2"
+                    />
+                    <p className="text-2xl font-bold text-dark dark:text-white">
+                      {property.beds}
+                    </p>
+                    <p className="text-sm text-dark/50 dark:text-white/50">
+                      Bedroom{property.beds !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                )}
+                {property.baths !== null && (
+                  <div className="flex flex-col items-center text-center p-4 bg-primary/5 dark:bg-primary/10 rounded-xl">
+                    <Icon
+                      icon="ph:bathtub"
+                      width={32}
+                      height={32}
+                      className="text-primary mb-2"
+                    />
+                    <p className="text-2xl font-bold text-dark dark:text-white">
+                      {property.baths}
+                    </p>
+                    <p className="text-sm text-dark/50 dark:text-white/50">
+                      Bathroom{property.baths !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                )}
+                <div className="flex flex-col items-center text-center p-4 bg-primary/5 dark:bg-primary/10 rounded-xl">
+                  <Icon
+                    icon="ph:ruler"
+                    width={32}
+                    height={32}
+                    className="text-primary mb-2"
+                  />
+                  <p className="text-2xl font-bold text-dark dark:text-white">
+                    {property.area}
+                  </p>
+                  <p className="text-sm text-dark/50 dark:text-white/50">
+                    {property.area_unit || "Area"}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center text-center p-4 bg-primary/5 dark:bg-primary/10 rounded-xl">
+                  <Icon
+                    icon="ph:house"
+                    width={32}
+                    height={32}
+                    className="text-primary mb-2"
+                  />
+                  <p className="text-lg font-bold text-dark dark:text-white capitalize">
+                    {property.property_type.replace(/-/g, " ")}
+                  </p>
+                  <p className="text-sm text-dark/50 dark:text-white/50">
+                    Type
+                  </p>
+                </div>
               </div>
             </div>
-            {testimonials.slice(0, 1).map((item, index) => (
-              <div
-                key={index}
-                className="border p-10 rounded-2xl border-dark/10 dark:border-white/20 mt-10 flex flex-col gap-6"
-              >
-                <Icon
-                  icon="ph:house-simple"
-                  width={44}
-                  height={44}
-                  className="text-primary"
-                />
-                <p className="text-xm text-dark dark:text-white">
-                  {item.review}
-                </p>
-                <div className="flex items-center gap-6">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    width={400}
-                    height={500}
-                    className="w-20 h-20 rounded-2xl"
-                    unoptimized={true}
-                  />
-                  <div className="">
-                    <h3 className="text-xm text-dark dark:text-white">
-                      {item.name}
-                    </h3>
-                    <h4 className="text-base text-dark/50 dark:text-white/50">
-                      {item.position}
+
+            {/* Constructed Area */}
+            {property.constructed_covered_area && (
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-blue-500/10 rounded-xl">
+                    <Icon
+                      icon="ph:buildings"
+                      width={32}
+                      height={32}
+                      className="text-blue-600 dark:text-blue-400"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-dark dark:text-white">
+                      Constructed/Covered Area
                     </h4>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {property.constructed_covered_area}{" "}
+                      {property.area_unit || ""}
+                    </p>
                   </div>
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* Installments */}
+            {property.installment_available && (
+              <div className="bg-gradient-to-r from-primary-50 to-emerald-50 dark:from-primary-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border border-prfrom-primary-200 dark:border-prfrom-primary-800">
+                <div className="flex items-start gap-4">
+                  <div className="flex-1">
+                    <h4 className="text-lg font-semibold text-dark dark:text-white mb-3">
+                      Installment Plan Available
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {property.advance_amount !== null && (
+                        <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl">
+                          <p className="text-sm text-dark/50 dark:text-white/50 mb-1">
+                            Advance
+                          </p>
+                          <p className="text-xl font-bold text-prfrom-primary-600 dark:text-prfrom-primary-400">
+                            PKR{" "}
+                            {Number(property.advance_amount).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {property.no_of_installments !== null && (
+                        <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl">
+                          <p className="text-sm text-dark/50 dark:text-white/50 mb-1">
+                            Installments
+                          </p>
+                          <p className="text-xl font-bold text-prfrom-primary-600 dark:text-prfrom-primary-400">
+                            {property.no_of_installments}
+                          </p>
+                        </div>
+                      )}
+                      {property.monthly_installments !== null && (
+                        <div className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl">
+                          <p className="text-sm text-dark/50 dark:text-white/50 mb-1">
+                            Monthly
+                          </p>
+                          <p className="text-xl font-bold text-prfrom-primary-600 dark:text-prfrom-primary-400">
+                            PKR{" "}
+                            {Number(
+                              property.monthly_installments
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Description */}
+            {property.description && (
+              <div>
+                <h3 className="text-2xl font-semibold text-dark dark:text-white mb-4">
+                  About This Property
+                </h3>
+                <div className="text-dark/70 dark:text-white/70 text-base leading-relaxed whitespace-pre-line">
+                  {property.description}
+                </div>
+              </div>
+            )}
+
+            {/* Features */}
+            {property.features && Object.keys(property.features).length > 0 && (
+              <div>
+                <h3 className="text-2xl font-semibold text-dark dark:text-white mb-6">
+                  Features & Amenities
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(property.features).map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex items-center gap-3 p-4 bg-primary/5 dark:bg-primary/10 rounded-xl"
+                    >
+                      <Icon
+                        icon="ph:check-circle-fill"
+                        width={24}
+                        height={24}
+                        className="text-primary flex-shrink-0"
+                      />
+                      <div>
+                        <p className="text-base font-medium text-dark dark:text-white capitalize">
+                          {key.replace(/_/g, " ")}
+                        </p>
+                        {typeof value !== "boolean" && (
+                          <p className="text-sm text-dark/50 dark:text-white/50">
+                            {String(value)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Video */}
+            {property.video_url && (
+              <div>
+                <h3 className="text-2xl font-semibold text-dark dark:text-white mb-6">
+                  Property Video Tour
+                </h3>
+                <div className="relative rounded-2xl overflow-hidden aspect-video bg-gray-100 dark:bg-gray-800 shadow-lg">
+                  <iframe
+                    src={
+                      property.video_url.includes("youtube.com") ||
+                      property.video_url.includes("youtu.be")
+                        ? property.video_url
+                            .replace("watch?v=", "embed/")
+                            .replace("youtu.be/", "youtube.com/embed/")
+                        : property.video_url
+                    }
+                    className="w-full h-full"
+                    allowFullScreen
+                    title="Property Video"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Map */}
+            <div>
+              <h3 className="text-2xl font-semibold text-dark dark:text-white mb-6 flex items-center gap-2">
+                Location
+              </h3>
+              {property.location ? (
+                <div className="rounded-2xl overflow-hidden shadow-lg">
+                  <GoogleMap
+                    address={property.location}
+                    height="400"
+                    className="w-full"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-[400px] bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Location not available
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-4 col-span-12 space-y-6">
+            {/* Contact */}
+            <div className="bg-gradient-to-br from-primary to-primary/90 p-8 rounded-2xl relative overflow-hidden shadow-xl">
+              <div className="relative z-10">
+                <h4 className="text-white text-2xl font-bold mb-2">
+                  Interested?
+                </h4>
+                <p className="text-white/90 text-sm mb-6">
+                  Contact us for more details
+                </p>
+                <Link
+                  href={`https://wa.me/+923344111778?text=${encodeURIComponent(
+                    `I'm interested in ${property.name}`
+                  )}`}
+                  target="_blank"
+                  className="py-4 px-8 bg-white text-primary rounded-full w-full block text-center hover:bg-gray-100 duration-300 font-semibold mb-3"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Icon icon="ph:whatsapp-logo-fill" width={24} height={24} />
+                    WhatsApp
+                  </div>
+                </Link>
+                <Link
+                  href="tel:+923344111778"
+                  className="py-4 px-8 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 rounded-full w-full block text-center hover:bg-white/20 duration-300 font-semibold"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Icon icon="ph:phone-fill" width={24} height={24} />
+                    Call Now
+                  </div>
+                </Link>
+              </div>
+            </div>
+
+            {/* Details */}
+            <div className="border border-dark/10 dark:border-white/20 p-6 rounded-2xl bg-white dark:bg-gray-800/50">
+              <h4 className="text-lg font-semibold text-dark dark:text-white mb-4">
+                Property Details
+              </h4>
+              <div className="space-y-3">
+                {property.property_type && (
+                  <div className="flex justify-between items-center py-3 border-b border-dark/5 dark:border-white/5">
+                    <span className="text-dark/60 dark:text-white/60 text-sm">
+                      Type
+                    </span>
+                    <span className="text-dark dark:text-white font-semibold capitalize">
+                      {property.property_type.replace(/-/g, " ")}
+                    </span>
+                  </div>
+                )}
+                {property.purpose && (
+                  <div className="flex justify-between items-center py-3 border-b border-dark/5 dark:border-white/5">
+                    <span className="text-dark/60 dark:text-white/60 text-sm">
+                      Purpose
+                    </span>
+                    <span className="text-dark dark:text-white font-semibold">
+                      For {property.purpose}
+                    </span>
+                  </div>
+                )}
+                {property.city && (
+                  <div className="flex justify-between items-center py-3 border-b border-dark/5 dark:border-white/5">
+                    <span className="text-dark/60 dark:text-white/60 text-sm">
+                      City
+                    </span>
+                    <span className="text-dark dark:text-white font-semibold">
+                      {property.city}
+                    </span>
+                  </div>
+                )}
+                {property.created_at && (
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-dark/60 dark:text-white/60 text-sm">
+                      Listed
+                    </span>
+                    <span className="text-dark dark:text-white font-semibold">
+                      {new Date(property.created_at).toLocaleDateString(
+                        "en-US",
+                        { year: "numeric", month: "short", day: "numeric" }
+                      )}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
