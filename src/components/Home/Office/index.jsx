@@ -16,8 +16,9 @@ import { FaTiktok } from "react-icons/fa";
 
 const LocationMap = () => {
   const officeLocation = {
-    lat: 33.7294, // Example coordinates for Islamabad
-    lng: 73.0931,
+    lat: 33.53536554596681,
+    lng: 73.1224, // based on Plaza 19, Tipu Boulevard
+
     address:
       "2nd Floor, Plaza no 19, Tipu Boulevard, Sector G DHA Phase II, Islamabad",
     phone: "+923344111778",
