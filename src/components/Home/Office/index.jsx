@@ -16,9 +16,6 @@ import { FaTiktok } from "react-icons/fa";
 
 const LocationMap = () => {
   const officeLocation = {
-    lat: 33.53536554596681,
-    lng: 73.1224, // based on Plaza 19, Tipu Boulevard
-
     address:
       "2nd Floor, Plaza no 19, Tipu Boulevard, Sector G DHA Phase II, Islamabad",
     phone: "+923344111778",
@@ -27,7 +24,7 @@ const LocationMap = () => {
   };
 
   const handleGetDirections = () => {
-    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${officeLocation.lat},${officeLocation.lng}`;
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${address}`;
     window.open(googleMapsUrl, "_blank");
   };
 
@@ -37,12 +34,6 @@ const LocationMap = () => {
 
   return (
     <div className="container max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-0 z-10 pb-20 relative overflow-hidden">
-      {/* Background Decorative Elements */}
-      {/* <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-amber-200/30 to-yellow-200/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-orange-200/20 to-amber-200/20 rounded-full blur-3xl"></div>
-      </div> */}
-
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">

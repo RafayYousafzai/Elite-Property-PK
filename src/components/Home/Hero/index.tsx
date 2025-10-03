@@ -1,19 +1,28 @@
 import type React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const Hero: React.FC = () => {
   return (
     <section className="relative h-screen overflow-hidden">
       {/* Background Image with Enhanced Overlay */}
       <div className="absolute inset-0 z-0">
-        <video
+        <Image
+          src="/images/hero/modern-apartment-building-with-numerous-windows-and-balconies_49091535.jpeg"
+          alt="Hero Background"
+          layout="fill"
+          objectFit="cover"
+          className="object-cover object-center h-full w-full"
+        />
+
+        {/* <video
           src="/images/hero/hero-video.mp4"
           autoPlay
           loop
           muted
           className="object-cover object-center h-full w-full"
-        />
+        /> */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/70 to-black/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
       </div>
@@ -44,7 +53,7 @@ const Hero: React.FC = () => {
                   financial goals.
                 </p>
               </div>
-              <div className="my-20 md:hidden">
+              <div className="my-10 md:hidden">
                 <p className="text-lg sm:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto lg:mx-0  font-semibold">
                   Explore.
                 </p>
@@ -78,7 +87,7 @@ const Hero: React.FC = () => {
                   size="lg"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25"
                 >
-                  <Link href="/contactus">Get in Touch</Link>
+                  <Link href="/contactus">Book a visit.</Link>
                 </Button>
                 <Button
                   asChild

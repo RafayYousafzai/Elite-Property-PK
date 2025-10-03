@@ -13,8 +13,9 @@ import { Button, Drawer, DrawerBody, DrawerContent } from "@heroui/react";
 const navigationItems = [
   // { name: "Home", href: "/" },
   // { name: "Plots", href: "/explore?type=plots" },
-  { name: "Homes", href: "/explore?type=homes" },
+  { name: "Houses", href: "/explore?type=homes" },
   { name: "Apartments", href: "/explore?type=apartments" },
+  { name: "Plots", href: "/explore?type=plots" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contactus" },
   { name: "Blogs", href: "/blogs" },
