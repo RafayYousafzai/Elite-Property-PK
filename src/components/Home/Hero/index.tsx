@@ -60,19 +60,19 @@ const Hero: React.FC = () => {
                     asChild
                     className="bg-primary/30 border border-primary/50 backdrop-blur-sm text-white/80 hover:bg-white/20 hover:text-white rounded-full"
                   >
-                    <Link href="/properties?type=apartment">Apartments</Link>
+                    <Link href="/explore?type=apartments">Apartments</Link>
                   </Button>
                   <Button
                     asChild
                     className="bg-primary/30 border border-primary/50 backdrop-blur-sm text-white/80 hover:bg-white/20 hover:text-white rounded-full"
                   >
-                    <Link href="/properties?type=house">Houses</Link>
+                    <Link href="/explore?type=homes">Houses</Link>
                   </Button>
                   <Button
                     asChild
                     className="bg-primary/30 border border-primary/50 backdrop-blur-sm text-white/80 hover:bg-white/20 hover:text-white rounded-full"
                   >
-                    <Link href="/properties?type=plot">Plots</Link>
+                    <Link href="/explore?type=plot">Plots</Link>
                   </Button>
                 </div>
               </div>

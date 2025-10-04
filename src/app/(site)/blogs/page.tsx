@@ -1,4 +1,4 @@
-import BlogList from "@/components/Blog";
+import BlogList from "@/components/Blog/BlogListServer";
 import HeroSub from "@/components/shared/HeroSub";
 import { Metadata } from "next";
 
