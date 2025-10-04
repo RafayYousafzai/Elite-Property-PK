@@ -7,7 +7,6 @@ import PropertyForm, {
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { PencilIcon } from "@heroicons/react/24/outline";
 import { updateProperty } from "../../actions";
 
 // Force dynamic rendering for admin pages
