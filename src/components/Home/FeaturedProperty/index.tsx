@@ -10,6 +10,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { Button } from "@heroui/react";
 
 interface FeaturedPropertyProps {
   properties: Property[];
@@ -282,11 +283,14 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
               )}
             </div>
             <div className="flex gap-10 items-center">
-              <Link
-                href={`/explore/${currentProperty.slug}`}
-                className="py-4 px-8 bg-primary hover:bg-dark duration-300 rounded-full text-white font-semibold"
-              >
-                View Details
+              <Link href={`/explore/${currentProperty.slug}`}>
+                <Button
+                  className="bg-primary text-white"
+                  size="lg"
+                  radius="full"
+                >
+                  View Details
+                </Button>
               </Link>
               <div>
                 <h4 className="text-3xl text-dark dark:text-white font-medium">

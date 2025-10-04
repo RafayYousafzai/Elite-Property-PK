@@ -71,10 +71,10 @@ export interface PropertyFormData {
   featured_image_index?: number; // Index 0 = first image is the cover/featured
 }
 
-const propertyTypes = {
+export const propertyTypes = {
   Home: [
     "House",
-    "Flat/Appartment",
+    "flat/appartment",
     "Upper Portion",
     "Lower Portion",
     "Farm House",

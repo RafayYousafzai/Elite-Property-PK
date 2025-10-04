@@ -1,5 +1,6 @@
 import { createClient as createBrowserClient } from "@/utils/supabase/client";
 import { DatabaseProperty, Property, SearchFilters } from "@/types/property";
+import { propertyTypes } from "@/components/Admin/PropertyForm";
 
 // Transform database property to app property
 export const transformDatabaseProperty = (
@@ -74,39 +75,22 @@ export async function getFilteredProperties(
     // Apply property type filter - now supports all property types
     if (filters.propertyType !== "all") {
       if (filters.propertyType === "homes") {
-        // Match all home types
         query = query.in("property_type", [
-          "house",
-          "flat",
-          "upper portion",
-          "lower portion",
-          "farm house",
-          "room",
-          "penthouse",
-          "apartment", // legacy
+          ...propertyTypes.Home.map((type) => type.toLowerCase()),
         ]);
       } else if (filters.propertyType === "apartments") {
-        query = query.in("property_type", ["flat", "apartment", "penthouse"]);
-      } else if (filters.propertyType === "plots") {
-        // Match all plot types
         query = query.in("property_type", [
-          "residential plot",
-          "commercial plot",
-          "agricultural land",
-          "industrial land",
-          "plot file",
-          "plot form",
-          "plot", // legacy
+          "flat",
+          "apartment",
+          "flat/appartment",
+        ]);
+      } else if (filters.propertyType === "plots") {
+        query = query.in("property_type", [
+          ...propertyTypes.Plots.map((type) => type.toLowerCase()),
         ]);
       } else if (filters.propertyType === "commercial") {
-        // Match all commercial types
         query = query.in("property_type", [
-          "office",
-          "shop",
-          "warehouse",
-          "factory",
-          "building",
-          "other",
+          ...propertyTypes.Commercial.map((type) => type.toLowerCase()),
         ]);
       }
     }

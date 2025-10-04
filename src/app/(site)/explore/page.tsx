@@ -24,6 +24,7 @@ import { PropertyListSkeleton } from "@/components/ui/property-skeleton";
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type");
+  const searchParam = searchParams.get("search");
 
   // Use the custom hook for Supabase integration
   const {
@@ -43,18 +44,22 @@ export default function SearchPage() {
         ? "plots"
         : typeParam === "commercial"
         ? "commercial"
+        : typeParam === "appartments" || typeParam === "apartments"
+        ? "apartments"
         : "all";
     return {
       propertyType: initialPropertyType,
       priceRange: [0, 1000000],
       minArea: 0,
       maxArea: 500,
-      searchQuery: "",
+      searchQuery: searchParam || "",
     };
   });
 
   // Update filters when URL parameters change
   useEffect(() => {
+    const updates: Partial<SearchFilters> = {};
+
     if (typeParam) {
       const newPropertyType =
         typeParam === "homes"
@@ -63,13 +68,23 @@ export default function SearchPage() {
           ? "plots"
           : typeParam === "commercial"
           ? "commercial"
+          : typeParam === "appartments" || typeParam === "apartments"
+          ? "apartments"
           : "all";
+      updates.propertyType = newPropertyType;
+    }
+
+    if (searchParam !== null) {
+      updates.searchQuery = searchParam;
+    }
+
+    if (Object.keys(updates).length > 0) {
       setFilters((prev) => ({
         ...prev,
-        propertyType: newPropertyType,
+        ...updates,
       }));
     }
-  }, [typeParam]);
+  }, [typeParam, searchParam]);
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -232,6 +247,7 @@ export default function SearchPage() {
                       }
                       fullWidth
                       size="lg"
+                      value={filters.searchQuery}
                       placeholder="Search by location, name, or property type..."
                       onValueChange={(value) => handleSearchChange(value)}
                       className="h-12   "

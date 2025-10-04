@@ -2,6 +2,7 @@ import type React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import HeroSearchBar from "./SearchBar";
 
 const Hero: React.FC = () => {
   return (
@@ -49,32 +50,9 @@ const Hero: React.FC = () => {
                 </p>
               </div>
 
-              {/* Category Buttons for mobile */}
-              <div className="my-10 md:hidden">
-                <p className="text-lg sm:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-semibold mb-4">
-                  Explore.
-                </p>
-                {/* Use flexbox with gap for clean, responsive spacing */}
-                <div className="flex flex-wrap justify-center gap-3">
-                  <Button
-                    asChild
-                    className="bg-primary/30 border border-primary/50 backdrop-blur-sm text-white/80 hover:bg-white/20 hover:text-white rounded-full"
-                  >
-                    <Link href="/explore?type=apartments">Apartments</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    className="bg-primary/30 border border-primary/50 backdrop-blur-sm text-white/80 hover:bg-white/20 hover:text-white rounded-full"
-                  >
-                    <Link href="/explore?type=homes">Houses</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    className="bg-primary/30 border border-primary/50 backdrop-blur-sm text-white/80 hover:bg-white/20 hover:text-white rounded-full"
-                  >
-                    <Link href="/explore?type=plot">Plots</Link>
-                  </Button>
-                </div>
+              {/* Category Buttons for mobile - Replaced with Search Bar */}
+              <div className="lg:hidden">
+                <HeroSearchBar />
               </div>
 
               {/* Main Call-to-Action Buttons */}
@@ -97,9 +75,9 @@ const Hero: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Kept hidden on lg screens as per original code */}
+            {/* Right Column: Search Bar for Desktop */}
             <div className="hidden lg:flex flex-col items-center justify-center space-y-10">
-              {/* Your commented-out code for desktop stats/buttons can go here */}
+              <HeroSearchBar />
             </div>
           </div>
         </div>

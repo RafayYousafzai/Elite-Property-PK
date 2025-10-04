@@ -94,7 +94,7 @@ const Header: React.FC = () => {
       }  ${hidden ? "-translate-y-full" : "translate-y-0 "}`}
     >
       <nav
-        className={`w-auto mx-auto max-w-8xl flex items-center justify-between py-0 pt-4 md:py-4 duration-300 ${
+        className={`w-auto mx-auto max-w-8xl flex items-center justify-between py-0 pt-2 md:py-4 duration-300 ${
           sticky ? " dark:bg-dark top-5 px-4 " : "shadow-none top-0"
         }`}
       >
