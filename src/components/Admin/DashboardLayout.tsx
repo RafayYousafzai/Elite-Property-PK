@@ -93,6 +93,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       href: "/admin/properties/create",
       icon: PlusIcon,
     },
+    {
+      name: "Testimonials",
+      href: "/admin/testimonials",
+      icon: UserCircleIcon,
+    },
     // {
     //   name: "Analytics",
     //   href: "/admin/analytics",

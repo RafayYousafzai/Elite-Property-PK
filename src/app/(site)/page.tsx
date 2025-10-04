@@ -2,7 +2,7 @@ import FeaturedProperty from "@/components/Home/FeaturedProperty";
 import Hero from "@/components/Home/Hero";
 // import Plots from "@/components/Home/Plots";
 import Categories from "@/components/Home/Categories";
-import Testimonial from "@/components/Home/Testimonial";
+import Testimonial from "@/components/Home/Testimonial/TestimonialsServer";
 import BlogSmall from "@/components/shared/Blog";
 import GetInTouch from "@/components/Home/GetInTouch";
 import FAQ from "@/components/Home/FAQs";
@@ -14,8 +14,6 @@ import {
 } from "@/lib/supabase/properties-server";
 import VideoShowcase from "@/components/shared/video-showcase";
 import LocationMap from "@/components/Home/Office";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 export default async function Home() {
   // Fetch properties from Supabase
