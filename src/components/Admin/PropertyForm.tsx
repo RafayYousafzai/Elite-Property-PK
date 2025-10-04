@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   Input,
@@ -42,9 +42,9 @@ export interface PropertyFormData {
   amenities: Record<string, string | number | boolean>;
   title: string;
   description: string;
-  images: File[];
+  images?: (File | string)[]; // Optional - Accept both File objects and string URLs
   videoUrl: string;
-  photo_sphere: File | null;
+  photo_sphere?: File | string | null; // Optional - Accept both File and string URL
   constructed_covered_area?: number;
   is_sold?: boolean;
   phase?: string;
@@ -150,13 +150,34 @@ export default function PropertyForm({
   );
   const [uploadingImages, setUploadingImages] = useState(false);
 
+  // Handle initial data - set previews for existing images and photo_sphere
+  useEffect(() => {
+    if (initialData?.images && Array.isArray(initialData.images)) {
+      // Filter only string URLs (existing images from DB)
+      const existingImageUrls = initialData.images.filter(
+        (img): img is string => typeof img === "string"
+      );
+      setImagePreviews(existingImageUrls);
+    }
+
+    if (
+      initialData?.photo_sphere &&
+      typeof initialData.photo_sphere === "string"
+    ) {
+      setPhotoSpherePreview(initialData.photo_sphere);
+    }
+  }, [initialData]);
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
     setUploadingImages(true);
     try {
-      setFormData((prev) => ({ ...prev, images: [...prev.images, ...files] }));
+      setFormData((prev) => ({
+        ...prev,
+        images: [...(prev.images || []), ...files],
+      }));
 
       // Create previews
       const previews = await Promise.all(
@@ -179,7 +200,7 @@ export default function PropertyForm({
   const removeImage = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      images: (prev.images || []).filter((_, i) => i !== index),
     }));
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
@@ -232,16 +253,24 @@ export default function PropertyForm({
       setUploadingImages(true);
 
       // Upload images to Supabase storage
-      const uploadedImages = await uploadImagesToSupabase(formData.images);
+      const uploadedImages = await uploadImagesToSupabase(
+        formData.images || []
+      );
       console.log(uploadedImages, "uploadedImages");
 
       // Upload photo_sphere if present
       let photo_sphereUrl: string | undefined = undefined;
       if (formData.photo_sphere) {
-        const photo_sphereUrls = await uploadImagesToSupabase([
-          formData.photo_sphere,
-        ]);
-        photo_sphereUrl = photo_sphereUrls[0];
+        // If it's already a string URL, use it directly
+        if (typeof formData.photo_sphere === "string") {
+          photo_sphereUrl = formData.photo_sphere;
+        } else {
+          // Otherwise, upload the file
+          const photo_sphereUrls = await uploadImagesToSupabase([
+            formData.photo_sphere,
+          ]);
+          photo_sphereUrl = photo_sphereUrls[0];
+        }
       }
       console.log(photo_sphereUrl, "photo_sphereUrl");
 
@@ -866,9 +895,7 @@ export default function PropertyForm({
             type="submit"
             color="primary"
             size="lg"
-            disabled={
-              loading || uploadingImages || formData.images.length === 0
-            }
+            disabled={loading || uploadingImages}
             className="h-14 px-12 text-base font-semibold"
           >
             {loading || uploadingImages ? (

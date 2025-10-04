@@ -36,13 +36,8 @@ export default function EditPropertyPage() {
         if (error) {
           setError(error.message);
         } else if (data) {
-          // Convert images array to the format expected by PropertyForm
-          const images = Array.isArray(data.images)
-            ? data.images.map((url: string) => ({
-                src: url,
-                type: "url" as const,
-              }))
-            : [];
+          // Images should be passed as string URLs for existing images
+          const images = Array.isArray(data.images) ? data.images : [];
 
           setInitialData({
             title: data.name || "",
@@ -63,6 +58,7 @@ export default function EditPropertyPage() {
             city: data.city || "",
             purpose: data.purpose || "Sell",
             images: images,
+            photo_sphere: data.photo_sphere || null,
             description: data.description || "",
             amenities: data.features || {},
             videoUrl: data.video_url || "",
@@ -197,21 +193,6 @@ export default function EditPropertyPage() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        {/* Header */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-teal-600 flex items-center justify-center">
-            <PencilIcon className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Edit Property
-            </h1>
-            <p className="mt-1 text-gray-600 dark:text-gray-400">
-              Update property information and details
-            </p>
-          </div>
-        </div>
-
         <PropertyForm
           initialData={initialData}
           onSubmit={handleSubmit}
