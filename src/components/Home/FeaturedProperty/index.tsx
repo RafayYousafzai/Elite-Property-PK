@@ -11,6 +11,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Button } from "@heroui/react";
+import formatNumberShort from "@/lib/formatNumberShort";
 
 interface FeaturedPropertyProps {
   properties: Property[];
@@ -294,7 +295,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
               </Link>
               <div>
                 <h4 className="text-3xl text-dark dark:text-white font-medium">
-                  Rs. {Number(currentProperty.rate).toLocaleString()}
+                  {formatNumberShort(Number(currentProperty.rate))}
                 </h4>
                 <p className="text-base text-dark/50 dark:text-white/50">
                   {currentProperty.purpose === "Rent"

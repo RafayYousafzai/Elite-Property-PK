@@ -7,6 +7,7 @@ import { Icon } from "@iconify/react";
 import Link from "next/link";
 import ImageCarousel from "@/components/shared/ImageCarousel";
 import GoogleMap from "@/components/shared/GoogleMap";
+import formatNumberShort from "@/lib/formatNumberShort";
 
 export default function Details() {
   const { id } = useParams();
@@ -392,7 +393,7 @@ export default function Details() {
                 Price
               </p>
               <h4 className="text-gray-900 dark:text-white text-4xl font-bold mb-1">
-                Rs. {Number(property.rate).toLocaleString()}
+                {formatNumberShort(Number(property.rate))}
               </h4>
               <div className="h-1 w-16 bg-amber-500 rounded-full mt-3"></div>
             </div>

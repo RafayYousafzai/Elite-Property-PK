@@ -6,6 +6,7 @@ import { Sparkles } from "lucide-react";
 import type { SearchFilters } from "@/types/property";
 import { Button, Chip } from "@heroui/react";
 import { propertyTypes } from "@/components/Admin/PropertyForm";
+import formatNumberShort from "@/lib/formatNumberShort";
 
 interface SearchSidebarProps {
   filters: SearchFilters;
@@ -193,8 +194,8 @@ export default function SearchSidebar({
                 Price Range
               </h3>
               <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-                Rs.{priceRange[0].toLocaleString()} - Rs.
-                {priceRange[1].toLocaleString()}
+                Rs.{formatNumberShort(priceRange[0])} - Rs.
+                {formatNumberShort(priceRange[1])}
               </div>
             </div>
             <div className="space-y-4">

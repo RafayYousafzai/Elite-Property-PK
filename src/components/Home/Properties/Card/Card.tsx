@@ -1,3 +1,4 @@
+import formatNumberShort from "@/lib/formatNumberShort";
 import { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
@@ -72,7 +73,7 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
         <div className="p-6">
           <div className="flex flex-col mobile:flex-row gap-3 mobile:gap-0 justify-between mb-4">
             <div className="flex-1">
-              <Link href={`/properties/${slug}`}>
+              <Link href={`/explore/${slug}`}>
                 <h3 className="text-xl font-medium text-black dark:text-white duration-300 group-hover:text-primary line-clamp-1">
                   {name}
                 </h3>
@@ -89,7 +90,7 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
             </div>
             <div className="flex flex-col gap-2 items-end">
               <button className="text-base font-semibold text-primary px-4 py-2 rounded-full bg-primary/10 whitespace-nowrap">
-                Rs. {Number(rate).toLocaleString()}
+                {formatNumberShort(Number(rate))}
               </button>
               {video_url && (
                 <a
