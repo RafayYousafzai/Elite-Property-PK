@@ -44,12 +44,13 @@ export default function SearchPage() {
         ? "plots"
         : typeParam === "commercial"
         ? "commercial"
-        : typeParam === "appartments" || typeParam === "apartments"
+        : typeParam === "apartments"
         ? "apartments"
         : "all";
     return {
       propertyType: initialPropertyType,
-      priceRange: [0, 1000000],
+      subCategory: undefined,
+      priceRange: [0, 1000000000],
       minArea: 0,
       maxArea: 500,
       searchQuery: searchParam || "",
@@ -123,7 +124,8 @@ export default function SearchPage() {
     startTransition(() => {
       setFilters({
         propertyType: "all",
-        priceRange: [0, 1000000],
+        subCategory: undefined,
+        priceRange: [0, 1000000000],
         minArea: 0,
         maxArea: 500,
         searchQuery: "",
@@ -308,6 +310,7 @@ export default function SearchPage() {
 
                 {/* Active Filters */}
                 {(filters.propertyType !== "all" ||
+                  filters.subCategory ||
                   filters.searchQuery ||
                   filters.beds ||
                   filters.baths) && (
@@ -329,6 +332,15 @@ export default function SearchPage() {
                             : filters.propertyType === "commercial"
                             ? "🏢 Commercial"
                             : "🏢 Apartments"}
+                        </Chip>
+                      )}
+                      {filters.subCategory && (
+                        <Chip
+                          variant="shadow"
+                          color="secondary"
+                          className="font-medium animate-in fade-in duration-200"
+                        >
+                          📋 {filters.subCategory}
                         </Chip>
                       )}
                       {filters.searchQuery && (

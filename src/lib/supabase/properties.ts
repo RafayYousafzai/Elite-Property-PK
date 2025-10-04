@@ -75,9 +75,14 @@ export async function getFilteredProperties(
     // Apply property type filter - now supports all property types
     if (filters.propertyType !== "all") {
       if (filters.propertyType === "homes") {
-        query = query.in("property_type", [
-          ...propertyTypes.Home.map((type) => type.toLowerCase()),
-        ]);
+        const homeTypes = propertyTypes.Home.map((type) => type.toLowerCase());
+
+        // If subCategory is selected, filter by that specific type
+        if (filters.subCategory) {
+          query = query.ilike("property_type", filters.subCategory);
+        } else {
+          query = query.in("property_type", homeTypes);
+        }
       } else if (filters.propertyType === "apartments") {
         query = query.in("property_type", [
           "flat",
@@ -85,13 +90,25 @@ export async function getFilteredProperties(
           "flat/appartment",
         ]);
       } else if (filters.propertyType === "plots") {
-        query = query.in("property_type", [
-          ...propertyTypes.Plots.map((type) => type.toLowerCase()),
-        ]);
+        const plotTypes = propertyTypes.Plots.map((type) => type.toLowerCase());
+
+        // If subCategory is selected, filter by that specific type
+        if (filters.subCategory) {
+          query = query.ilike("property_type", filters.subCategory);
+        } else {
+          query = query.in("property_type", plotTypes);
+        }
       } else if (filters.propertyType === "commercial") {
-        query = query.in("property_type", [
-          ...propertyTypes.Commercial.map((type) => type.toLowerCase()),
-        ]);
+        const commercialTypes = propertyTypes.Commercial.map((type) =>
+          type.toLowerCase()
+        );
+
+        // If subCategory is selected, filter by that specific type
+        if (filters.subCategory) {
+          query = query.ilike("property_type", filters.subCategory);
+        } else {
+          query = query.in("property_type", commercialTypes);
+        }
       }
     }
 

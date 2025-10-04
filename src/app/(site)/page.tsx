@@ -31,41 +31,45 @@ export default async function Home() {
         videos={[
           {
             id: "1",
-            title: "Solar powered 5 bed designer residence in DHA Phase 2.",
+            title: "Casa Prisma – Modern Design Meets Timeless Elegance",
             description:
-              "A stunning 5-bedroom designer residence powered by solar energy, located in the prestigious DHA Phase 2.",
-            youtubeId: "https://youtu.be/0niH-x7L3Zk?si=k_-76bAIiX-YsbQE",
-            // category: "Investment Insights",
-            // highlightText: "Smart property decisions.",
+              "Tour Casa Prisma, a stunning fusion of sleek modern architecture and classic luxury — redefining elegant living.",
+            youtubeId: "https://www.youtube.com/watch?v=mTwsTzWOzA8",
           },
           {
             id: "2",
-            title:
-              "Elite Lounge Podcast Ep 2 | Real Estate, RECA & Realtor Insights",
+            title: "Villa Arista – 1 Kanal Modern Designer House",
             description:
-              "Dive into the world of real estate with Sheraz Saleem, exploring market trends, investment strategies, and the future of property in this insightful podcast episode.",
-            youtubeId: "https://youtu.be/kFCfQoVB90Q?si=QFJh23B7qRy3MzQj",
-            // category: "Property Tours",
-            // highlightText: "Exclusive lifestyle access.",
+              "Step inside Villa Arista in DHA Phase 2, Islamabad — a 1 Kanal masterpiece featuring 3D marble elevation and premium interiors.",
+            youtubeId: "https://www.youtube.com/watch?v=mmrFAQyZUbU",
           },
           {
-            id: "1",
-            title: "Solar powered 5 bed designer residence in DHA Phase 2.",
+            id: "3",
+            title: "Villa Novella – 2 Kanal Italian Dream Home",
             description:
-              "A stunning 5-bedroom designer residence powered by solar energy, located in the prestigious DHA Phase 2.",
-            youtubeId: "https://youtu.be/0niH-x7L3Zk?si=k_-76bAIiX-YsbQE",
-            // category: "Investment Insights",
-            // highlightText: "Smart property decisions.",
+              "Explore Villa Novella, an Italian-inspired 2 Kanal luxury villa with multi-level design, grand spaces, and modern interiors.",
+            youtubeId: "https://www.youtube.com/watch?v=WLnZEtiRZO0",
           },
           {
-            id: "2",
-            title:
-              "Elite Lounge Podcast Ep 2 | Real Estate, RECA & Realtor Insights",
+            id: "4",
+            title: "Ultra Modern 1 Kanal Straight Line House",
             description:
-              "Dive into the world of real estate with Sheraz Saleem, exploring market trends, investment strategies, and the future of property in this insightful podcast episode.",
-            youtubeId: "https://youtu.be/kFCfQoVB90Q?si=QFJh23B7qRy3MzQj",
-            // category: "Property Tours",
-            // highlightText: "Exclusive lifestyle access.",
+              "A sleek, ultra-modern straight-line residence in DHA Phase 2, Islamabad — minimalist elegance meets smart architecture.",
+            youtubeId: "https://www.youtube.com/watch?v=DfdVx44EClk",
+          },
+          {
+            id: "5",
+            title: "The Prestige Manor – 1 Kanal Elite Luxury",
+            description:
+              "Experience The Prestige Manor: a 1 Kanal luxury home in DHA Phase 2, crafted with elite finishing and refined sophistication.",
+            youtubeId: "https://www.youtube.com/watch?v=qlL4TzZD3wU",
+          },
+          {
+            id: "6",
+            title: "The Grand Haven – 1 Kanal Luxury Residence",
+            description:
+              "Discover The Grand Haven, a lavish 1 Kanal residence in DHA Phase 2 featuring elite finishes and contemporary architecture.",
+            youtubeId: "https://youtu.be/kSyNG7QE93M?si=XLAmujqLz11DQgWr",
           },
         ]}
       />

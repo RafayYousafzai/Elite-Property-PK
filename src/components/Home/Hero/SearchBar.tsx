@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Loader } from "@googlemaps/js-api-loader";
 import { Search, Home, Building2, MapPin, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -31,32 +32,65 @@ const PropertyTypeButton = ({
 
 export default function HeroSearchBar() {
   const [selectedType, setSelectedType] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isLoaded, setIsLoaded] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const propertyTypes = [
     { value: "all", label: "All", icon: Building2 },
     { value: "homes", label: "Homes", icon: Home },
-    { value: "appartments", label: "Apartments", icon: Building2 },
+    { value: "apartments", label: "Apartments", icon: Building2 },
     { value: "plots", label: "Plots", icon: MapPin },
     { value: "commercial", label: "Commercial", icon: Store },
   ];
 
+  // Initialize Google Places Autocomplete
+  useEffect(() => {
+    const initAutocomplete = async () => {
+      try {
+        const loader = new Loader({
+          apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+          version: "weekly",
+          libraries: ["places"],
+        });
+        await loader.load();
+        setIsLoaded(true);
+
+        if (inputRef.current && window.google) {
+          const autocomplete = new window.google.maps.places.Autocomplete(
+            inputRef.current,
+            {
+              types: ["geocode", "establishment"],
+              componentRestrictions: { country: ["pk", "us", "ae"] },
+            }
+          );
+
+          autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+            if (place.formatted_address) {
+              setSearchQuery(place.formatted_address);
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Google Places failed to load:", error);
+        setIsLoaded(true);
+      }
+    };
+
+    initAutocomplete();
+  }, []);
+
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (selectedType !== "all") {
-      params.set("type", selectedType);
-    }
-    if (searchQuery) {
-      params.set("search", searchQuery);
-    }
+    if (selectedType !== "all") params.set("type", selectedType);
+    if (searchQuery) params.set("search", searchQuery);
     router.push(`/explore?${params.toString()}`);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+    if (e.key === "Enter") handleSearch();
   };
 
   return (
@@ -74,27 +108,41 @@ export default function HeroSearchBar() {
         ))}
       </div>
 
-      {/* Search Input */}
+      {/* Search Input with Autocomplete */}
       <div className="flex flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
+            ref={inputRef}
             type="text"
-            placeholder="Search..."
+            placeholder="Search location..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="w-full pl-4 pr-4 py-2 rounded-xl bg-white/95 backdrop-blur-sm border border-white/20 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+            className="w-full pl-12 pr-4 py-2 rounded-xl bg-white/95 backdrop-blur-sm border border-white/20 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
           />
+          {!isLoaded && (
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">
+              Loading...
+            </span>
+          )}
         </div>
+
         <Button
           onClick={handleSearch}
           size="lg"
           className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 whitespace-nowrap"
         >
-          <Search className="w-5 h-5   text-white" />
+          <Search className="w-5 h-5 text-white" />
         </Button>
       </div>
     </div>
   );
+}
+
+// Extend window interface
+declare global {
+  interface Window {
+    google: any;
+  }
 }

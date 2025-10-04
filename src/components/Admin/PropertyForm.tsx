@@ -41,6 +41,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import formatNumberShort from "@/lib/formatNumberShort";
 
 export interface PropertyFormData {
   purpose: "Sell" | "Rent";
@@ -640,7 +641,7 @@ export default function PropertyForm({
                 </div>
                 <Input
                   type="text"
-                  label="Price (PKR) *"
+                  label={`Price (${formatNumberShort(formData.price)}) *`}
                   placeholder="Enter price"
                   value={formData.price}
                   onValueChange={(value) =>

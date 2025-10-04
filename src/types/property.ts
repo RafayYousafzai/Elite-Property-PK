@@ -73,6 +73,7 @@ interface PropertyImage {
 
 export interface SearchFilters {
   propertyType: "all" | "homes" | "apartments" | "plots" | "commercial";
+  subCategory?: string;
   priceRange: [number, number];
   beds?: number;
   baths?: number;

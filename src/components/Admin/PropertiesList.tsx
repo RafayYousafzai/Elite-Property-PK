@@ -15,6 +15,7 @@ import {
   BuildingOfficeIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
+import formatNumberShort from "@/lib/formatNumberShort";
 
 interface Property {
   id: string;
@@ -152,8 +153,7 @@ export default function PropertiesList({
                       </span>
 
                       <div className="flex items-center text-green-600 dark:text-green-400 font-medium">
-                        Rs.
-                        {property.rate}
+                        {formatNumberShort(property.rate)}
                       </div>
 
                       {property.beds && (

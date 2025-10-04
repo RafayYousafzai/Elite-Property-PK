@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Sparkles } from "lucide-react";
 import type { SearchFilters } from "@/types/property";
 import { Button, Chip } from "@heroui/react";
+import { propertyTypes } from "@/components/Admin/PropertyForm";
 
 interface SearchSidebarProps {
   filters: SearchFilters;
@@ -28,7 +29,15 @@ export default function SearchSidebar({
   const handlePropertyTypeChange = (
     type: "all" | "homes" | "plots" | "apartments" | "commercial"
   ) => {
-    onFiltersChange({ ...filters, propertyType: type });
+    onFiltersChange({ ...filters, propertyType: type, subCategory: undefined });
+  };
+
+  const handleSubCategoryChange = (subCategory: string) => {
+    onFiltersChange({
+      ...filters,
+      subCategory:
+        filters.subCategory === subCategory ? undefined : subCategory,
+    });
   };
 
   const handlePriceRangeChange = (value: number[]) => {
@@ -59,7 +68,8 @@ export default function SearchSidebar({
 
   const activeFiltersCount = [
     filters.propertyType !== "all",
-    filters.priceRange[0] > 0 || filters.priceRange[1] < 1000000,
+    filters.subCategory !== undefined,
+    filters.priceRange[0] > 0 || filters.priceRange[1] < 1000000000,
     filters.beds !== undefined,
     filters.baths !== undefined,
     filters.minArea > 0 || filters.maxArea < 500,
@@ -135,6 +145,47 @@ export default function SearchSidebar({
             </div>
           </div>
 
+          {/* Sub Category - Show only when a main category is selected */}
+          {filters.propertyType !== "all" &&
+            filters.propertyType !== "apartments" && (
+              <div
+                className="animate-fade-in"
+                style={{ animationDelay: "0.15s" }}
+              >
+                <div className="flex items-center gap-3 mb-4 pb-2">
+                  <h3 className="text-base font-semibold text-foreground">
+                    Sub Category
+                  </h3>
+                  <Sparkles className="h-3 w-3 text-secondary ml-auto" />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(filters.propertyType === "homes"
+                    ? propertyTypes.Home
+                    : filters.propertyType === "plots"
+                    ? propertyTypes.Plots
+                    : filters.propertyType === "commercial"
+                    ? propertyTypes.Commercial
+                    : []
+                  ).map((subType) => (
+                    <Chip
+                      key={subType}
+                      variant={
+                        filters.subCategory === subType ? "shadow" : "flat"
+                      }
+                      className={`cursor-pointer transition-all duration-300 premium-hover ${
+                        filters.subCategory === subType
+                          ? "bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground shadow-lg scale-105 border-secondary/50"
+                          : "hover:bg-muted hover:scale-105 hover:shadow-md border-border/50"
+                      }`}
+                      onClick={() => handleSubCategoryChange(subType)}
+                    >
+                      {subType}
+                    </Chip>
+                  ))}
+                </div>
+              </div>
+            )}
+
           {/* Price Range */}
           <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <div className="flex items-center justify-between mb-4 pb-2 ">
@@ -151,7 +202,7 @@ export default function SearchSidebar({
                 <Slider
                   value={priceRange}
                   onValueChange={handlePriceRangeChange}
-                  max={1000000}
+                  max={1000000000}
                   min={0}
                   step={10000}
                   className="w-full"
@@ -231,7 +282,7 @@ export default function SearchSidebar({
           )}
 
           {/* Area Range */}
-          <div className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
+          {/* <div className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
             <div className="flex items-center justify-between mb-4 pb-2 ">
               <h3 className="text-base font-semibold text-foreground">
                 Area (sq ft)
@@ -261,7 +312,7 @@ export default function SearchSidebar({
                 </span>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Apply Button */}
           {/* {activeFiltersCount > 0 && (
