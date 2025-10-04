@@ -152,6 +152,9 @@ export default function EditPropertyPage() {
 
         // JSON fields
         features: formData.amenities || {},
+
+        // Featured image is always the first image (index 0)
+        featured_image_index: 0,
       };
 
       const result = await updateProperty(propertyId, propertyData);

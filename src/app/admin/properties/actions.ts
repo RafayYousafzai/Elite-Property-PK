@@ -17,6 +17,7 @@ export interface PropertyData {
   images: string[];
   description?: string | null;
   is_featured: boolean;
+  featured_image_index?: number; // Index 0 = first image is cover
 
   // New fields
   purpose?: string | null;

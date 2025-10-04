@@ -17,12 +17,30 @@ import {
   CardBody,
   Image,
   Spinner,
+  Chip,
 } from "@heroui/react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, GripVertical, Star } from "lucide-react";
 import LocationAutocomplete from "../shared/LocationAutocomplete";
 import FeaturesAmenitiesModal from "./features-amenities-modal";
 import { CubeIcon } from "@heroicons/react/24/solid";
 import { createClient } from "@/utils/supabase/client";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export interface PropertyFormData {
   purpose: "Sell" | "Rent";
@@ -50,6 +68,7 @@ export interface PropertyFormData {
   phase?: string;
   sector?: string;
   street?: string;
+  featured_image_index?: number; // Index 0 = first image is the cover/featured
 }
 
 const propertyTypes = {
@@ -98,6 +117,87 @@ const bedroomOptions = [
   "10+",
 ];
 const bathroomOptions = ["1", "2", "3", "4", "5", "6", "6+"];
+
+// Sortable Image Item Component
+interface SortableImageItemProps {
+  id: string;
+  preview: string;
+  index: number;
+  onRemove: (index: number) => void;
+  isFeatured: boolean;
+}
+
+function SortableImageItem({
+  id,
+  preview,
+  index,
+  onRemove,
+  isFeatured,
+}: SortableImageItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative group ${isDragging ? "z-50" : ""}`}
+    >
+      <div className="relative">
+        <Image
+          src={preview || "/placeholder.svg"}
+          alt={`Preview ${index + 1}`}
+          className="w-full h-40 object-cover"
+        />
+
+        {/* Featured Badge */}
+        {isFeatured && (
+          <Chip
+            color="warning"
+            variant="solid"
+            size="sm"
+            startContent={<Star className="h-3 w-3 fill-current" />}
+            className="absolute top-2 left-2 z-10"
+          >
+            Cover
+          </Chip>
+        )}
+
+        {/* Drag Handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute top-2 right-2 p-2 bg-black/50 rounded-lg cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        >
+          <GripVertical className="h-4 w-4 text-white" />
+        </div>
+
+        {/* Remove Button */}
+        <Button
+          isIconOnly
+          color="danger"
+          size="sm"
+          onClick={() => onRemove(index)}
+          className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 interface PropertyFormProps {
   initialData?: Partial<PropertyFormData>;
@@ -150,6 +250,14 @@ export default function PropertyForm({
   );
   const [uploadingImages, setUploadingImages] = useState(false);
 
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   // Handle initial data - set previews for existing images and photo_sphere
   useEffect(() => {
     if (initialData?.images && Array.isArray(initialData.images)) {
@@ -167,6 +275,27 @@ export default function PropertyForm({
       setPhotoSpherePreview(initialData.photo_sphere);
     }
   }, [initialData]);
+
+  // Handle drag end for image reordering
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = imagePreviews.findIndex(
+        (_, i) => `image-${i}` === active.id
+      );
+      const newIndex = imagePreviews.findIndex(
+        (_, i) => `image-${i}` === over.id
+      );
+
+      // Reorder both previews and actual images
+      setImagePreviews((items) => arrayMove(items, oldIndex, newIndex));
+      setFormData((prev) => ({
+        ...prev,
+        images: arrayMove(prev.images || [], oldIndex, newIndex),
+      }));
+    }
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -777,9 +906,17 @@ export default function PropertyForm({
           <Card className="p-4">
             <CardBody className="space-y-8">
               <div className="space-y-4">
-                <label className="text-lg font-semibold text-foreground-500">
-                  Property Images
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-lg font-semibold text-foreground-500">
+                    Property Images
+                  </label>
+                  {imagePreviews.length > 0 && (
+                    <p className="text-sm text-foreground-400 flex items-center gap-2">
+                      <Star className="h-4 w-4 fill-warning text-warning" />
+                      First image is the cover photo. Drag to reorder.
+                    </p>
+                  )}
+                </div>
                 <div className="bg-default-100 rounded-xl p-12 text-center hover:bg-default-200 transition-colors">
                   <input
                     type="file"
@@ -799,26 +936,29 @@ export default function PropertyForm({
                 </div>
 
                 {imagePreviews.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative group">
-                        <Image
-                          src={preview || "/placeholder.svg"}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-40 object-cover"
-                        />
-                        <Button
-                          isIconOnly
-                          color="danger"
-                          size="sm"
-                          onClick={() => removeImage(index)}
-                          className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={imagePreviews.map((_, i) => `image-${i}`)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                        {imagePreviews.map((preview, index) => (
+                          <SortableImageItem
+                            key={`image-${index}`}
+                            id={`image-${index}`}
+                            preview={preview}
+                            index={index}
+                            onRemove={removeImage}
+                            isFeatured={index === 0}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </SortableContext>
+                  </DndContext>
                 )}
               </div>
 

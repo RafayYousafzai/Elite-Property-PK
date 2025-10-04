@@ -100,7 +100,7 @@ export default function PropertiesList({
                         <Image
                           className="h-20 w-20 lg:h-24 lg:w-24 rounded-xl object-cover ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-500 transition-all duration-200"
                           src={
-                            property.images[0]?.src ||
+                            property.images[0] ||
                             "/images/properties/property1/image-2.jpg"
                           }
                           alt={property.name}
@@ -152,13 +152,8 @@ export default function PropertiesList({
                       </span>
 
                       <div className="flex items-center text-green-600 dark:text-green-400 font-medium">
-                        <CurrencyDollarIcon className="h-4 w-4 mr-1" />
+                        Rs.
                         {property.rate}
-                      </div>
-
-                      <div className="flex items-center text-gray-600 dark:text-gray-400">
-                        <HomeIcon className="h-4 w-4 mr-1" />
-                        {property.area} sq ft
                       </div>
 
                       {property.beds && (

@@ -85,6 +85,9 @@ export default function CreatePropertyPage() {
 
         // JSON fields
         features: formData.amenities || {},
+
+        // Featured image is always the first image (index 0)
+        featured_image_index: 0,
       };
 
       console.log("Sending property data:", propertyData);
