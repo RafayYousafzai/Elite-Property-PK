@@ -47,6 +47,12 @@ const Categories = () => {
             >
               View Properties
             </Link>
+            <Link
+              href="/contactus"
+              className="ml-2 inline-block py-3 sm:py-4 px-6 sm:px-8 bg-primary text-sm sm:text-base leading-4 text-white rounded-full font-semibold mt-6 sm:mt-8 hover:bg-dark duration-300 transition-colors"
+            >
+              Lets Talk
+            </Link>
           </div>
 
           {/* Apartments */}

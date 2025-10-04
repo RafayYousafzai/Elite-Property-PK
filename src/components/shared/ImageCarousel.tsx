@@ -12,7 +12,7 @@ interface PropertyImage {
 
 interface ImageCarouselProps {
   images: PropertyImage[];
-  photoSphere?: string;
+  photoSphere?: string | null;
 }
 
 const ImageCarousel: React.FC<ImageCarouselProps> = ({
@@ -86,7 +86,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
             {/* 360° Viewer */}
             <div className="lg:col-span-4 col-span-12">
               <div className="relative">
-                <h3 className="text-lg font-medium text-dark dark:text-white mb-4 flex items-center gap-2">
+                {/* <h3 className="text-lg font-medium text-dark dark:text-white mb-4 flex items-center gap-2">
                   <Icon
                     icon="ph:globe"
                     width={20}
@@ -94,12 +94,16 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                     className="text-primary"
                   />
                   360° Virtual Tour
-                </h3>
-                <PhotoSphereViewer
-                  src={photoSphere}
-                  height="460px"
-                  className="shadow-lg"
-                />
+                </h3> */}
+                {photoSphere && (
+                  <PhotoSphereViewer
+                    src={[
+                      "https://eqwshdwdmvfqbeuqknkn.supabase.co/storage/v1/object/public/property-images/properties/42vrk13aqma-1759564251566.jpg",
+                    ]}
+                    height="460px"
+                    className="shadow-lg"
+                  />
+                )}
               </div>
             </div>
           </div>

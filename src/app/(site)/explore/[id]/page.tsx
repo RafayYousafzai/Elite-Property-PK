@@ -137,9 +137,7 @@ export default function Details() {
         <div className="mb-10">
           <ImageCarousel
             images={property.images || []}
-            photoSphere={
-              "https://eqwshdwdmvfqbeuqknkn.supabase.co/storage/v1/object/public/property-images/PXL_20250921_105538646.PHOTOSPHERE.jpg"
-            }
+            photoSphere={property.photo_sphere || null}
           />
         </div>
 
