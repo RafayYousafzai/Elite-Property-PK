@@ -25,7 +25,9 @@ export default function SearchSidebar({
     filters.maxArea,
   ]);
 
-  const handlePropertyTypeChange = (type: "all" | "homes" | "plots") => {
+  const handlePropertyTypeChange = (
+    type: "all" | "homes" | "plots" | "apartments" | "commercial"
+  ) => {
     onFiltersChange({ ...filters, propertyType: type });
   };
 
@@ -103,7 +105,8 @@ export default function SearchSidebar({
                 { value: "all", label: "All Properties" },
                 { value: "homes", label: "Homes" },
                 { value: "apartments", label: "Apartments" },
-                // { value: "plots", label: "Plots" },
+                { value: "plots", label: "Plots" },
+                { value: "commercial", label: "Commercial" },
               ].map((type) => (
                 <Chip
                   key={type.value}
@@ -117,7 +120,12 @@ export default function SearchSidebar({
                   }`}
                   onClick={() =>
                     handlePropertyTypeChange(
-                      type.value as "all" | "homes" | "plots"
+                      type.value as
+                        | "all"
+                        | "homes"
+                        | "plots"
+                        | "apartments"
+                        | "commercial"
                     )
                   }
                 >
@@ -134,7 +142,7 @@ export default function SearchSidebar({
                 Price Range
               </h3>
               <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-                ${priceRange[0].toLocaleString()} - $
+                Rs.{priceRange[0].toLocaleString()} - Rs.
                 {priceRange[1].toLocaleString()}
               </div>
             </div>
@@ -152,10 +160,10 @@ export default function SearchSidebar({
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground font-medium">
-                  ${priceRange[0].toLocaleString()}
+                  Rs.{priceRange[0].toLocaleString()}
                 </span>
                 <span className="text-muted-foreground font-medium">
-                  ${priceRange[1].toLocaleString()}
+                  Rs.{priceRange[1].toLocaleString()}
                 </span>
               </div>
             </div>

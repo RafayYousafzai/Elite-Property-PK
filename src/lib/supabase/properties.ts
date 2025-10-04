@@ -98,6 +98,16 @@ export async function getFilteredProperties(
           "plot form",
           "plot", // legacy
         ]);
+      } else if (filters.propertyType === "commercial") {
+        // Match all commercial types
+        query = query.in("property_type", [
+          "office",
+          "shop",
+          "warehouse",
+          "factory",
+          "building",
+          "other",
+        ]);
       }
     }
 

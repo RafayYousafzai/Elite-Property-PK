@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useMemo,
-  useEffect,
-  useCallback,
-  useTransition,
-} from "react";
+import { useState, useEffect, useCallback, useTransition } from "react";
 import SearchSidebar from "@/components/search-sidebar";
 
 import {
@@ -43,7 +37,13 @@ export default function SearchPage() {
   // Initialize filters with URL parameter if present
   const [filters, setFilters] = useState<SearchFilters>(() => {
     const initialPropertyType =
-      typeParam === "homes" ? "homes" : typeParam === "plots" ? "plots" : "all";
+      typeParam === "homes"
+        ? "homes"
+        : typeParam === "plots"
+        ? "plots"
+        : typeParam === "commercial"
+        ? "commercial"
+        : "all";
     return {
       propertyType: initialPropertyType,
       priceRange: [0, 1000000],
@@ -59,10 +59,10 @@ export default function SearchPage() {
       const newPropertyType =
         typeParam === "homes"
           ? "homes"
-          : typeParam === "apartments"
-          ? "apartments"
           : typeParam === "plots"
           ? "plots"
+          : typeParam === "commercial"
+          ? "commercial"
           : "all";
       setFilters((prev) => ({
         ...prev,
@@ -103,23 +103,6 @@ export default function SearchPage() {
 
     applyFiltersAsync();
   }, [filters, applyFilters]);
-
-  // Transform database properties to match the expected structure
-  const transformedProperties = useMemo(() => {
-    return filteredProperties.map((property) => ({
-      property: {
-        ...property,
-        propertyType: property.property_type, // Transform for compatibility
-        photoSphere: property.photo_sphere, // Transform for compatibility
-      },
-      type:
-        property.property_type === "plot"
-          ? ("plot" as const)
-          : property.property_type === "apartment"
-          ? ("apartment" as const)
-          : ("home" as const),
-    }));
-  }, [filteredProperties]);
 
   const handleClearFilters = useCallback(() => {
     startTransition(() => {
@@ -209,7 +192,7 @@ export default function SearchPage() {
                         {isLoading || isPending || dataLoading ? (
                           <span className="inline-block w-8 h-4 bg-slate-200 dark:bg-transparent rounded animate-pulse"></span>
                         ) : (
-                          transformedProperties.length
+                          filteredProperties.length
                         )}
                       </span>{" "}
                       properties available
@@ -325,7 +308,11 @@ export default function SearchPage() {
                         >
                           {filters.propertyType === "homes"
                             ? "🏠 Homes"
-                            : "🏞️ Plots"}
+                            : filters.propertyType === "plots"
+                            ? "🏞️ Plots"
+                            : filters.propertyType === "commercial"
+                            ? "🏢 Commercial"
+                            : "🏢 Apartments"}
                         </Chip>
                       )}
                       {filters.searchQuery && (
@@ -372,7 +359,7 @@ export default function SearchPage() {
 
           {/* Properties Grid */}
           <div className="transition-all duration-300">
-            {transformedProperties.length === 0 &&
+            {filteredProperties.length === 0 &&
             !isLoading &&
             !isPending &&
             !dataLoading ? (
@@ -395,24 +382,20 @@ export default function SearchPage() {
                   <div className="animate-in fade-in duration-300">
                     {viewMode === "list" ? (
                       <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 px-2 pb-20">
-                        {transformedProperties.map(
-                          ({ property, type }, index) => (
-                            <div
-                              key={`${type}-${property.slug}-${index}`}
-                              className="animate-in fade-in duration-200"
-                              style={{ animationDelay: `${index * 50}ms` }}
-                            >
-                              <PropertyCard item={property} />
-                            </div>
-                          )
-                        )}
+                        {filteredProperties.map((property, index) => (
+                          <div
+                            key={`${property.id}-${property.slug}-${index}`}
+                            className="animate-in fade-in duration-200"
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <PropertyCard item={property} />
+                          </div>
+                        ))}
                       </div>
                     ) : (
                       <div className="pt-20">
                         <ParallaxScroll
-                          items={transformedProperties.map(
-                            ({ property }) => property
-                          )}
+                          items={filteredProperties}
                           isLessColls={true}
                         />
                       </div>
@@ -471,7 +454,7 @@ export default function SearchPage() {
                   onClick={() => setMobileFiltersOpen(false)}
                   className="w-full transition-all duration-200"
                 >
-                  Apply Filters ({transformedProperties.length} results)
+                  Apply Filters ({filteredProperties.length} results)
                 </Button>
                 <Button
                   color="danger"

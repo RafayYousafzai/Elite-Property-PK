@@ -55,7 +55,7 @@ export interface PropertyFormData {
 const propertyTypes = {
   Home: [
     "House",
-    "Flat",
+    "Flat/Appartment",
     "Upper Portion",
     "Lower Portion",
     "Farm House",
@@ -521,8 +521,8 @@ export default function PropertyForm({
                 />
                 <Input
                   type="number"
-                  label="Constructed Covered Area"
-                  placeholder="Constructed Covered Area"
+                  label="Constructed Covered Area (Sqr Ft)"
+                  placeholder="Constructed Covered Area  (Sqr Ft)"
                   value={String(formData.constructed_covered_area || 0)}
                   onValueChange={(value) =>
                     setFormData((prev) => ({

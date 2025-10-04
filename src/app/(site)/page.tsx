@@ -70,7 +70,7 @@ export default async function Home() {
         ]}
       />
 
-      <FeaturedProperty properties={featuredProperties} />
+      {/* <FeaturedProperty properties={featuredProperties} /> */}
       <LocationMap />
       <BlogSmall />
       {/* <Plots /> */}

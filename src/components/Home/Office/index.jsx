@@ -16,6 +16,8 @@ import { FaTiktok } from "react-icons/fa";
 
 const LocationMap = () => {
   const officeLocation = {
+    lat: 33.535113,
+    lng: 73.170038,
     address:
       "2nd Floor, Plaza no 19, Tipu Boulevard, Sector G DHA Phase II, Islamabad",
     phone: "+923344111778",
@@ -24,7 +26,7 @@ const LocationMap = () => {
   };
 
   const handleGetDirections = () => {
-    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${address}`;
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${officeLocation.lat},${officeLocation.lng}`;
     window.open(googleMapsUrl, "_blank");
   };
 

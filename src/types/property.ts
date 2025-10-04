@@ -72,7 +72,7 @@ interface PropertyImage {
 }
 
 export interface SearchFilters {
-  propertyType: "all" | "homes" | "apartments" | "plots";
+  propertyType: "all" | "homes" | "apartments" | "plots" | "commercial";
   priceRange: [number, number];
   beds?: number;
   baths?: number;
