@@ -142,10 +142,10 @@ const WhyChooseUs = () => {
                 </p>
 
                 {/* Learn More */}
-                <div className="mt-6 flex items-center text-primary font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-2">
+                {/* <div className="mt-6 flex items-center text-primary font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-2">
                   <span className="mr-2">Learn More</span>
                   <Icon icon="ph:arrow-right" className="text-lg" />
-                </div>
+                </div> */}
               </div>
             </div>
           ))}

@@ -12,12 +12,12 @@ const Hero: React.FC = () => {
       {/* Background Image & Overlays */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero/modern-apartment-building-with-numerous-windows-and-balconies_49091535.jpeg"
+          src="/images/hero/1 (1).jpg"
           alt="Hero Background"
           fill // Changed layout="fill" to the recommended `fill` prop
           className="object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/70 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
       </div>
 

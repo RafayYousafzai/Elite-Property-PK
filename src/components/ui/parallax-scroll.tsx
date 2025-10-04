@@ -188,7 +188,7 @@ export const ParallaxScroll = ({
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                       <p className="text-sm  mb-1">{property.location}</p>{" "}
-                      <p className="text-sm "> {property.area} sqft</p>
+                      {/* <p className="text-sm "> {property.area} sqft</p> */}
                     </div>
 
                     <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">

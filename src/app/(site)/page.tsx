@@ -3,7 +3,7 @@ import Hero from "@/components/Home/Hero";
 // import Plots from "@/components/Home/Plots";
 import Categories from "@/components/Home/Categories";
 import Testimonial from "@/components/Home/Testimonial/TestimonialsServer";
-import BlogSmall from "@/components/shared/Blog";
+import BlogSmall from "@/components/shared/Blog/BlogSmallServer";
 import GetInTouch from "@/components/Home/GetInTouch";
 import FAQ from "@/components/Home/FAQs";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
@@ -70,7 +70,7 @@ export default async function Home() {
         ]}
       />
 
-      {/* <FeaturedProperty properties={featuredProperties} /> */}
+      <FeaturedProperty properties={featuredProperties} />
       <LocationMap />
       <BlogSmall />
       {/* <Plots /> */}

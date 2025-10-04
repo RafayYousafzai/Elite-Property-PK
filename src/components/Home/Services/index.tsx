@@ -134,12 +134,12 @@ const Services = () => {
                 </div>
 
                 {/* Learn More Button */}
-                <div className="mt-6 pt-6 border-t border-white/10">
+                {/* <div className="mt-6 pt-6 border-t border-white/10">
                   <button className="flex items-center gap-2 text-primary font-semibold group-hover:gap-3 transition-all duration-300">
                     Learn More
                     <Icon icon="ph:arrow-right" className="text-lg" />
                   </button>
-                </div>
+                </div> */}
               </div>
 
               {/* Hover Border Effect */}

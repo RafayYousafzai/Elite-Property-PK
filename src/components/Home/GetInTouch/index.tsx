@@ -13,10 +13,7 @@ const GetInTouch: React.FC = () => {
             playsInline
             aria-label="Video background showing luxurious real estate"
           >
-            <source
-              src="/images/get-in-touch/7233782-hd_1920_1080_25fps.mp4"
-              type="video/mp4"
-            />
+            <source src="/images/drone-shot.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
 

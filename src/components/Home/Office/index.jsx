@@ -64,7 +64,7 @@ const LocationMap = () => {
               {/* Interactive Map Placeholder */}
               <div className="aspect-[4/3] bg-gradient-to-br from-amber-100 to-yellow-100 relative">
                 <iframe
-                  src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3321.8!2d${officeLocation.lng}!3d${officeLocation.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDQzJzQ1LjgiTiA3M8KwMDUnMzUuMiJF!5e0!3m2!1sen!2s!4v1234567890`}
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3325.7026272595363!2d73.16746392552783!3d33.53511641307411!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfed8930128de7%3A0x4b866d1a81e61490!2sElite%20Property%20Exchange!5e0!3m2!1sen!2s!4v1759570688102!5m2!1sen!2s"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

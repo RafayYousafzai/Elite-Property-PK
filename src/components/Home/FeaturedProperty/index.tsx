@@ -189,7 +189,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
             </div>
             <p className="text-base text-dark/50 dark:text-white/50 line-clamp-3">
               {currentProperty.description ||
-                `Experience luxury living at ${currentProperty.name}, located at ${currentProperty.location}. This ${currentProperty.area} ft² ${currentProperty.property_type} offers modern amenities and spacious living areas.`}
+                "This property features modern amenities and spacious living areas in a prime location."}
             </p>
             <div className="grid grid-cols-2 gap-10">
               {currentProperty.beds && (
@@ -197,7 +197,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                   <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
                     <Image
                       src={"/images/hero/sofa.svg"}
-                      alt="sofa"
+                      alt="bedrooms"
                       width={24}
                       height={24}
                       className="block dark:hidden"
@@ -205,7 +205,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                     />
                     <Image
                       src={"/images/hero/dark-sofa.svg"}
-                      alt="sofa"
+                      alt="bedrooms"
                       width={24}
                       height={24}
                       className="hidden dark:block"
@@ -220,7 +220,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                   <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
                     <Image
                       src={"/images/hero/tube.svg"}
-                      alt="tube"
+                      alt="bathrooms"
                       width={24}
                       height={24}
                       className="block dark:hidden"
@@ -228,7 +228,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                     />
                     <Image
                       src={"/images/hero/dark-tube.svg"}
-                      alt="tube"
+                      alt="bathrooms"
                       width={24}
                       height={24}
                       className="hidden dark:block"
@@ -241,29 +241,8 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
               <div className="flex items-center gap-4">
                 <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
                   <Image
-                    src={"/images/hero/parking.svg"}
-                    alt="parking"
-                    width={24}
-                    height={24}
-                    className="block dark:hidden"
-                    unoptimized={true}
-                  />
-                  <Image
-                    src={"/images/hero/dark-parking.svg"}
-                    alt="parking"
-                    width={24}
-                    height={24}
-                    className="hidden dark:block"
-                    unoptimized={true}
-                  />
-                </div>
-                <h6 className="">Parking Space</h6>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
-                  <Image
                     src={"/images/hero/bar.svg"}
-                    alt="bar"
+                    alt="area"
                     width={24}
                     height={24}
                     className="block dark:hidden"
@@ -271,28 +250,53 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                   />
                   <Image
                     src={"/images/hero/dark-bar.svg"}
-                    alt="bar"
+                    alt="area"
                     width={24}
                     height={24}
                     className="hidden dark:block"
                     unoptimized={true}
                   />
                 </div>
-                <h6 className="">{currentProperty.area} ft² area</h6>
+                <h6 className="">
+                  {currentProperty.area} {currentProperty.area_unit || "Sq Ft"}
+                </h6>
               </div>
+              {currentProperty.property_category && (
+                <div className="flex items-center gap-4">
+                  <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
+                    <Icon
+                      icon={
+                        currentProperty.property_category === "Home"
+                          ? "ph:house-simple-fill"
+                          : currentProperty.property_category === "Plots"
+                          ? "ph:app-window-fill"
+                          : "ph:buildings-fill"
+                      }
+                      width={24}
+                      height={24}
+                      className="text-dark dark:text-white"
+                    />
+                  </div>
+                  <h6 className="">{currentProperty.property_type}</h6>
+                </div>
+              )}
             </div>
-            <div className="flex gap-10">
+            <div className="flex gap-10 items-center">
               <Link
-                href="/contactus"
-                className="py-4 px-8  bg-primary hover:bg-dark duration-300 rounded-full text-white"
+                href={`/explore/${currentProperty.slug}`}
+                className="py-4 px-8 bg-primary hover:bg-dark duration-300 rounded-full text-white font-semibold"
               >
-                Get in touch
+                View Details
               </Link>
               <div>
                 <h4 className="text-3xl text-dark dark:text-white font-medium">
-                  Rs. {currentProperty.rate}
+                  Rs. {Number(currentProperty.rate).toLocaleString()}
                 </h4>
-                <p className="text-base text-dark/50">Discounted price</p>
+                <p className="text-base text-dark/50 dark:text-white/50">
+                  {currentProperty.purpose === "Rent"
+                    ? "Per Month"
+                    : "Total Price"}
+                </p>
               </div>
             </div>
           </div>

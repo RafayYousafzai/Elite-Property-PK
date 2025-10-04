@@ -2,6 +2,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
+import Link from "next/link";
 
 const AboutCTA = () => {
   const contactMethods = [
@@ -11,14 +12,16 @@ const AboutCTA = () => {
       description: "Speak directly with our property experts",
       value: "+92 300 1234567",
       action: "Call Now",
+      href: "tel:+923344111778",
       color: "from-emerald-500 to-emerald-600",
     },
     {
       icon: "ph:envelope-fill",
       title: "Email Us",
       description: "Get detailed information via email",
-      value: "info@homely.pk",
+      value: "pk.eliteproperty@gmail.com",
       action: "Send Email",
+      href: "mailto:pk.eliteproperty@gmail.com",
       color: "from-blue-500 to-blue-600",
     },
     {
@@ -27,6 +30,7 @@ const AboutCTA = () => {
       description: "Meet us at our DHA Islamabad office",
       value: "Phase 2, DHA Islamabad",
       action: "Get Directions",
+      href: "https://www.google.com/maps/dir/?api=1&destination=33.535113,73.170038",
       color: "from-purple-500 to-purple-600",
     },
     {
@@ -35,6 +39,7 @@ const AboutCTA = () => {
       description: "Instant support through live chat",
       value: "Available 24/7",
       action: "Start Chat",
+      href: "whatsapp://send?phone=+923344111778",
       color: "from-orange-500 to-orange-600",
     },
   ];
@@ -117,14 +122,16 @@ const AboutCTA = () => {
 
             {/* Primary CTA */}
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
-              <button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
-                <Icon icon="ph:calendar-plus-fill" className="text-xl" />
-                Schedule Free Consultation
-              </button>
-              <button className="border-2 border-white/30 hover:border-primary text-white hover:text-primary px-8 py-4 rounded-xl font-semibold text-lg backdrop-blur-sm hover:bg-white/5 transition-all duration-300 flex items-center justify-center gap-2">
-                <Icon icon="ph:download-fill" className="text-xl" />
-                Download Brochure
-              </button>
+              <Link href="whatsapp://send?phone=+923344111778?text=Hello%2C%20I%27d%20like%20to%20schedule%20a%20free%20consultation%20regarding%20property%20investments.">
+                <button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                  Schedule Free Consultation
+                </button>
+              </Link>
+              <Link href="/contactus">
+                <button className="border-2 border-white/30 hover:border-primary text-white hover:text-primary px-8 py-4 rounded-xl font-semibold text-lg backdrop-blur-sm hover:bg-white/5 transition-all duration-300 flex items-center justify-center gap-2">
+                  Lets talk
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -155,10 +162,17 @@ const AboutCTA = () => {
                     <p className="text-white font-semibold mb-4">
                       {method.value}
                     </p>
-                    <button className="text-primary font-semibold text-sm flex items-center gap-2 group-hover:gap-3 transition-all duration-300">
-                      {method.action}
-                      <Icon icon="ph:arrow-right" className="text-sm" />
-                    </button>
+                    <Link
+                      href={method.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="cursor-pointer"
+                    >
+                      <button className="text-primary font-semibold text-sm flex items-center gap-2 group-hover:gap-3 transition-all duration-300">
+                        {method.action}
+                        <Icon icon="ph:arrow-right" className="text-sm" />
+                      </button>
+                    </Link>
                   </div>
                 ))}
               </div>
@@ -189,7 +203,7 @@ const AboutCTA = () => {
             </div>
 
             {/* Newsletter Signup */}
-            <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6">
+            {/* <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6">
               <div className="text-center mb-4">
                 <h4 className="text-xl font-bold text-white mb-2">
                   Stay Updated
@@ -208,7 +222,7 @@ const AboutCTA = () => {
                   <Icon icon="ph:paper-plane-fill" className="text-lg" />
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 

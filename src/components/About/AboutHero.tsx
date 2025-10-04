@@ -52,25 +52,37 @@ const AboutHero = () => {
                 Premium Real Estate Excellence
               </span>
             </div>
-
             {/* Main Heading */}
             <div className="space-y-6">
               <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight">
-                Crafting
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary/60">
                   Dream Homes
                 </span>
-                Since 2009
+                Since 2021
               </h1>
 
-              <p className="text-xl lg:text-2xl text-white/80 leading-relaxed max-w-2xl">
-                We are more than just a real estate company. We are architects
-                of dreams, curators of luxury, and guardians of your most
-                important investment.
+              <p className="text-md lg:text-2xl text-white/80 leading-relaxed max-w-2xl text-balance">
+                At Elite Property Exchange, we believe real estate should be
+                simple, secure, and transparent.
+                <br />
+                <br />
+                Based in DHA Phase 2, Islamabad, we specialize in verified
+                listings only — ensuring every property showcased on our
+                platform is authentic, inspected, and worth your investment.
+                <br />
+                <br />
+                Our mission is to bring trust and clarity back into real estate
+                by connecting serious buyers and sellers through honest,
+                verified, and transparent deals. From luxury villas and
+                apartments to high-return commercial plots, we handle every
+                transaction with professionalism and integrity.
+                <br />
+                <br />
+                Choose Elite Property Exchange — where every deal is genuine,
+                and every listing is verified.
               </p>
             </div>
-
-            {/* Feature Points */}
+            Feature Points
             <div className="space-y-4">
               {[
                 "Premium properties in DHA Islamabad's most coveted locations",
@@ -88,7 +100,6 @@ const AboutHero = () => {
                 </div>
               ))}
             </div>
-
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-105 flex items-center gap-2">
