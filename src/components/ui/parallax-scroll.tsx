@@ -57,6 +57,8 @@ export const ParallaxScroll = ({
   const handleClick = (slug: string) => {
     router.push(`/explore/${slug}`);
   };
+  const defaultImage =
+    "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
   return (
     <div
@@ -106,7 +108,7 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden">
                 <Image
-                  src={property.images[0]}
+                  src={property.images[0] || defaultImage}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
@@ -141,7 +143,7 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden">
                 <Image
-                  src={property.images[0]}
+                  src={property.images[0] || defaultImage}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
@@ -176,7 +178,7 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden">
                 <Image
-                  src={property.images[0]}
+                  src={property.images[0] || defaultImage}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
@@ -212,7 +214,7 @@ export const ParallaxScroll = ({
               >
                 <div className="relative overflow-hidden">
                   <Image
-                    src={property.images[0]}
+                    src={property.images[0] || defaultImage}
                     className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
                     height="400"
                     width="400"
