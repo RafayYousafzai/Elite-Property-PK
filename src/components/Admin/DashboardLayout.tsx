@@ -15,6 +15,7 @@ import {
   SunIcon,
   MoonIcon,
   ArrowRightEndOnRectangleIcon,
+  NewspaperIcon,
 } from "@heroicons/react/24/outline";
 
 interface DashboardLayoutProps {
@@ -97,6 +98,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       name: "Testimonials",
       href: "/admin/testimonials",
       icon: UserCircleIcon,
+    },
+    {
+      name: "Blogs",
+      href: "/admin/blogs",
+      icon: NewspaperIcon,
     },
     // {
     //   name: "Analytics",
