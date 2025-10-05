@@ -10,21 +10,21 @@ import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 import Services from "@/components/Home/Services";
 import {
   getFeaturedProperties,
-  getProperties,
+  // getProperties,
 } from "@/lib/supabase/properties-server";
 import VideoShowcase from "@/components/shared/video-showcase";
 import LocationMap from "@/components/Home/Office";
 
 export default async function Home() {
   // Fetch properties from Supabase
-  const properties = await getProperties();
+  // const properties = await getProperties();
   const featuredProperties = await getFeaturedProperties();
 
   return (
     <main>
       <Hero />
       <Categories />
-      <ParallaxScroll items={properties} />
+      <ParallaxScroll items={featuredProperties} />
       <Services />
 
       <VideoShowcase
@@ -74,7 +74,7 @@ export default async function Home() {
         ]}
       />
 
-      <FeaturedProperty properties={featuredProperties} />
+      <FeaturedProperty properties={[featuredProperties[0]]} />
       <LocationMap />
       <BlogSmall />
       {/* <Plots /> */}

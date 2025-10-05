@@ -1,14 +1,11 @@
-export default function formatNumberShort(num: number): string {
-  if (num < 1000) return `Rs.${num.toString()}`;
+export default function formatNumberFull(num: number): string {
+  if (num < 1000) return `Rs ${num}`;
 
   if (num < 1_00_000) {
-    // Up to 99,999 → show as thousands
-    return `Rs.${(num / 1000).toFixed(1).replace(/\.0$/, "")}K`;
+    return `Rs ${(num / 1000).toFixed(1).replace(/\.0$/, "")} thousand`;
   } else if (num < 1_00_00_000) {
-    // Up to 99,99,999 → show as lakhs
-    return `Rs.${(num / 1_00_000).toFixed(1).replace(/\.0$/, "")}L`;
+    return `Rs ${(num / 1_00_000).toFixed(1).replace(/\.0$/, "")} lakh`;
   } else {
-    // 1 crore and above
-    return `Rs.${(num / 1_00_00_000).toFixed(1).replace(/\.0$/, "")}Cr`;
+    return `Rs ${(num / 1_00_00_000).toFixed(1).replace(/\.0$/, "")} crore`;
   }
 }

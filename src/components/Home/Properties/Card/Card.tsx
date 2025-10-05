@@ -48,7 +48,7 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
         )}
 
         <div className="overflow-hidden rounded-t-2xl">
-          <Link href={`/properties/${slug}`}>
+          <Link href={`/explore/${slug}`}>
             {mainImage && (
               <Image
                 src={mainImage}
