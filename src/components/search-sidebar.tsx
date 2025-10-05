@@ -161,7 +161,7 @@ export default function SearchSidebar({
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {(filters.propertyType === "homes"
-                    ? propertyTypes.Home
+                    ? ["House", "flat/appartment", "Farm House", "Room"]
                     : filters.propertyType === "plots"
                     ? propertyTypes.Plots
                     : filters.propertyType === "commercial"
@@ -175,7 +175,7 @@ export default function SearchSidebar({
                       }
                       className={`cursor-pointer transition-all duration-300 premium-hover ${
                         filters.subCategory === subType
-                          ? "bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground shadow-lg scale-105 border-secondary/50"
+                          ? "bg-primary text-secondary-foreground shadow-lg scale-105 border-secondary/50"
                           : "hover:bg-muted hover:scale-105 hover:shadow-md border-border/50"
                       }`}
                       onClick={() => handleSubCategoryChange(subType)}

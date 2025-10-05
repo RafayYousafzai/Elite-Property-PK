@@ -76,10 +76,10 @@ export const propertyTypes = {
   Home: [
     "House",
     "flat/appartment",
-    "Upper Portion",
-    "Lower Portion",
     "Farm House",
     "Room",
+    "Upper Portion",
+    "Lower Portion",
     "Penthouse",
   ],
   Plots: [
