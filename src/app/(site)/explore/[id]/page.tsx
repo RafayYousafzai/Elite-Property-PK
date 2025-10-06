@@ -25,6 +25,8 @@ export default function Details() {
 
       try {
         const propertyData = await getPropertyBySlug(id);
+        console.log(propertyData);
+
         if (propertyData) {
           setProperty(propertyData);
         } else {
@@ -88,10 +90,16 @@ export default function Details() {
         <div className="grid grid-cols-12 items-end gap-6 mb-8">
           <div className="lg:col-span-8 col-span-12">
             <div className="flex items-center gap-3 mb-4 flex-wrap">
-              {property.purpose && (
-                <span className="px-4 py-1.5 bg-white dark:bg-gray-900 border border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-500 rounded-lg text-sm font-medium">
-                  For {property.purpose}
+              {property.is_sold ? (
+                <span className="px-4 py-1.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-500 rounded-lg text-sm font-medium">
+                  SOLD
                 </span>
+              ) : (
+                property.purpose && (
+                  <span className="px-4 py-1.5 bg-white dark:bg-gray-900 border border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-500 rounded-lg text-sm font-medium">
+                    For {property.purpose}
+                  </span>
+                )
               )}
               {property.property_category && (
                 <span className="px-4 py-1.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium">
@@ -445,7 +453,16 @@ export default function Details() {
                     </span>
                   </div>
                 )}
-                {property.purpose && (
+                {property.is_sold ? (
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-600 dark:text-gray-400 text-sm">
+                      Status
+                    </span>
+                    <span className="text-gray-900 dark:text-white font-semibold text-sm">
+                      Sold
+                    </span>
+                  </div>
+                ) : property.purpose ? (
                   <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800">
                     <span className="text-gray-600 dark:text-gray-400 text-sm">
                       Purpose
@@ -454,7 +471,7 @@ export default function Details() {
                       For {property.purpose}
                     </span>
                   </div>
-                )}
+                ) : null}
                 {property.city && (
                   <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800">
                     <span className="text-gray-600 dark:text-gray-400 text-sm">

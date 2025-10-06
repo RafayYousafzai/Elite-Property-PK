@@ -34,17 +34,16 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
     <div>
       <div className="relative rounded-2xl border border-dark/10 dark:border-white/10 group hover:shadow-3xl duration-300 dark:hover:shadow-white/20">
         {/* Status Badge */}
-        {is_sold && (
+        {is_sold ? (
           <div className="absolute top-6 left-6 z-10 px-4 py-2 bg-red-500 text-white rounded-full text-sm font-semibold">
             Sold
           </div>
-        )}
-
-        {/* Purpose Badge */}
-        {purpose && (
-          <div className="absolute top-6 left-6 z-10 px-4 py-2 bg-primary text-white rounded-full text-sm font-semibold">
-            For {purpose}
-          </div>
+        ) : (
+          purpose && (
+            <div className="absolute top-6 left-6 z-10 px-4 py-2 bg-primary text-white rounded-full text-sm font-semibold">
+              For {purpose}
+            </div>
+          )
         )}
 
         <div className="overflow-hidden rounded-t-2xl">
