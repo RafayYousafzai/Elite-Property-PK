@@ -160,7 +160,7 @@ const FeaturesAmenitiesModal: React.FC<FeaturesAmenitiesModalProps> = ({
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         size="4xl"
-        scrollBehavior="outside"
+        className="max-h-[80%] overflow-y-scroll"
       >
         <ModalContent className="!py-4">
           {(onClose) => (
