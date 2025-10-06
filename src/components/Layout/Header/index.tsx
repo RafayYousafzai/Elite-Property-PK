@@ -17,6 +17,7 @@ const navigationItems = [
   { name: "Plots", href: "/explore?type=plots" },
   { name: "Apartments", href: "/explore?type=apartments" },
   { name: "About", href: "/about" },
+  { name: "Team", href: "/team" },
   { name: "Contact", href: "/contactus" },
   { name: "Blogs", href: "/blogs" },
 ];

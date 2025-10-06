@@ -482,6 +482,36 @@ export default function Details() {
                     </span>
                   </div>
                 )}
+                {property.phase && (
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-600 dark:text-gray-400 text-sm">
+                      Phase
+                    </span>
+                    <span className="text-gray-900 dark:text-white font-semibold text-sm">
+                      {property.phase}
+                    </span>
+                  </div>
+                )}
+                {property.sector && (
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-600 dark:text-gray-400 text-sm">
+                      Sector
+                    </span>
+                    <span className="text-gray-900 dark:text-white font-semibold text-sm">
+                      {property.sector}
+                    </span>
+                  </div>
+                )}
+                {property.street && (
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-600 dark:text-gray-400 text-sm">
+                      Street
+                    </span>
+                    <span className="text-gray-900 dark:text-white font-semibold text-sm">
+                      {property.street}
+                    </span>
+                  </div>
+                )}
                 {property.created_at && (
                   <div className="flex justify-between items-center py-3">
                     <span className="text-gray-600 dark:text-gray-400 text-sm">

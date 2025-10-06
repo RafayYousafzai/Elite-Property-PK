@@ -100,6 +100,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       icon: UserCircleIcon,
     },
     {
+      name: "Teams",
+      href: "/admin/team",
+      icon: UserCircleIcon,
+    },
+    {
       name: "Blogs",
       href: "/admin/blogs",
       icon: NewspaperIcon,
