@@ -1,86 +1,64 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Loader } from "@googlemaps/js-api-loader";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Search, Home, Building2, MapPin, Store } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectItem } from "@heroui/react";
 
-import { Input, Spinner } from "@heroui/react";
+const PropertyTypeButton = ({
+  icon: Icon,
+  label,
+  isActive,
+  onClick,
+}: {
+  icon: React.ElementType;
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+      isActive
+        ? "bg-primary text-white shadow-lg shadow-primary/30"
+        : "bg-white/10 backdrop-blur-sm text-white/80 hover:bg-white/20 hover:text-white border border-white/20"
+    }`}
+  >
+    <Icon className="w-4 h-4" />
+    <span className="text-sm">{label}</span>
+  </button>
+);
 
-interface LocationAutocompleteProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  className?: string;
-  required?: boolean;
-}
+export default function HeroSearchBar() {
+  const [query, setQuery] = useState<string>("");
 
-export default function LocationAutocomplete({
-  value,
-  onChange,
-  placeholder = "Enter location",
-  className = "h-full",
-  required = false,
-}: LocationAutocompleteProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    const initializeAutocomplete = async () => {
-      try {
-        const loader = new Loader({
-          apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-          version: "weekly",
-          libraries: ["places"],
-        });
-
-        await loader.load();
-        setIsLoaded(true);
-
-        if (inputRef.current && window.google) {
-          const autocomplete = new window.google.maps.places.Autocomplete(
-            inputRef.current,
-            {
-              types: ["geocode", "establishment"],
-              componentRestrictions: { country: ["pk", "us", "ae"] }, // Adjust countries as needed
-            }
-          );
-
-          autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
-            if (place.formatted_address) {
-              onChange(place.formatted_address);
-            }
-          });
-        }
-      } catch (error) {
-        console.error("Error loading Google Places:", error);
-        setIsLoaded(true); // Still show the input even if API fails
-      }
-    };
-
-    initializeAutocomplete();
-  }, [onChange]);
+  // Generate Phase options
+  const phases = Array.from({ length: 10 }, (_, i) => ({
+    value: `Phase ${i + 1}`,
+    label: `Phase ${i + 1}`,
+  }));
 
   return (
-    <div className="relative w-full ">
-      <Input
-        label="Location"
-        size="lg"
-        ref={inputRef}
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={className}
-        isRequired={required}
-        endContent={!isLoaded && <Spinner size="sm" color="primary" />}
-      />
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      <div className="flex flex-row gap-3">
+        <Select
+          placeholder="Select in islamabad DHA..."
+          selectedKeys={query ? [query] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
+            setQuery(selected || "");
+          }}
+          startContent={<MapPin className="w-5 h-5 text-slate-400" />}
+          className="flex-1"
+        >
+          {phases.map((phase) => (
+            <SelectItem key={phase.value} value={phase.value}>
+              {phase.label}
+            </SelectItem>
+          ))}
+        </Select>
+      </div>
     </div>
   );
-}
-
-// Extend the Window interface to include Google Maps
-declare global {
-  interface Window {
-    google: any;
-  }
 }

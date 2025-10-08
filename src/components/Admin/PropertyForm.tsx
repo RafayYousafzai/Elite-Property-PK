@@ -19,7 +19,7 @@ import {
   Spinner,
   Chip,
 } from "@heroui/react";
-import { Upload, X, GripVertical, Star } from "lucide-react";
+import { Upload, X, GripVertical, Star, MapPin } from "lucide-react";
 import LocationAutocomplete from "../shared/LocationAutocomplete";
 import FeaturesAmenitiesModal from "./features-amenities-modal";
 import { CubeIcon } from "@heroicons/react/24/solid";
@@ -444,6 +444,11 @@ export default function PropertyForm({
     setPhotoSpherePreview(null);
   };
 
+  const phases = Array.from({ length: 7 }, (_, i) => ({
+    value: `Phase ${i + 1}`,
+    label: `Phase ${i + 1}`,
+  }));
+
   return (
     <div className="relative">
       {/* Loading Overlay */}
@@ -578,15 +583,22 @@ export default function PropertyForm({
                   ))}
                 </Select>
 
-                <LocationAutocomplete
-                  value={formData.location}
-                  onChange={(value) =>
-                    setFormData((prev) => ({ ...prev, location: value }))
-                  }
-                  className=""
-                  placeholder="Enter property location"
+                <Select
+                  placeholder="Select in islamabad DHA..."
+                  selectedKeys={formData.location ? [formData.location] : []}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    setFormData((prev) => ({ ...prev, location: selected }));
+                  }}
+                  startContent={<MapPin className="w-5 h-5 text-slate-400" />}
+                  className="flex-1"
+                  label="Location *"
                   required
-                />
+                >
+                  {phases.map((phase) => (
+                    <SelectItem key={phase.value}>{phase.label}</SelectItem>
+                  ))}
+                </Select>
               </div>
             </CardBody>
           </Card>
