@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, MessageCircle, Sparkles } from "lucide-react";
 
@@ -8,6 +8,115 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+}
+
+// Function to parse and render markdown-style text with links
+function parseMessageContent(content: string): (string | React.ReactElement)[] {
+  // Split content into parts (text, bold, italic, links, etc.)
+  const parts: (string | React.ReactElement)[] = [];
+  let lastIndex = 0;
+  let key = 0;
+
+  // Enhanced pattern to match multiple markdown formats:
+  // **bold**, *italic*, `code`, links, and emojis are preserved
+  const combinedPattern =
+    /(\*\*\*(.*?)\*\*\*)|(\*\*(.*?)\*\*)|(\*(.*?)\*)|(`(.*?)`)|(https?:\/\/[^\s]+)/g;
+
+  let match;
+  while ((match = combinedPattern.exec(content)) !== null) {
+    // Add text before the match
+    if (match.index > lastIndex) {
+      parts.push(
+        <span key={`text-${key++}`}>
+          {content.substring(lastIndex, match.index)}
+        </span>
+      );
+    }
+
+    if (match[1]) {
+      // Bold + Italic (***text***)
+      parts.push(
+        <strong
+          key={`bolditalic-${key++}`}
+          className="font-bold italic text-amber-300"
+        >
+          {match[2]}
+        </strong>
+      );
+    } else if (match[3]) {
+      // Bold text (**text**)
+      parts.push(
+        <strong key={`bold-${key++}`} className="font-bold text-amber-300">
+          {match[4]}
+        </strong>
+      );
+    } else if (match[5]) {
+      // Italic text (*text*)
+      parts.push(
+        <em key={`italic-${key++}`} className="italic text-amber-200">
+          {match[6]}
+        </em>
+      );
+    } else if (match[7]) {
+      // Inline code (`code`)
+      parts.push(
+        <code
+          key={`code-${key++}`}
+          className="px-1.5 py-0.5 bg-gray-900/50 border border-amber-500/30 rounded text-amber-400 font-mono text-xs"
+        >
+          {match[8]}
+        </code>
+      );
+    } else if (match[9]) {
+      // URL match
+      const url = match[9];
+      // Extract property name from URL if it's a property link
+      const propertyMatch = url.match(/\/explore\/([^\/]+)$/);
+      const displayText = propertyMatch
+        ? propertyMatch[1]
+            .split("-")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")
+            .substring(0, 40) + (propertyMatch[1].length > 40 ? "..." : "")
+        : "View Property";
+
+      parts.push(
+        <a
+          key={`link-${key++}`}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-amber-400 hover:text-amber-300 underline underline-offset-2 font-medium inline-flex items-center gap-1 break-words"
+        >
+          {displayText}
+          <svg
+            className="w-3 h-3 inline-block flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
+      );
+    }
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text
+  if (lastIndex < content.length) {
+    parts.push(
+      <span key={`text-${key++}`}>{content.substring(lastIndex)}</span>
+    );
+  }
+
+  return parts.length > 0 ? parts : [content];
 }
 
 export function CustomChatWidget() {
@@ -103,7 +212,8 @@ export function CustomChatWidget() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (err) {
+      console.error("Chat error:", err);
       const errorMessage: Message = {
         role: "assistant",
         content: "I'm having trouble connecting. Please try again later.",
@@ -171,7 +281,7 @@ export function CustomChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.8 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 right-0 z-50 flex h-[100vh] h-[calc(var(--vh,1vh)*100)] w-full flex-col overflow-hidden border-amber-300/10 bg-gradient-to-br from-black via-gray-900/50 to-black shadow-2xl shadow-amber-500/20 backdrop-blur-xl sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-3xl"
+            className="fixed bottom-0 right-0 z-50 flex h-[calc(var(--vh,1vh)*100)] w-full flex-col overflow-hidden border-amber-300/10 bg-gradient-to-br from-black via-gray-900/50 to-black shadow-2xl shadow-amber-500/20 backdrop-blur-xl sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-3xl"
           >
             {/* Header */}
             <div className="relative flex items-center justify-between border-b border-amber-300/10 bg-gradient-to-r from-amber-600/30 via-yellow-600/30 to-amber-600/30 p-5 backdrop-blur-xl">
@@ -183,7 +293,9 @@ export function CustomChatWidget() {
                   <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-black bg-emerald-500"></div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">AI Assistant</h3>
+                  <h3 className="font-semibold text-white">
+                    Emma <span className="font-light">(Ai)</span>
+                  </h3>
                   <p className="text-xs text-amber-200">
                     Online • Ready to help
                   </p>
@@ -218,7 +330,9 @@ export function CustomChatWidget() {
                         : "bg-gray-800/50 text-gray-100 backdrop-blur-sm border border-amber-300/10"
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      {parseMessageContent(message.content)}
+                    </div>
                     <p
                       className={`mt-1 text-xs ${
                         message.role === "user"
