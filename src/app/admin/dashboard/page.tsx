@@ -122,7 +122,10 @@ export default async function AdminDashboard() {
             </div>
           </Link>
 
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200">
+          <Link
+            href="/admin/properties?category=Home"
+            className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-green-100 font-medium">Homes</p>
@@ -134,9 +137,12 @@ export default async function AdminDashboard() {
                 <HomeIcon className="h-10 w-10 text-white" />
               </div>
             </div>
-          </div>
+          </Link>
 
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200">
+          <Link
+            href="/admin/properties?category=Plots"
+            className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-purple-100 font-medium">Plots</p>
@@ -148,9 +154,12 @@ export default async function AdminDashboard() {
                 <MapPinIcon className="h-10 w-10 text-white" />
               </div>
             </div>
-          </div>
+          </Link>
 
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200">
+          <Link
+            href="/admin/properties?category=Commercial"
+            className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-orange-100 font-medium">
@@ -164,7 +173,7 @@ export default async function AdminDashboard() {
                 <BuildingOffice2Icon className="h-10 w-10 text-white" />
               </div>
             </div>
-          </div>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

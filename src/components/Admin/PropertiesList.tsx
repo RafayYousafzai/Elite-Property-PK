@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import DeletePropertyButton from "@/components/Admin/DeletePropertyButton";
@@ -8,11 +8,11 @@ import StarButton from "@/components/Admin/StarButton";
 import {
   PencilIcon,
   MapPinIcon,
-  CurrencyDollarIcon,
   HomeIcon,
   StarIcon,
   PlusIcon,
   BuildingOfficeIcon,
+  FunnelIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import formatNumberShort from "@/lib/formatNumberShort";
@@ -33,12 +33,56 @@ interface Property {
 
 interface PropertiesListProps {
   initialProperties: Property[];
+  initialCategory?: string;
 }
+
+// Property type categories mapping
+const propertyTypes = {
+  Home: [
+    "House",
+    "flat/appartment",
+    "Farm House",
+    "Room",
+    "Upper Portion",
+    "Lower Portion",
+    "Penthouse",
+  ],
+  Plots: [
+    "Residential Plot",
+    "Commercial Plot",
+    "Agricultural Land",
+    "Industrial Land",
+    "Plot File",
+    "Plot Form",
+  ],
+  Commercial: ["Office", "Shop", "Warehouse", "Factory", "Building", "Other"],
+};
 
 export default function PropertiesList({
   initialProperties,
+  initialCategory,
 }: PropertiesListProps) {
   const [properties, setProperties] = useState(initialProperties);
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    initialCategory || "All"
+  );
+
+  // Filter properties based on selected category
+  const filteredProperties = useMemo(() => {
+    if (selectedCategory === "All") {
+      return properties;
+    }
+
+    const categoryTypes =
+      propertyTypes[selectedCategory as keyof typeof propertyTypes];
+    if (!categoryTypes) return properties;
+
+    return properties.filter((property) =>
+      categoryTypes.some(
+        (type) => type.toLowerCase() === property.property_type?.toLowerCase()
+      )
+    );
+  }, [properties, selectedCategory]);
 
   const handleFeaturedChange = (propertyId: string, isFeatured: boolean) => {
     setProperties((prev) =>
@@ -83,9 +127,72 @@ export default function PropertiesList({
 
   return (
     <>
-      {properties && properties.length > 0 ? (
+      {/* Filter Buttons */}
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <FunnelIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Filter by Category
+            </h3>
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-medium text-gray-900 dark:text-white">
+              {filteredProperties.length}
+            </span>{" "}
+            {selectedCategory !== "All" ? selectedCategory : "properties"}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => setSelectedCategory("All")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+              selectedCategory === "All"
+                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md scale-105"
+                : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 shadow-sm"
+            }`}
+          >
+            All Properties
+          </button>
+          <button
+            onClick={() => setSelectedCategory("Home")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 ${
+              selectedCategory === "Home"
+                ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md scale-105"
+                : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 shadow-sm"
+            }`}
+          >
+            <HomeIcon className="h-4 w-4" />
+            <span>Homes</span>
+          </button>
+          <button
+            onClick={() => setSelectedCategory("Plots")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 ${
+              selectedCategory === "Plots"
+                ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md scale-105"
+                : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 shadow-sm"
+            }`}
+          >
+            <MapPinIcon className="h-4 w-4" />
+            <span>Plots</span>
+          </button>
+          <button
+            onClick={() => setSelectedCategory("Commercial")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 ${
+              selectedCategory === "Commercial"
+                ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md scale-105"
+                : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 shadow-sm"
+            }`}
+          >
+            <BuildingOfficeIcon className="h-4 w-4" />
+            <span>Commercial</span>
+          </button>
+        </div>
+      </div>
+
+      {filteredProperties && filteredProperties.length > 0 ? (
         <div className="divide-y divide-gray-200 dark:divide-gray-700">
-          {properties.map((property, index) => (
+          {filteredProperties.map((property, index) => (
             <div
               key={property.id}
               className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -101,7 +208,7 @@ export default function PropertiesList({
                         <Image
                           className="h-20 w-20 lg:h-24 lg:w-24 rounded-xl object-cover ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-500 transition-all duration-200"
                           src={
-                            property.images[0] ||
+                            property.images[0]?.src ||
                             "/images/properties/property1/image-2.jpg"
                           }
                           alt={property.name}
@@ -153,7 +260,7 @@ export default function PropertiesList({
                       </span>
 
                       <div className="flex items-center text-green-600 dark:text-green-400 font-medium">
-                        {formatNumberShort(property.rate)}
+                        {formatNumberShort(Number(property.rate) || 0)}
                       </div>
 
                       {property.beds && (

@@ -3,10 +3,15 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import PropertiesList from "@/components/Admin/PropertiesList";
-import { PlusIcon, BuildingOfficeIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
-export default async function PropertiesPage() {
+export default async function PropertiesPage({
+  searchParams,
+}: {
+  searchParams: { category?: string };
+}) {
   const supabase = await createClient(cookies());
+  const category = searchParams.category;
 
   const { data: properties, error } = await supabase
     .from("properties")
@@ -52,7 +57,10 @@ export default async function PropertiesPage() {
 
         {/* Properties List */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <PropertiesList initialProperties={properties || []} />
+          <PropertiesList
+            initialProperties={properties || []}
+            initialCategory={category}
+          />
         </div>
       </div>
     </DashboardLayout>
