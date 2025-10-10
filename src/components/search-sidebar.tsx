@@ -180,7 +180,9 @@ export default function SearchSidebar({
           {/* Property Type */}
           <div className="animate-fade-in" style={{ animationDelay: "0.1s" }}>
             <div className="flex items-center gap-3 mb-4 pb-2 ">
-              <h3 className="text-base font-semibold text-foreground">Type</h3>
+              <h3 className="text-base font-semibold text-foreground">
+                Select Phase
+              </h3>
               <Sparkles className="h-3 w-3 text-secondary ml-auto" />
             </div>
             <div className="flex flex-wrap gap-2">
