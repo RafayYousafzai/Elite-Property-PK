@@ -9,324 +9,455 @@ import {
   MapPinIcon,
   PlusIcon,
   EyeIcon,
-  ChartBarIcon,
-  ArrowTrendingUpIcon,
-  UsersIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
 } from "@heroicons/react/24/outline";
 
-const StatCard = ({
-  title,
-  value,
-  icon: Icon,
-  color,
-  trend,
-  trendValue,
-}: {
-  title: string;
-  value: number | string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  trend?: "up" | "down";
-  trendValue?: string;
-}) => (
-  <div
-    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-    style={{
-      animation: "fadeInUp 0.6s ease-out forwards",
-    }}
-  >
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-          {title}
-        </p>
-        <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          {value}
-        </p>
-        {trend && trendValue && (
-          <div className="flex items-center mt-2">
-            {trend === "up" ? (
-              <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1 animate-bounce" />
-            ) : (
-              <ArrowDownIcon className="h-4 w-4 text-red-500 mr-1" />
-            )}
-            <span
-              className={`text-sm font-medium ${
-                trend === "up" ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {trendValue}
-            </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">
-              vs last month
-            </span>
-          </div>
-        )}
-      </div>
-      <div
-        className={`p-3 rounded-xl ${color} transform transition-transform duration-200 hover:scale-110`}
-      >
-        <Icon className="h-8 w-8 text-white" />
-      </div>
-    </div>
-  </div>
-);
-
-const ActionCard = ({
-  title,
-  description,
-  icon: Icon,
-  href,
-  bgColor,
-}: {
-  title: string;
-  description: string;
-  icon: React.ComponentType<{ className?: string }>;
-  href: string;
-  bgColor: string;
-}) => (
-  <Link href={href}>
-    <div
-      className={`${bgColor} rounded-2xl p-6 hover:shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer border border-opacity-20`}
-    >
-      <div className="flex items-center mb-4">
-        <div className={`p-3 rounded-xl bg-white/10 bg-opacity-20`}>
-          <Icon className="h-6 w-6 text-white" />
-        </div>
-        <h3 className="text-lg font-bold text-white ml-4">{title}</h3>
-      </div>
-      <p className="text-white text-opacity-90 text-sm">{description}</p>
-    </div>
-  </Link>
-);
+export const propertyTypes = {
+  Home: [
+    "House",
+    "flat/appartment",
+    "Farm House",
+    "Room",
+    "Upper Portion",
+    "Lower Portion",
+    "Penthouse",
+  ],
+  Plots: [
+    "Residential Plot",
+    "Commercial Plot",
+    "Agricultural Land",
+    "Industrial Land",
+    "Plot File",
+    "Plot Form",
+  ],
+  Commercial: ["Office", "Shop", "Warehouse", "Factory", "Building", "Other"],
+};
 
 export default async function AdminDashboard() {
   const supabase = await createClient(cookies());
 
-  // Get total properties count
-  const { count: propertiesCount } = await supabase
+  const { data: allProperties } = await supabase
     .from("properties")
-    .select("*", { count: "exact" });
+    .select("id, name, created_at, property_type, rate, purpose");
 
-  // Get properties by type
-  const { data: houses } = await supabase
-    .from("properties")
-    .select("id", { count: "exact" })
-    .eq("type", "house");
+  const totalCount = allProperties?.length || 0;
 
-  const { data: apartments } = await supabase
-    .from("properties")
-    .select("id", { count: "exact" })
-    .eq("type", "apartment");
+  const homeTypes = propertyTypes.Home.map((t) => t.toLowerCase());
+  const plotTypes = propertyTypes.Plots.map((t) => t.toLowerCase());
+  const commercialTypes = propertyTypes.Commercial.map((t) => t.toLowerCase());
 
-  const { data: plots } = await supabase
-    .from("properties")
-    .select("id", { count: "exact" })
-    .eq("type", "plot");
+  const homesCount =
+    allProperties?.filter((p) =>
+      homeTypes.includes(p.property_type?.toLowerCase() || "")
+    ).length || 0;
 
-  // Get recent properties
-  const { data: recentProperties } = await supabase
-    .from("properties")
-    .select("id, title, created_at, type, price")
-    .order("created_at", { ascending: false })
-    .limit(5);
+  const plotsCount =
+    allProperties?.filter((p) =>
+      plotTypes.includes(p.property_type?.toLowerCase() || "")
+    ).length || 0;
+
+  const commercialCount =
+    allProperties?.filter((p) =>
+      commercialTypes.includes(p.property_type?.toLowerCase() || "")
+    ).length || 0;
+
+  const typeBreakdown: Record<string, number> = {};
+  Object.entries(propertyTypes).forEach(([, types]) => {
+    types.forEach((type) => {
+      const count =
+        allProperties?.filter(
+          (p) => p.property_type?.toLowerCase() === type.toLowerCase()
+        ).length || 0;
+      if (count > 0) {
+        typeBreakdown[type] = count;
+      }
+    });
+  });
+
+  const recentProperties = allProperties
+    ?.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+    .slice(0, 5);
+
+  const forSale =
+    allProperties?.filter((p) => p.purpose === "Sell").length || 0;
+  const forRent =
+    allProperties?.filter((p) => p.purpose === "Rent").length || 0;
+
+  const prices = allProperties?.map((p) => p.rate).filter((p) => p) || [];
+  const avgPrice = prices.length
+    ? prices.reduce((a, b) => a + b, 0) / prices.length
+    : 0;
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Dashboard Overview
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Welcome back! Here&apos;s what&apos;s happening with your
-              properties today.
-            </p>
-          </div>
-          <div className="mt-4 sm:mt-0">
-            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-              System Online
-            </span>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Total Properties"
-            value={propertiesCount || 0}
-            icon={BuildingOfficeIcon}
-            color="bg-gradient-to-r from-blue-500 to-blue-600"
-            trend="up"
-            trendValue="+12%"
-          />
-          <StatCard
-            title="Houses"
-            value={houses?.length || 0}
-            icon={HomeIcon}
-            color="bg-gradient-to-r from-green-500 to-green-600"
-            trend="up"
-            trendValue="+8%"
-          />
-          <StatCard
-            title="Apartments"
-            value={apartments?.length || 0}
-            icon={BuildingOffice2Icon}
-            color="bg-gradient-to-r from-yellow-500 to-orange-500"
-            trend="down"
-            trendValue="-3%"
-          />
-          <StatCard
-            title="Plots"
-            value={plots?.length || 0}
-            icon={MapPinIcon}
-            color="bg-gradient-to-r from-purple-500 to-purple-600"
-            trend="up"
-            trendValue="+15%"
-          />
-        </div>
-
-        {/* Quick Actions */}
+      <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <ActionCard
-              title="Create Property"
-              description="Add a new property to your portfolio with our easy-to-use form"
-              icon={PlusIcon}
-              href="/admin/properties/create"
-              bgColor="bg-gradient-to-r from-blue-500 to-purple-600"
-            />
-            <ActionCard
-              title="View Properties"
-              description="Browse and manage all your existing properties in one place"
-              icon={EyeIcon}
-              href="/admin/properties"
-              bgColor="bg-gradient-to-r from-green-500 to-teal-600"
-            />
-            <ActionCard
-              title="Analytics"
-              description="View detailed insights and performance metrics"
-              icon={ChartBarIcon}
-              href="/admin/analytics"
-              bgColor="bg-gradient-to-r from-orange-500 to-red-600"
-            />
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-gray-600 dark:text-gray-400">
+            Property management overview
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Link
+            href="/admin/properties"
+            className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-blue-100 font-medium">
+                  Total Properties
+                </p>
+                <p className="text-4xl font-bold text-white mt-2">
+                  {totalCount}
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-white/20 backdrop-blur-sm">
+                <BuildingOfficeIcon className="h-10 w-10 text-white" />
+              </div>
+            </div>
+          </Link>
+
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-green-100 font-medium">Homes</p>
+                <p className="text-4xl font-bold text-white mt-2">
+                  {homesCount}
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-white/20 backdrop-blur-sm">
+                <HomeIcon className="h-10 w-10 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-purple-100 font-medium">Plots</p>
+                <p className="text-4xl font-bold text-white mt-2">
+                  {plotsCount}
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-white/20 backdrop-blur-sm">
+                <MapPinIcon className="h-10 w-10 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-orange-100 font-medium">
+                  Commercial
+                </p>
+                <p className="text-4xl font-bold text-white mt-2">
+                  {commercialCount}
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-white/20 backdrop-blur-sm">
+                <BuildingOffice2Icon className="h-10 w-10 text-white" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Properties */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Recent Properties
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Latest properties added to your portfolio
-              </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link
+            href="/admin/properties/create"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:scale-105 transition-all duration-200"
+          >
+            <div className="flex items-center text-white">
+              <div className="p-4 rounded-xl bg-white/20 backdrop-blur-sm mr-4">
+                <PlusIcon className="h-8 w-8" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Add Property</h3>
+                <p className="text-sm text-white/90 mt-1">Create new listing</p>
+              </div>
             </div>
-            <div className="p-6">
-              {recentProperties && recentProperties.length > 0 ? (
-                <div className="space-y-4">
-                  {recentProperties.map((property) => (
-                    <div
-                      key={property.id}
-                      className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-                          <HomeIcon className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {property.title}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {property.type} • Added{" "}
-                            {new Date(property.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                        ${property.price?.toLocaleString()}
+          </Link>
+
+          <Link
+            href="/admin/properties"
+            className="bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:scale-105 transition-all duration-200"
+          >
+            <div className="flex items-center text-white">
+              <div className="p-4 rounded-xl bg-white/20 backdrop-blur-sm mr-4">
+                <EyeIcon className="h-8 w-8" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">View All</h3>
+                <p className="text-sm text-white/90 mt-1">Manage properties</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Property Types</h2>
+            <Link
+              href="/admin/properties"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center gap-1"
+            >
+              View All →
+            </Link>
+          </div>
+          {Object.keys(typeBreakdown).length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Object.entries(typeBreakdown)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => (
+                  <div
+                    key={type}
+                    className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-xl shadow-sm p-4 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                        {type}
+                      </span>
+                      <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                        {count}
                       </span>
                     </div>
-                  ))}
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 py-8">
+              No properties found
+            </p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h3 className="text-xl font-bold mb-6">Purpose Distribution</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold">For Sale</span>
+                  <span className="text-sm font-bold">
+                    {forSale} (
+                    {totalCount > 0
+                      ? ((forSale / totalCount) * 100).toFixed(1)
+                      : 0}
+                    %)
+                  </span>
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <BuildingOfficeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400">
-                    No properties yet
-                  </p>
-                  <Link
-                    href="/admin/properties/create"
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                  >
-                    Create your first property →
-                  </Link>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full shadow-sm transition-all duration-500"
+                    style={{
+                      width: `${
+                        totalCount > 0 ? (forSale / totalCount) * 100 : 0
+                      }%`,
+                    }}
+                  ></div>
                 </div>
-              )}
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold">For Rent</span>
+                  <span className="text-sm font-bold">
+                    {forRent} (
+                    {totalCount > 0
+                      ? ((forRent / totalCount) * 100).toFixed(1)
+                      : 0}
+                    %)
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                  <div
+                    className="bg-gradient-to-r from-green-500 to-green-600 h-4 rounded-full shadow-sm transition-all duration-500"
+                    style={{
+                      width: `${
+                        totalCount > 0 ? (forRent / totalCount) * 100 : 0
+                      }%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Performance Metrics */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Performance Metrics
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Key performance indicators
-              </p>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h3 className="text-xl font-bold mb-6">Category Distribution</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold">Homes</span>
+                  <span className="text-sm font-bold">
+                    {homesCount} (
+                    {totalCount > 0
+                      ? ((homesCount / totalCount) * 100).toFixed(1)
+                      : 0}
+                    %)
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                  <div
+                    className="bg-gradient-to-r from-green-500 to-green-600 h-4 rounded-full shadow-sm transition-all duration-500"
+                    style={{
+                      width: `${
+                        totalCount > 0 ? (homesCount / totalCount) * 100 : 0
+                      }%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold">Plots</span>
+                  <span className="text-sm font-bold">
+                    {plotsCount} (
+                    {totalCount > 0
+                      ? ((plotsCount / totalCount) * 100).toFixed(1)
+                      : 0}
+                    %)
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 h-4 rounded-full shadow-sm transition-all duration-500"
+                    style={{
+                      width: `${
+                        totalCount > 0 ? (plotsCount / totalCount) * 100 : 0
+                      }%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold">Commercial</span>
+                  <span className="text-sm font-bold">
+                    {commercialCount} (
+                    {totalCount > 0
+                      ? ((commercialCount / totalCount) * 100).toFixed(1)
+                      : 0}
+                    %)
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                  <div
+                    className="bg-gradient-to-r from-orange-500 to-orange-600 h-4 rounded-full shadow-sm transition-all duration-500"
+                    style={{
+                      width: `${
+                        totalCount > 0
+                          ? (commercialCount / totalCount) * 100
+                          : 0
+                      }%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
             </div>
-            <div className="p-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <ArrowTrendingUpIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold">Recent Properties</h3>
+              <Link
+                href="/admin/properties"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center gap-1"
+              >
+                View All →
+              </Link>
+            </div>
+            {recentProperties && recentProperties.length > 0 ? (
+              <div className="space-y-3">
+                {recentProperties.map((property) => (
+                  <div
+                    key={property.id}
+                    className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate text-gray-900 dark:text-white">
+                        {property.name}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        {property.property_type} • {property.purpose}
+                      </p>
+                    </div>
+                    <span className="text-sm font-bold text-green-600 dark:text-green-400 ml-4">
+                      {property.rate
+                        ? `PKR ${property.rate.toLocaleString()}`
+                        : "N/A"}
+                    </span>
                   </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    Views This Month
-                  </span>
-                </div>
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                  2,847
-                </span>
+                ))}
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                    <UsersIcon className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    Inquiries
-                  </span>
-                </div>
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                  142
-                </span>
+            ) : (
+              <div className="text-center py-8">
+                <BuildingOfficeIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">No properties yet</p>
+                <Link
+                  href="/admin/properties/create"
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
+                >
+                  Add your first property →
+                </Link>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                    <ChartBarIcon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    Conversion Rate
-                  </span>
+            )}
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h3 className="text-xl font-bold mb-6">Quick Stats</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-5 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl shadow-sm">
+                <div>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                    Average Price
+                  </p>
+                  <p className="text-3xl font-bold text-blue-900 dark:text-white mt-1">
+                    PKR{" "}
+                    {avgPrice > 0
+                      ? avgPrice.toLocaleString(undefined, {
+                          maximumFractionDigits: 0,
+                        })
+                      : "0"}
+                  </p>
                 </div>
-                <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                  12.5%
-                </span>
+                <div className="p-4 bg-blue-500 rounded-xl shadow-md">
+                  <BuildingOfficeIcon className="h-8 w-8 text-white" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-5 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-xl shadow-sm">
+                <div>
+                  <p className="text-sm text-green-700 dark:text-green-300 font-medium">
+                    For Sale
+                  </p>
+                  <p className="text-3xl font-bold text-green-900 dark:text-white mt-1">
+                    {forSale}
+                  </p>
+                </div>
+                <div className="p-4 bg-green-500 rounded-xl shadow-md">
+                  <HomeIcon className="h-8 w-8 text-white" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-5 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl shadow-sm">
+                <div>
+                  <p className="text-sm text-purple-700 dark:text-purple-300 font-medium">
+                    For Rent
+                  </p>
+                  <p className="text-3xl font-bold text-purple-900 dark:text-white mt-1">
+                    {forRent}
+                  </p>
+                </div>
+                <div className="p-4 bg-purple-500 rounded-xl shadow-md">
+                  <MapPinIcon className="h-8 w-8 text-white" />
+                </div>
               </div>
             </div>
           </div>
