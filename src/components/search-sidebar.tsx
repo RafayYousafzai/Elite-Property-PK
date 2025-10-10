@@ -22,10 +22,6 @@ export default function SearchSidebar({
   const [priceRange, setPriceRange] = useState<[number, number]>(
     filters.priceRange
   );
-  const [areaRange, setAreaRange] = useState<[number, number]>([
-    filters.minArea,
-    filters.maxArea,
-  ]);
 
   const handlePropertyTypeChange = (
     type: "all" | "homes" | "plots" | "apartments" | "commercial"
@@ -45,12 +41,6 @@ export default function SearchSidebar({
     const newRange: [number, number] = [value[0], value[1]];
     setPriceRange(newRange);
     onFiltersChange({ ...filters, priceRange: newRange });
-  };
-
-  const handleAreaRangeChange = (value: number[]) => {
-    const newRange: [number, number] = [value[0], value[1]];
-    setAreaRange(newRange);
-    onFiltersChange({ ...filters, minArea: newRange[0], maxArea: newRange[1] });
   };
 
   const handleBedsChange = (beds: number) => {
@@ -186,6 +176,45 @@ export default function SearchSidebar({
                 </div>
               </div>
             )}
+
+          {/* Property Type */}
+          <div className="animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <div className="flex items-center gap-3 mb-4 pb-2 ">
+              <h3 className="text-base font-semibold text-foreground">Type</h3>
+              <Sparkles className="h-3 w-3 text-secondary ml-auto" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: "Phase 1" },
+                { value: "Phase 2" },
+                { value: "Phase 3" },
+                { value: "Phase 4" },
+                { value: "Phase 5" },
+                { value: "Phase 6" },
+                { value: "Phase 7" },
+              ].map((type) => (
+                <Chip
+                  key={type.value}
+                  variant={
+                    filters.searchQuery === type.value ? "shadow" : "flat"
+                  }
+                  className={`cursor-pointer transition-all duration-300 premium-hover ${
+                    filters.searchQuery === type.value
+                      ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg scale-105 border-primary/50"
+                      : "hover:bg-muted hover:scale-105 hover:shadow-md border-border/50"
+                  }`}
+                  onClick={() =>
+                    onFiltersChange({
+                      ...filters,
+                      searchQuery: type.value as string,
+                    })
+                  }
+                >
+                  {type.value}
+                </Chip>
+              ))}
+            </div>
+          </div>
 
           {/* Price Range */}
           <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>

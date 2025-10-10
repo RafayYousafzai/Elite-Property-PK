@@ -108,10 +108,16 @@ const Footer = () => {
         <div className="flex justify-between md:flex-nowrap flex-wrap items-center py-6 gap-6">
           <p className="text-white text-sm ">©2025 - Elite Property</p>
           <div className="flex gap-8 items-center">
-            <Link href="#" className="text-white hover:text-[#f77f00] text-sm">
+            <Link
+              href="/terms"
+              className="text-white hover:text-[#f77f00] text-sm"
+            >
               Terms of service
             </Link>
-            <Link href="#" className="text-white hover:text-[#f77f00] text-sm">
+            <Link
+              href="/privacy"
+              className="text-white hover:text-[#f77f00] text-sm"
+            >
               Privacy policy
             </Link>
           </div>
