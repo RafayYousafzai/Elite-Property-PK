@@ -26,11 +26,25 @@ export async function POST(request) {
     const fbc = cookieStore.get("_fbc")?.value || null;
     const fbp = cookieStore.get("_fbp")?.value || null;
 
+    // Warn if cookies are missing (common for first-time visitors)
+    if (!fbc && !fbp) {
+      console.warn(
+        "⚠️ Meta Pixel cookies (_fbc, _fbp) are missing. This is normal for first-time visitors or if cookies are blocked. Event will still be sent with IP and user agent."
+      );
+    }
+
+    // 3.5. Extract client IP address from request headers
+    const clientIp =
+      request.headers.get("x-forwarded-for")?.split(",")[0] ||
+      request.headers.get("x-real-ip") ||
+      null;
+
     // 4. Log the complete event data for verification
     console.log("Meta CAPI Event Received:", {
       event_id: data.event_id,
       event_name: data.event_name,
       cookies: { _fbc: fbc, _fbp: fbp },
+      client_ip: clientIp,
       user_agent: data.user_data?.client_user_agent,
     });
 
@@ -60,9 +74,13 @@ export async function POST(request) {
           action_source: "website",
           event_id: data.event_id, // Critical for deduplication
           user_data: {
-            fbc: fbc,
-            fbp: fbp,
-            client_user_agent: data.user_data?.client_user_agent,
+            // Only include non-null values to satisfy Meta's requirements
+            ...(fbc && { fbc: fbc }),
+            ...(fbp && { fbp: fbp }),
+            ...(data.user_data?.client_user_agent && {
+              client_user_agent: data.user_data.client_user_agent,
+            }),
+            ...(clientIp && { client_ip_address: clientIp }),
           },
           custom_data: data.custom_data || {},
         },
@@ -72,13 +90,22 @@ export async function POST(request) {
     // 7. Construct the Meta Graph API URL
     const metaApiUrl = `https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${META_ACCESS_TOKEN}`;
 
+    // 7.5. Add test event code if in testing mode (REMOVE THIS AFTER TESTING!)
+    const TEST_EVENT_CODE = process.env.META_TEST_EVENT_CODE || null;
+    if (TEST_EVENT_CODE) {
+      console.log("🧪 Running in TEST MODE with code:", TEST_EVENT_CODE);
+    }
+
     // 8. Send the event to Meta Conversions API
     const metaResponse = await fetch(metaApiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(capiPayload),
+      body: JSON.stringify({
+        ...capiPayload,
+        test_event_code: TEST_EVENT_CODE, // Will be undefined/ignored in production
+      }),
     });
 
     const metaResult = await metaResponse.json();

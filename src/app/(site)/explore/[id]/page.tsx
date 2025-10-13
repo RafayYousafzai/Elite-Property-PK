@@ -55,6 +55,64 @@ export default function Details() {
     fetchProperty();
   }, [id]);
 
+  // Send ViewContent event when property loads
+  useEffect(() => {
+    if (!property) return;
+
+    const sendViewContentEvent = async () => {
+      // Generate unique event ID for deduplication
+      const eventId = crypto.randomUUID();
+
+      // Send to Meta Pixel (browser-side)
+      if (typeof window !== "undefined" && window.fbq) {
+        window.fbq(
+          "track",
+          "ViewContent",
+          {
+            content_name: property.name,
+            content_category: property.property_type,
+            content_ids: [property.id],
+            content_type: "product",
+            value: Number(property.rate) || 0,
+            currency: "PKR",
+          },
+          {
+            eventID: eventId, // Deduplication ID
+          }
+        );
+      }
+
+      // Send to server for CAPI
+      try {
+        await fetch("/api/meta-events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event_name: "ViewContent",
+            event_id: eventId, // Same ID for deduplication
+            event_time: Math.floor(Date.now() / 1000),
+            event_source_url: window.location.href,
+            user_data: {
+              client_user_agent: navigator.userAgent,
+            },
+            custom_data: {
+              content_name: property.name,
+              content_category: property.property_type,
+              content_ids: [property.id],
+              content_type: "product",
+              value: Number(property.rate) || 0,
+              currency: "PKR",
+            },
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to send ViewContent CAPI event:", error);
+      }
+    };
+
+    sendViewContentEvent();
+  }, [property]);
+
   if (loading) {
     return (
       <section className="!pt-44 pb-20 relative">
