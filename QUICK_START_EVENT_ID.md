@@ -7,6 +7,7 @@ An **event_id** is a unique identifier (like a fingerprint) for each event that 
 ## 🎯 Why Do We Need It?
 
 ### The Problem Without Event ID:
+
 ```
 User clicks WhatsApp button
     ↓
@@ -18,6 +19,7 @@ Total: 2 leads ❌ (WRONG!)
 ```
 
 ### The Solution With Event ID:
+
 ```
 User clicks WhatsApp button
     ↓
@@ -40,12 +42,14 @@ const eventId = crypto.randomUUID();
 ```
 
 **What is it?**
+
 - Built into all modern browsers
 - Creates a random, unique string every time
 - Secure and impossible to guess
 - No library installation needed!
 
 **Think of it like:**
+
 - A lottery ticket number
 - A serial number on a product
 - A unique order ID in an online store
@@ -55,19 +59,19 @@ const eventId = crypto.randomUUID();
 ```
 1. User Action
    User clicks "WhatsApp" button
-   
+
 2. Generate ID
    eventId = crypto.randomUUID()
    → "550e8400-e29b-41d4-a716-446655440000"
-   
+
 3. Browser Event
    Send to Meta Pixel:
    "Hey Meta! User clicked WhatsApp. Event ID: 550e8400..."
-   
+
 4. Server Event
    Send to Meta CAPI:
    "Hey Meta! User clicked WhatsApp. Event ID: 550e8400..."
-   
+
 5. Meta's Smart Deduplication
    Meta sees: "Oh, I got two events with ID 550e8400..."
    Meta thinks: "These are the same event!"
@@ -77,12 +81,14 @@ const eventId = crypto.randomUUID();
 ## 📊 Real Example
 
 ### Before (Double Counting):
+
 ```
 Day 1: 10 people clicked WhatsApp
 Meta reports: 20 leads (10 from browser + 10 from server) ❌
 ```
 
 ### After (Correct Counting):
+
 ```
 Day 1: 10 people clicked WhatsApp
 Meta reports: 10 leads (browser + server deduplicated) ✅
@@ -109,12 +115,13 @@ Result: John enters ONCE ✅
 ## 🛠️ Implementation (What We Did)
 
 ### Client-Side (Browser)
+
 ```javascript
 // When user clicks WhatsApp button:
 const eventId = crypto.randomUUID();  // Generate unique ID
 
 // Send to browser pixel
-window.fbq('track', 'Lead', {...}, { 
+window.fbq('track', 'Lead', {...}, {
   eventID: eventId  // 🔑 Include the ID
 });
 
@@ -129,6 +136,7 @@ fetch('/api/meta-events', {
 ```
 
 ### Server-Side
+
 ```javascript
 // Receive the event
 const data = await request.json();

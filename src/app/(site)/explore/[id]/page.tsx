@@ -12,7 +12,12 @@ import formatNumberShort from "@/lib/formatNumberShort";
 // Extend Window interface for Meta Pixel
 declare global {
   interface Window {
-    fbq?: (action: string, eventName: string, data?: object, options?: object) => void;
+    fbq?: (
+      action: string,
+      eventName: string,
+      data?: object,
+      options?: object
+    ) => void;
   }
 }
 
@@ -425,49 +430,55 @@ export default function Details() {
                   onClick={async () => {
                     // Generate a unique event ID for deduplication
                     const eventId = crypto.randomUUID();
-                    
+
                     // Send event to Meta Pixel (browser-side)
-                    if (typeof window !== 'undefined' && window.fbq) {
-                      window.fbq('track', 'Lead', {
-                        content_name: property.name,
-                        content_category: 'WhatsApp Contact',
-                        value: parseFloat(property.rate.replace(/[^0-9.-]+/g, '')) || 0,
-                        currency: 'PKR',
-                      }, {
-                        eventID: eventId  // Same ID for deduplication
-                      });
+                    if (typeof window !== "undefined" && window.fbq) {
+                      window.fbq(
+                        "track",
+                        "Lead",
+                        {
+                          content_name: property.name,
+                          content_category: "WhatsApp Contact",
+                          value: Number(property.rate) || 0,
+                          currency: "PKR",
+                        },
+                        {
+                          eventID: eventId, // Same ID for deduplication
+                        }
+                      );
                     }
-                    
+
                     // Send event to server for CAPI
                     try {
-                      await fetch('/api/meta-events', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                      await fetch("/api/meta-events", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                          event_name: 'Lead',
-                          event_id: eventId,  // Same ID for deduplication
+                          event_name: "Lead",
+                          event_id: eventId, // Same ID for deduplication
                           event_time: Math.floor(Date.now() / 1000),
+                          event_source_url: window.location.href, // Current page URL
                           user_data: {
                             client_user_agent: navigator.userAgent,
                           },
                           custom_data: {
                             content_name: property.name,
-                            content_category: 'WhatsApp Contact',
-                            value: parseFloat(property.rate.replace(/[^0-9.-]+/g, '')) || 0,
-                            currency: 'PKR',
+                            content_category: "WhatsApp Contact",
+                            value: Number(property.rate) || 0,
+                            currency: "PKR",
                           },
                         }),
                       });
                     } catch (error) {
-                      console.error('Failed to send CAPI event:', error);
+                      console.error("Failed to send CAPI event:", error);
                     }
-                    
+
                     // Open WhatsApp
                     window.open(
                       `https://wa.me/+923344111778?text=${encodeURIComponent(
                         `I'm interested in ${property.name}`
                       )}`,
-                      '_blank'
+                      "_blank"
                     );
                   }}
                   className="py-3.5 px-6 bg-white text-gray-900 rounded-lg w-full block text-center hover:bg-amber-50 hover:text-amber-600 transition-colors duration-300 font-semibold mb-3"

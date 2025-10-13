@@ -34,20 +34,83 @@ export async function POST(request) {
       user_agent: data.user_data?.client_user_agent,
     });
 
-    // 5. Return success response with all collected data
-    return NextResponse.json({
-      success: true,
-      message: "Event received and ready for CAPI",
-      event_id: data.event_id,
-      event_name: data.event_name,
-      cookies: {
-        _fbc: fbc,
-        _fbp: fbp,
+    // 5. Retrieve Meta credentials from environment variables
+    const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+    const PIXEL_ID = process.env.PIXEL_ID;
+
+    // Validate credentials are present
+    if (!META_ACCESS_TOKEN || !PIXEL_ID) {
+      console.error("Missing Meta credentials in environment variables");
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Server configuration error: Missing Meta credentials",
+        },
+        { status: 500 }
+      );
+    }
+
+    // 6. Construct the Meta CAPI payload
+    const capiPayload = {
+      data: [
+        {
+          event_name: data.event_name,
+          event_time: Math.floor(Date.now() / 1000), // Current time in seconds since epoch
+          event_source_url: data.event_source_url,
+          action_source: "website",
+          event_id: data.event_id, // Critical for deduplication
+          user_data: {
+            fbc: fbc,
+            fbp: fbp,
+            client_user_agent: data.user_data?.client_user_agent,
+          },
+          custom_data: data.custom_data || {},
+        },
+      ],
+    };
+
+    // 7. Construct the Meta Graph API URL
+    const metaApiUrl = `https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${META_ACCESS_TOKEN}`;
+
+    // 8. Send the event to Meta Conversions API
+    const metaResponse = await fetch(metaApiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      user_data: data.user_data,
-      custom_data: data.custom_data,
-      note: "This event is ready to be sent to Meta CAPI with proper deduplication",
+      body: JSON.stringify(capiPayload),
     });
+
+    const metaResult = await metaResponse.json();
+
+    // 9. Log the Meta API response
+    console.log("Meta CAPI Response:", {
+      status: metaResponse.status,
+      result: metaResult,
+    });
+
+    // 10. Return response based on Meta API result
+    if (metaResponse.ok) {
+      return NextResponse.json({
+        success: true,
+        message: "Event successfully sent to Meta CAPI",
+        event_id: data.event_id,
+        event_name: data.event_name,
+        meta_response: metaResult,
+        events_received: metaResult.events_received || 0,
+      });
+    } else {
+      // Meta API returned an error
+      console.error("Meta CAPI Error:", metaResult);
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Meta CAPI request failed",
+          error: metaResult.error || metaResult,
+        },
+        { status: metaResponse.status }
+      );
+    }
   } catch (error) {
     // Handle any errors that occur during processing
     console.error("Error processing Meta Pixel event:", error);

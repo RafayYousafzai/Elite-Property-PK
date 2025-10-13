@@ -9,13 +9,17 @@ A complete event tracking system that prevents double-counting of user actions w
 ## 🔑 The Key Concept: Event Deduplication
 
 ### The Problem
+
 When a user clicks the WhatsApp button:
+
 - **Browser Pixel** sends a "Lead" event to Meta → Counted as 1 lead
 - **Server CAPI** sends the same "Lead" event to Meta → Counted as another lead
 - **Result**: Meta counts 2 leads instead of 1 ❌
 
 ### The Solution: Unique Event ID
+
 Both the browser and server send the **same unique `event_id`** with their events:
+
 - Browser sends Lead event with `event_id: "abc-123-def"`
 - Server sends Lead event with `event_id: "abc-123-def"`
 - **Result**: Meta recognizes it's the same event and counts only 1 lead ✅
@@ -33,6 +37,7 @@ const eventId = crypto.randomUUID();
 ```
 
 **What is `crypto.randomUUID()`?**
+
 - A built-in JavaScript method (available in all modern browsers)
 - Generates a universally unique identifier (UUID)
 - Example output: `"550e8400-e29b-41d4-a716-446655440000"`
@@ -42,36 +47,41 @@ const eventId = crypto.randomUUID();
 ### 2. **Browser Pixel Event** (Client-Side)
 
 ```typescript
-if (typeof window !== 'undefined' && window.fbq) {
-  window.fbq('track', 'Lead', {
-    content_name: property.name,
-    content_category: 'WhatsApp Contact',
-    value: parseFloat(property.rate.replace(/[^0-9.-]+/g, '')) || 0,
-    currency: 'PKR',
-  }, {
-    eventID: eventId  // 🔑 Deduplication key
-  });
+if (typeof window !== "undefined" && window.fbq) {
+  window.fbq(
+    "track",
+    "Lead",
+    {
+      content_name: property.name,
+      content_category: "WhatsApp Contact",
+      value: parseFloat(property.rate.replace(/[^0-9.-]+/g, "")) || 0,
+      currency: "PKR",
+    },
+    {
+      eventID: eventId, // 🔑 Deduplication key
+    }
+  );
 }
 ```
 
 ### 3. **Server CAPI Event** (Client-Side → Server)
 
 ```typescript
-await fetch('/api/meta-events', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+await fetch("/api/meta-events", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    event_name: 'Lead',
-    event_id: eventId,  // 🔑 Same ID for deduplication
+    event_name: "Lead",
+    event_id: eventId, // 🔑 Same ID for deduplication
     event_time: Math.floor(Date.now() / 1000),
     user_data: {
       client_user_agent: navigator.userAgent,
     },
     custom_data: {
       content_name: property.name,
-      content_category: 'WhatsApp Contact',
-      value: parseFloat(property.rate.replace(/[^0-9.-]+/g, '')) || 0,
-      currency: 'PKR',
+      content_category: "WhatsApp Contact",
+      value: parseFloat(property.rate.replace(/[^0-9.-]+/g, "")) || 0,
+      currency: "PKR",
     },
   }),
 });
@@ -82,6 +92,7 @@ await fetch('/api/meta-events', {
 **Location**: `src/app/api/meta-events/route.js`
 
 **Key Features**:
+
 - ✅ Validates `event_id` is present
 - ✅ Extracts Meta Pixel cookies (`_fbc`, `_fbp`)
 - ✅ Logs complete event data
@@ -136,6 +147,7 @@ User Clicks WhatsApp Button
 1. **Open Developer Console** in your browser (F12)
 
 2. **Navigate to a property details page**:
+
    ```
    http://localhost:3000/explore/[property-slug]
    ```
@@ -143,6 +155,7 @@ User Clicks WhatsApp Button
 3. **Click the WhatsApp button**
 
 4. **Check Console for**:
+
    - Browser: Meta Pixel event fired with `eventID`
    - Network: POST request to `/api/meta-events` with `event_id`
 
@@ -226,15 +239,18 @@ To complete the CAPI implementation, you'll need to:
 ## 🔍 Troubleshooting
 
 ### If `event_id` is missing:
+
 ```json
 {
   "success": false,
   "message": "event_id is required for deduplication"
 }
 ```
+
 **Fix**: Ensure client-side code generates and sends the `event_id`
 
 ### If cookies are null:
+
 ```json
 {
   "cookies": {
@@ -243,7 +259,9 @@ To complete the CAPI implementation, you'll need to:
   }
 }
 ```
+
 **Possible reasons**:
+
 - User hasn't visited the site with Meta Pixel active
 - Cookies blocked by browser
 - Meta Pixel not installed/configured
