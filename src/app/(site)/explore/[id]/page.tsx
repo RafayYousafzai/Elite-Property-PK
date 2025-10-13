@@ -9,6 +9,13 @@ import ImageCarousel from "@/components/shared/ImageCarousel";
 import GoogleMap from "@/components/shared/GoogleMap";
 import formatNumberShort from "@/lib/formatNumberShort";
 
+// Extend Window interface for Meta Pixel
+declare global {
+  interface Window {
+    fbq?: (action: string, eventName: string, data?: object, options?: object) => void;
+  }
+}
+
 export default function Details() {
   const { id } = useParams();
   const [property, setProperty] = useState<Property | null>(null);
@@ -414,18 +421,62 @@ export default function Details() {
                 <p className="text-gray-600 text-sm mb-6">
                   Contact us for more details
                 </p>
-                <Link
-                  href={`https://wa.me/+923344111778?text=${encodeURIComponent(
-                    `I'm interested in ${property.name}`
-                  )}`}
-                  target="_blank"
+                <button
+                  onClick={async () => {
+                    // Generate a unique event ID for deduplication
+                    const eventId = crypto.randomUUID();
+                    
+                    // Send event to Meta Pixel (browser-side)
+                    if (typeof window !== 'undefined' && window.fbq) {
+                      window.fbq('track', 'Lead', {
+                        content_name: property.name,
+                        content_category: 'WhatsApp Contact',
+                        value: parseFloat(property.rate.replace(/[^0-9.-]+/g, '')) || 0,
+                        currency: 'PKR',
+                      }, {
+                        eventID: eventId  // Same ID for deduplication
+                      });
+                    }
+                    
+                    // Send event to server for CAPI
+                    try {
+                      await fetch('/api/meta-events', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          event_name: 'Lead',
+                          event_id: eventId,  // Same ID for deduplication
+                          event_time: Math.floor(Date.now() / 1000),
+                          user_data: {
+                            client_user_agent: navigator.userAgent,
+                          },
+                          custom_data: {
+                            content_name: property.name,
+                            content_category: 'WhatsApp Contact',
+                            value: parseFloat(property.rate.replace(/[^0-9.-]+/g, '')) || 0,
+                            currency: 'PKR',
+                          },
+                        }),
+                      });
+                    } catch (error) {
+                      console.error('Failed to send CAPI event:', error);
+                    }
+                    
+                    // Open WhatsApp
+                    window.open(
+                      `https://wa.me/+923344111778?text=${encodeURIComponent(
+                        `I'm interested in ${property.name}`
+                      )}`,
+                      '_blank'
+                    );
+                  }}
                   className="py-3.5 px-6 bg-white text-gray-900 rounded-lg w-full block text-center hover:bg-amber-50 hover:text-amber-600 transition-colors duration-300 font-semibold mb-3"
                 >
                   <div className="flex items-center justify-center gap-2">
                     <Icon icon="ph:whatsapp-logo-fill" width={22} height={22} />
                     WhatsApp
                   </div>
-                </Link>
+                </button>
                 <Link
                   href="tel:+923344111778"
                   className="py-3.5 px-6 bg-gray-100 text-gray-900 rounded-lg w-full block text-center hover:bg-gray-200 transition-colors duration-300 font-semibold"

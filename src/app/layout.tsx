@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import Script from "next/script";
-
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import SessionProviderComp from "@/components/nextauth/SessionProvider";
@@ -25,18 +24,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Tag Manager */}
-        <Script id="google-tag-manager" strategy="afterInteractive">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-TR6MVDDH');
-          `}
-        </Script>
-        {/* End Google Tag Manager */}
-
         {/* Meta Pixel Code */}
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
@@ -48,32 +35,31 @@ export default function RootLayout({
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '805329828975923');
+            fbq('init', '1546726066333932');
             fbq('track', 'PageView');
           `}
         </Script>
+
+        {/* Meta CAPI Gateway (via Stape) */}
+        <Script id="meta-capi-gateway" strategy="afterInteractive">
+          {`
+            fbq('set', 'autoConfig', false, '1546726066333932');
+            fbq('set', 'endpoint', 'https://capig.elitepropertypk.com');
+          `}
+        </Script>
+
         <noscript>
           <img
             height="1"
             width="1"
             style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=805329828975923&ev=PageView&noscript=1"
+            src="https://www.facebook.com/tr?id=1546726066333932&ev=PageView&noscript=1"
             alt=""
           />
         </noscript>
       </head>
-      <body className={`${font.className} bg-white dark:bg-black antialiased`}>
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-TR6MVDDH"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          ></iframe>
-        </noscript>
-        {/* End Google Tag Manager (noscript) */}
 
+      <body className={`${font.className} bg-white dark:bg-black antialiased`}>
         <NextTopLoader color="#d8b648" showSpinner={false} />
         <SessionProviderComp session={session}>
           <ThemeProvider
