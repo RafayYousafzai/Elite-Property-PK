@@ -29,6 +29,7 @@
     "@studio-freight/lenis": "^1.0.42",
     "@supabase/ssr": "^0.7.0",
     "@vercel/analytics": "^1.5.0",
+    "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -41,6 +42,7 @@
     "next-themes": "^0.4.5",
     "nextjs-toploader": "^3.8.16",
     "photo-sphere-viewer": "^4.8.1",
+    "postcss": "^8.5.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
@@ -62,8 +64,8 @@
     "@types/react-slick": "^0.23.13",
     "eslint": "^9",
     "eslint-config-next": "15.2.1",
-    "lightningcss": "^1.28.3",
-    "tailwindcss": "^4",
+    "lightningcss": "^1.30.2",
+    "tailwindcss": "^4.1.14",
     "typescript": "^5"
   }
 }
