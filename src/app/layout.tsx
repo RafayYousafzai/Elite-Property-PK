@@ -1,3 +1,4 @@
+import "./globals.css";
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import Script from "next/script";
@@ -7,7 +8,6 @@ import SessionProviderComp from "@/components/nextauth/SessionProvider";
 import { Providers } from "./providers";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/react";
-import "./globals.css";
 
 const font = Bricolage_Grotesque({ subsets: ["latin"] });
 
