@@ -21,7 +21,7 @@ The issue: `lightningcss` wasn't explicitly listed in `package.json`, so npm did
 ```json
 {
   "devDependencies": {
-    "lightningcss": "^1.28.3",  // ← Added this!
+    "lightningcss": "^1.28.3", // ← Added this!
     "tailwindcss": "^4",
     "@tailwindcss/postcss": "^4"
   }
@@ -33,7 +33,7 @@ The issue: `lightningcss` wasn't explicitly listed in `package.json`, so npm did
 ```json
 {
   "buildCommand": "npm run build",
-  "installCommand": "npm install",  // ← Explicit install command
+  "installCommand": "npm install", // ← Explicit install command
   "framework": "nextjs"
 }
 ```
@@ -53,6 +53,7 @@ git push
 ### Step 2: Vercel Will Auto-Deploy
 
 Vercel will:
+
 1. ✅ Run `npm install` (installs lightningcss with correct binaries)
 2. ✅ Run `npm run build` (compiles successfully)
 3. ✅ Deploy your site
@@ -102,6 +103,7 @@ Both should work! ✅
 ### After Deploying:
 
 Check Vercel build logs - should see:
+
 ```
 ✓ Compiled successfully
 ✓ Generating static pages
@@ -142,16 +144,18 @@ npm install -D tailwindcss@3 postcss autoprefixer
 ```
 
 Update `postcss.config.mjs`:
+
 ```javascript
 export default {
   plugins: {
     tailwindcss: {},
     autoprefixer: {},
   },
-}
+};
 ```
 
 Update `src/app/globals.css`:
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -162,6 +166,7 @@ Update `src/app/globals.css`:
 ### Option 2: Force NPM on Vercel
 
 In Vercel Dashboard:
+
 1. Settings → General → Build & Development Settings
 2. Package Manager: **npm**
 3. Redeploy
@@ -181,12 +186,12 @@ In Vercel Dashboard:
 
 ## 📝 Files Changed
 
-| File | Change | Reason |
-|------|--------|--------|
-| `package.json` | Added `lightningcss: "^1.28.3"` | Install native binaries for Linux |
-| `vercel.json` | Set install/build commands | Ensure proper npm usage |
-| `.nvmrc` | Node 20.11.0 | Version consistency |
-| `src/types/css.d.ts` | CSS type declarations | TypeScript support |
+| File                 | Change                          | Reason                            |
+| -------------------- | ------------------------------- | --------------------------------- |
+| `package.json`       | Added `lightningcss: "^1.28.3"` | Install native binaries for Linux |
+| `vercel.json`        | Set install/build commands      | Ensure proper npm usage           |
+| `.nvmrc`             | Node 20.11.0                    | Version consistency               |
+| `src/types/css.d.ts` | CSS type declarations           | TypeScript support                |
 
 ---
 
@@ -219,6 +224,7 @@ After pushing:
 ## 💡 Future Prevention
 
 Always explicitly install dependencies that have native bindings:
+
 - `lightningcss` (for Tailwind v4)
 - `sharp` (for image processing)
 - `canvas` (for canvas operations)
