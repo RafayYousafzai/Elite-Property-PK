@@ -6,6 +6,8 @@ import NextTopLoader from "nextjs-toploader";
 import SessionProviderComp from "@/components/nextauth/SessionProvider";
 import { Providers } from "./providers";
 import { Suspense } from "react";
+import { Analytics } from "@vercel/analytics/react";
+import "./globals.css";
 
 const font = Bricolage_Grotesque({ subsets: ["latin"] });
 
@@ -72,6 +74,7 @@ export default function RootLayout({
             </Providers>
           </ThemeProvider>
         </SessionProviderComp>
+        <Analytics />
       </body>
     </html>
   );
