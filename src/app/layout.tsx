@@ -42,6 +42,22 @@ export default function RootLayout({
           `}
         </Script>
 
+        {/* Google tag (gtag.js) - AW-17506316720 */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17506316720"
+          strategy="afterInteractive"
+          async
+        />
+        <Script id="gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);} 
+            gtag('js', new Date());
+
+            gtag('config', 'AW-17506316720');
+          `}
+        </Script>
+
         {/* Meta CAPI Gateway (via Stape) */}
         <Script id="meta-capi-gateway" strategy="afterInteractive">
           {`
