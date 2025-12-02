@@ -190,7 +190,7 @@ export function CustomChatWidget() {
 
     try {
       const response = await fetch(
-        "https://rafayiscool.online/webhook/343c586c-fecf-4279-bbe9-bf74e3b6d418/chat",
+        "https://n8n.coderesults.tech/webhook/343c586c-fecf-4279-bbe9-bf74e3b6d418/chat",
         {
           method: "POST",
           headers: {
