@@ -41,12 +41,12 @@ export default function SearchPage() {
       typeParam === "homes"
         ? "homes"
         : typeParam === "plots"
-        ? "plots"
-        : typeParam === "commercial"
-        ? "commercial"
-        : typeParam === "apartments"
-        ? "apartments"
-        : "all";
+          ? "plots"
+          : typeParam === "commercial"
+            ? "commercial"
+            : typeParam === "apartments"
+              ? "apartments"
+              : "all";
     return {
       propertyType: initialPropertyType,
       subCategory: undefined,
@@ -57,6 +57,9 @@ export default function SearchPage() {
     };
   });
 
+  // Use local state for input to avoid typing lag
+  const [searchValue, setSearchValue] = useState(searchParam || "");
+
   // Update filters when URL parameters change
   useEffect(() => {
     const updates: Partial<SearchFilters> = {};
@@ -66,17 +69,18 @@ export default function SearchPage() {
         typeParam === "homes"
           ? "homes"
           : typeParam === "plots"
-          ? "plots"
-          : typeParam === "commercial"
-          ? "commercial"
-          : typeParam === "appartments" || typeParam === "apartments"
-          ? "apartments"
-          : "all";
+            ? "plots"
+            : typeParam === "commercial"
+              ? "commercial"
+              : typeParam === "appartments" || typeParam === "apartments"
+                ? "apartments"
+                : "all";
       updates.propertyType = newPropertyType;
     }
 
     if (searchParam !== null) {
       updates.searchQuery = searchParam;
+      setSearchValue(searchParam);
     }
 
     if (Object.keys(updates).length > 0) {
@@ -87,11 +91,30 @@ export default function SearchPage() {
     }
   }, [typeParam, searchParam]);
 
+  // Debounce search filter updates
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchValue !== filters.searchQuery) {
+        startTransition(() => {
+          setFilters((prev) => ({ ...prev, searchQuery: searchValue }));
+        });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchValue, filters.searchQuery]);
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [filters]);
 
   useEffect(() => {
     if (mobileFiltersOpen) {
@@ -121,6 +144,7 @@ export default function SearchPage() {
   }, [filters, applyFilters]);
 
   const handleClearFilters = useCallback(() => {
+    setSearchValue("");
     startTransition(() => {
       setFilters({
         propertyType: "all",
@@ -140,9 +164,7 @@ export default function SearchPage() {
   }, []);
 
   const handleSearchChange = useCallback((value: string) => {
-    startTransition(() => {
-      setFilters((prev) => ({ ...prev, searchQuery: value }));
-    });
+    setSearchValue(value);
   }, []);
 
   const handleViewModeChange = useCallback((mode: "grid" | "list") => {
@@ -178,9 +200,8 @@ export default function SearchPage() {
       <div className="flex">
         {/* Desktop Sidebar - Hidden on mobile */}
         <div
-          className={`hidden lg:block transition-all duration-300 ease-in-out ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className={`hidden lg:block transition-all duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
         >
           {sidebarOpen && (
             <SearchSidebar
@@ -249,7 +270,7 @@ export default function SearchPage() {
                       }
                       fullWidth
                       size="lg"
-                      value={filters.searchQuery}
+                      value={searchValue}
                       placeholder="Search by location, name, or property type..."
                       onValueChange={(value) => handleSearchChange(value)}
                       className="h-12   "
@@ -288,9 +309,8 @@ export default function SearchPage() {
                         className="bg-transparent"
                       >
                         <ListFilter
-                          className={`h-5 w-5 ${
-                            viewMode === "list" ? "text-primary" : ""
-                          }`}
+                          className={`h-5 w-5 ${viewMode === "list" ? "text-primary" : ""
+                            }`}
                         />
                       </Button>
                       <Button
@@ -299,9 +319,8 @@ export default function SearchPage() {
                         className="bg-transparent"
                       >
                         <Grid
-                          className={`h-4 w-4 ${
-                            viewMode === "grid" ? "text-primary" : ""
-                          }`}
+                          className={`h-4 w-4 ${viewMode === "grid" ? "text-primary" : ""
+                            }`}
                         />
                       </Button>
                     </ButtonGroup>
@@ -314,73 +333,73 @@ export default function SearchPage() {
                   filters.searchQuery ||
                   filters.beds ||
                   filters.baths) && (
-                  <div className="md:hidden mt-4 pt-4 ">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Active filters:
-                      </span>
-                      {filters.propertyType !== "all" && (
-                        <Chip
-                          variant="shadow"
-                          color="primary"
-                          className="font-medium animate-in fade-in duration-200"
+                    <div className="md:hidden mt-4 pt-4 ">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                          Active filters:
+                        </span>
+                        {filters.propertyType !== "all" && (
+                          <Chip
+                            variant="shadow"
+                            color="primary"
+                            className="font-medium animate-in fade-in duration-200"
+                          >
+                            {filters.propertyType === "homes"
+                              ? "🏠 Homes"
+                              : filters.propertyType === "plots"
+                                ? "🏞️ Plots"
+                                : filters.propertyType === "commercial"
+                                  ? "🏢 Commercial"
+                                  : "🏢 Apartments"}
+                          </Chip>
+                        )}
+                        {filters.subCategory && (
+                          <Chip
+                            variant="shadow"
+                            color="secondary"
+                            className="font-medium animate-in fade-in duration-200"
+                          >
+                            📋 {filters.subCategory}
+                          </Chip>
+                        )}
+                        {filters.searchQuery && (
+                          <Chip
+                            variant="shadow"
+                            color="primary"
+                            className="font-medium animate-in fade-in duration-200"
+                          >
+                            🔍 {filters.searchQuery}
+                          </Chip>
+                        )}
+                        {filters.beds && (
+                          <Chip
+                            variant="shadow"
+                            color="primary"
+                            className="font-medium animate-in fade-in duration-200"
+                          >
+                            🛏️ {filters.beds}+ beds
+                          </Chip>
+                        )}
+                        {filters.baths && (
+                          <Chip
+                            variant="shadow"
+                            color="primary"
+                            className="font-medium animate-in fade-in duration-200"
+                          >
+                            🛁 {filters.baths}+ baths
+                          </Chip>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleClearFilters}
+                          className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 h-6 px-2 text-xs transition-colors duration-200"
                         >
-                          {filters.propertyType === "homes"
-                            ? "🏠 Homes"
-                            : filters.propertyType === "plots"
-                            ? "🏞️ Plots"
-                            : filters.propertyType === "commercial"
-                            ? "🏢 Commercial"
-                            : "🏢 Apartments"}
-                        </Chip>
-                      )}
-                      {filters.subCategory && (
-                        <Chip
-                          variant="shadow"
-                          color="secondary"
-                          className="font-medium animate-in fade-in duration-200"
-                        >
-                          📋 {filters.subCategory}
-                        </Chip>
-                      )}
-                      {filters.searchQuery && (
-                        <Chip
-                          variant="shadow"
-                          color="primary"
-                          className="font-medium animate-in fade-in duration-200"
-                        >
-                          🔍 {filters.searchQuery}
-                        </Chip>
-                      )}
-                      {filters.beds && (
-                        <Chip
-                          variant="shadow"
-                          color="primary"
-                          className="font-medium animate-in fade-in duration-200"
-                        >
-                          🛏️ {filters.beds}+ beds
-                        </Chip>
-                      )}
-                      {filters.baths && (
-                        <Chip
-                          variant="shadow"
-                          color="primary"
-                          className="font-medium animate-in fade-in duration-200"
-                        >
-                          🛁 {filters.baths}+ baths
-                        </Chip>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleClearFilters}
-                        className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 h-6 px-2 text-xs transition-colors duration-200"
-                      >
-                        Clear all
-                      </Button>
+                          Clear all
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             </div>
           </div>
@@ -388,9 +407,9 @@ export default function SearchPage() {
           {/* Properties Grid */}
           <div className="transition-all duration-300">
             {filteredProperties.length === 0 &&
-            !isLoading &&
-            !isPending &&
-            !dataLoading ? (
+              !isLoading &&
+              !isPending &&
+              !dataLoading ? (
               <div className="text-center py-12 animate-in fade-in duration-500">
                 <div className="text-muted-foreground text-lg mb-2">
                   No properties found
@@ -410,22 +429,43 @@ export default function SearchPage() {
                   <div className="animate-in fade-in duration-300">
                     {viewMode === "list" ? (
                       <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 px-2 pb-20">
-                        {filteredProperties.map((property, index) => (
-                          <div
-                            key={`${property.id}-${property.slug}-${index}`}
-                            className="animate-in fade-in duration-200"
-                            style={{ animationDelay: `${index * 50}ms` }}
-                          >
-                            <PropertyCard item={property} />
-                          </div>
-                        ))}
+                        {filteredProperties
+                          .slice(0, visibleCount)
+                          .map((property, index) => (
+                            <div
+                              key={`${property.id}-${property.slug}-${index}`}
+                              className="animate-in fade-in duration-200"
+                              style={{ animationDelay: `${index * 50}ms` }}
+                            >
+                              <PropertyCard item={property} />
+                            </div>
+                          ))}
                       </div>
                     ) : (
                       <div className="pt-20">
                         <ParallaxScroll
-                          items={filteredProperties}
+                          items={filteredProperties.slice(0, visibleCount)}
                           isLessColls={true}
                         />
+                      </div>
+                    )}
+
+                    {/* Load More Button */}
+                    {visibleCount < filteredProperties.length && (
+                      <div className="flex justify-center mt-8 pb-10">
+                        <Button
+                          className="bg-primary text-white"
+                          variant="flat"
+                          size="lg"
+                          onClick={() =>
+                            setVisibleCount((prev) =>
+                              Math.min(prev + 12, filteredProperties.length)
+                            )
+                          }
+                        >
+                          Load More ({filteredProperties.length - visibleCount}{" "}
+                          remaining)
+                        </Button>
                       </div>
                     )}
                   </div>

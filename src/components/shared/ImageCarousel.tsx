@@ -22,6 +22,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const thumbnailsRef = React.useRef<HTMLDivElement>(null);
 
   // Keyboard navigation
   React.useEffect(() => {
@@ -45,12 +46,40 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [currentIndex, lightboxOpen, images.length]);
 
+  // Auto-scroll thumbnails when active index changes
+  React.useEffect(() => {
+    if (thumbnailsRef.current) {
+      const container = thumbnailsRef.current;
+      const thumbnailWidth = 88; // 80px width + 8px gap
+      const scrollPosition =
+        currentIndex * thumbnailWidth -
+        container.clientWidth / 2 +
+        thumbnailWidth / 2;
+
+      container.scrollTo({
+        left: scrollPosition,
+        behavior: "smooth",
+      });
+    }
+  }, [currentIndex]);
+
   const nextImage = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = () => {
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const scrollThumbnails = (direction: "left" | "right") => {
+    if (thumbnailsRef.current) {
+      const container = thumbnailsRef.current;
+      const scrollAmount = container.clientWidth / 2;
+      container.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
   };
 
   const openLightbox = (index: number) => {
@@ -131,9 +160,8 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
       <div className="grid grid-cols-12 gap-6 mt-8">
         {/* Main Image Carousel - Left Side */}
         <div
-          className={`${
-            photoSphere ? "lg:col-span-8" : "col-span-12"
-          } col-span-12`}
+          className={`${photoSphere ? "lg:col-span-8" : "col-span-12"
+            } col-span-12`}
         >
           <div className="relative group">
             {/* Main Image */}
@@ -147,7 +175,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                 width={800}
                 height={500}
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                unoptimized={true}
+                priority
               />
 
               {/* Fullscreen Icon */}
@@ -198,17 +226,26 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
           {/* Thumbnail Navigation */}
           {images.length > 1 && (
-            <div className="relative mt-4">
-              <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+            <div className="relative mt-4 group/thumbs">
+              <button
+                onClick={() => scrollThumbnails("left")}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full p-1 text-white opacity-0 group-hover/thumbs:opacity-100 transition-all duration-300 -ml-3"
+              >
+                <Icon icon="ph:caret-left" width={20} height={20} />
+              </button>
+
+              <div
+                ref={thumbnailsRef}
+                className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth"
+              >
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentIndex(index)}
-                    className={`flex-shrink-0 relative overflow-hidden rounded-lg transition-all duration-300 ${
-                      index === currentIndex
+                    className={`flex-shrink-0 relative overflow-hidden rounded-lg transition-all duration-300 ${index === currentIndex
                         ? "ring-2 ring-primary scale-105"
                         : "hover:scale-105 opacity-70 hover:opacity-100"
-                    }`}
+                      }`}
                   >
                     <Image
                       src={image}
@@ -216,11 +253,17 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                       width={80}
                       height={60}
                       className="w-20 h-16 object-cover"
-                      unoptimized={true}
                     />
                   </button>
                 ))}
               </div>
+
+              <button
+                onClick={() => scrollThumbnails("right")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full p-1 text-white opacity-0 group-hover/thumbs:opacity-100 transition-all duration-300 -mr-3"
+              >
+                <Icon icon="ph:caret-right" width={20} height={20} />
+              </button>
 
               {/* Scroll indicators */}
               {images.length > 6 && (
