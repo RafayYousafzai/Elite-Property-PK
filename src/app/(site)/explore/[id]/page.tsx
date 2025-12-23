@@ -307,7 +307,7 @@ export default function Details() {
                     </h4>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
                       {property.constructed_covered_area}{" "}
-                      {property.area_unit || ""}
+                      <span className="font-light">Sqr Ft</span>{" "}
                     </p>
                   </div>
                 </div>
