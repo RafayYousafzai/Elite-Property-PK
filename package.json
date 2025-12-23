@@ -37,14 +37,14 @@
     "framer-motion": "^12.23.15",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.479.0",
-    "next": "^15.2.2",
+    "next": "16.1.1",
     "next-auth": "^4.24.11",
     "next-themes": "^0.4.5",
     "nextjs-toploader": "^3.8.16",
     "photo-sphere-viewer": "^4.8.1",
     "postcss": "^8.5.6",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
     "react-slick": "^0.30.3",
@@ -59,13 +59,17 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "@types/react-slick": "^0.23.13",
     "eslint": "^9",
-    "eslint-config-next": "15.2.1",
+    "eslint-config-next": "16.1.1",
     "lightningcss": "^1.30.2",
     "tailwindcss": "^4.1.14",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3"
   }
 }
