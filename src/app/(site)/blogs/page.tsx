@@ -2,6 +2,8 @@ import BlogList from "@/components/Blog/BlogListServer";
 import HeroSub from "@/components/shared/HeroSub";
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Blog Grids | Elite Property ",
 };

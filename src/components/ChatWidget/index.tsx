@@ -29,7 +29,7 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
       parts.push(
         <span key={`text-${key++}`}>
           {content.substring(lastIndex, match.index)}
-        </span>
+        </span>,
       );
     }
 
@@ -41,21 +41,21 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
           className="font-bold italic text-amber-300"
         >
           {match[2]}
-        </strong>
+        </strong>,
       );
     } else if (match[3]) {
       // Bold text (**text**)
       parts.push(
         <strong key={`bold-${key++}`} className="font-bold text-amber-300">
           {match[4]}
-        </strong>
+        </strong>,
       );
     } else if (match[5]) {
       // Italic text (*text*)
       parts.push(
         <em key={`italic-${key++}`} className="italic text-amber-200">
           {match[6]}
-        </em>
+        </em>,
       );
     } else if (match[7]) {
       // Inline code (`code`)
@@ -65,7 +65,7 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
           className="px-1.5 py-0.5 bg-gray-900/50 border border-amber-500/30 rounded text-amber-400 font-mono text-xs"
         >
           {match[8]}
-        </code>
+        </code>,
       );
     } else if (match[9]) {
       // URL match
@@ -102,7 +102,7 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
               d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
             />
           </svg>
-        </a>
+        </a>,
       );
     }
 
@@ -112,7 +112,7 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
   // Add remaining text
   if (lastIndex < content.length) {
     parts.push(
-      <span key={`text-${key++}`}>{content.substring(lastIndex)}</span>
+      <span key={`text-${key++}`}>{content.substring(lastIndex)}</span>,
     );
   }
 
@@ -190,7 +190,7 @@ export function CustomChatWidget() {
 
     try {
       const response = await fetch(
-        "https://n8n.coderesults.tech/webhook/343c586c-fecf-4279-bbe9-bf74e3b6d418/chat",
+        "https://n8n.srv1548576.hstgr.cloud/webhook/343c586c-fecf-4279-bbe9-bf74e3b6d418/chat",
         {
           method: "POST",
           headers: {
@@ -201,7 +201,7 @@ export function CustomChatWidget() {
             sessionId: "custom-chat-session",
             message: content.trim(),
           }),
-        }
+        },
       );
 
       const data = await response.json();

@@ -5,22 +5,83 @@ import Link from "next/link";
 import PropertiesList from "@/components/Admin/PropertiesList";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
+const propertyTypes = {
+  Home: [
+    "House",
+    "flat/appartment",
+    "Farm House",
+    "Room",
+    "Upper Portion",
+    "Lower Portion",
+    "Penthouse",
+  ],
+  Plots: [
+    "Residential Plot",
+    "Commercial Plot",
+    "Agricultural Land",
+    "Industrial Land",
+    "Plot File",
+    "Plot Form",
+  ],
+  Commercial: ["Office", "Shop", "Warehouse", "Factory", "Building", "Other"],
+};
+
 export default async function PropertiesPage({
   searchParams,
 }: {
-  searchParams: { category?: string };
+  searchParams: Promise<{ category?: string; page?: string; search?: string }>;
 }) {
-  const supabase = await createClient(cookies());
-  const category = searchParams.category;
+  const resolvedParams = await searchParams;
+  const category = resolvedParams.category || "All";
+  const page = Number(resolvedParams.page) || 1;
+  const search = resolvedParams.search || "";
+  const limit = 10;
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
 
-  const { data: properties, error } = await supabase
+  const supabase = await createClient(cookies());
+
+  let query = supabase
     .from("properties")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select("*", { count: "exact" });
+
+  // Apply search filtering
+  if (search) {
+    query = query.or(`name.ilike.%${search}%,location.ilike.%${search}%`);
+  }
+
+  // Apply category filtering (case-insensitive by generating variations)
+  if (category && category !== "All") {
+    const types = propertyTypes[category as keyof typeof propertyTypes];
+    if (types) {
+      const caseVariations = Array.from(
+        new Set([
+          ...types,
+          ...types.map((t) => t.toLowerCase()),
+          ...types.map((t) => t.toUpperCase()),
+          ...types.map((t) =>
+            t
+              .split(" ")
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+              .join(" ")
+          ),
+        ])
+      );
+      query = query.in("property_type", caseVariations);
+    }
+  }
+
+  // Order and paginate
+  const { data: properties, count, error } = await query
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
   if (error) {
     console.error("Error fetching properties:", error);
   }
+
+  const totalCount = count || 0;
+  const totalPages = Math.ceil(totalCount / limit) || 1;
 
   return (
     <DashboardLayout>
@@ -41,7 +102,7 @@ export default async function PropertiesPage({
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
             <div className="text-sm text-gray-500 dark:text-gray-400">
               <span className="font-medium text-gray-900 dark:text-white">
-                {properties?.length || 0}
+                {totalCount}
               </span>{" "}
               total properties
             </div>
@@ -60,6 +121,10 @@ export default async function PropertiesPage({
           <PropertiesList
             initialProperties={properties || []}
             initialCategory={category}
+            currentPage={page}
+            totalPages={totalPages}
+            totalCount={totalCount}
+            searchQuery={search}
           />
         </div>
       </div>
