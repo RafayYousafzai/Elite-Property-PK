@@ -160,9 +160,9 @@ const FeaturesAmenitiesModal: React.FC<FeaturesAmenitiesModalProps> = ({
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         size="4xl"
-        className="max-h-[80%] overflow-y-scroll"
+        className="max-h-[80vh] overflow-y-auto"
       >
-        <ModalContent className="!py-4">
+        <ModalContent className="!py-4" data-lenis-prevent>
           {(onClose) => (
             <>
               <ModalHeader>

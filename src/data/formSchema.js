@@ -25,6 +25,7 @@ export const defaultFormSchema = [
       { id: "central_heating", label: "Central Heating", type: "boolean" },
       { id: "waste_disposal", label: "Waste Disposal", type: "boolean" },
       { id: "furnished", label: "Furnished", type: "boolean" },
+      { id: "corner", label: "Corner", type: "boolean" },
     ],
   },
   {

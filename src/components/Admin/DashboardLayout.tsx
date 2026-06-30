@@ -123,11 +123,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="text-center">
           <div className="relative">
-            <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-            <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin absolute top-2 left-2 animate-pulse"></div>
+            <div className="w-20 h-20 border-4 border-amber-200 border-t-primary rounded-full animate-spin mx-auto"></div>
+            <div className="w-16 h-16 border-4 border-amber-100 border-t-primary rounded-full animate-spin absolute top-2 left-2 animate-pulse"></div>
           </div>
           <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">
             Loading dashboard...
@@ -141,7 +141,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div
-      className={`flex min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 ${
+      className={`flex min-h-screen bg-gray-50 dark:bg-gray-950 ${
         darkMode ? "dark" : ""
       }`}
     >
@@ -170,7 +170,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       `}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between h-16 px-6 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800">
+        <div className="flex items-center justify-between h-16 px-6 bg-primary">
           {!sidebarCollapsed && (
             <h1 className="text-white text-xl font-bold tracking-tight">
               Admin Panel
@@ -178,13 +178,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           )}
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="hidden lg:flex p-2 rounded-lg bg-transparent bg-opacity-20 hover:bg-opacity-30 text-white transition-colors"
+            className="hidden lg:flex p-2 rounded-lg bg-transparent hover:bg-black/10 text-white transition-colors"
           >
             <Bars3Icon className="h-5 w-5" />
           </button>
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="lg:hidden p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 text-white transition-colors"
+            className="lg:hidden p-2 rounded-lg bg-transparent hover:bg-black/10 text-white transition-colors"
           >
             <XMarkIcon className="h-5 w-5" />
           </button>
@@ -203,7 +203,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   transition-all duration-200 ease-in-out
                   ${
                     isActive
-                      ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg transform scale-[1.02]"
+                      ? "bg-primary text-white shadow-md transform scale-[1.02]"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white hover:scale-[1.01]"
                   }
                 `}
@@ -241,8 +241,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* User Section */}
         {!sidebarCollapsed && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-gray-50 dark:from-gray-800 to-transparent">
-            <div className="flex items-center p-3 rounded-xl bg-white dark:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-600">
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900">
+            <div className="flex items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
               <UserCircleIcon className="h-10 w-10 text-gray-400 dark:text-gray-300" />
               <div className="ml-3 flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
@@ -309,7 +309,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               {/* Logout */}
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-200 hover:shadow-md transform hover:scale-105"
+                className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-200 hover:shadow-md transform hover:scale-105"
               >
                 <ArrowRightEndOnRectangleIcon className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Logout</span>
