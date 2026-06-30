@@ -9,8 +9,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
       <HeroUIProvider>
+        <CustomChatWidget />
         <SmoothScrollProvider>
-          <CustomChatWidget />
           {children}
         </SmoothScrollProvider>
       </HeroUIProvider>

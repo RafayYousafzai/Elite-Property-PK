@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, MessageCircle, Sparkles } from "lucide-react";
+import {
+  X,
+  Send,
+  MessageCircle,
+  Image as ImageIcon,
+  ArrowUp,
+} from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -12,19 +18,15 @@ interface Message {
 
 // Function to parse and render markdown-style text with links
 function parseMessageContent(content: string): (string | React.ReactElement)[] {
-  // Split content into parts (text, bold, italic, links, etc.)
   const parts: (string | React.ReactElement)[] = [];
   let lastIndex = 0;
   let key = 0;
 
-  // Enhanced pattern to match multiple markdown formats:
-  // **bold**, *italic*, `code`, links, and emojis are preserved
   const combinedPattern =
     /(\*\*\*(.*?)\*\*\*)|(\*\*(.*?)\*\*)|(\*(.*?)\*)|(`(.*?)`)|(https?:\/\/[^\s]+)/g;
 
   let match;
   while ((match = combinedPattern.exec(content)) !== null) {
-    // Add text before the match
     if (match.index > lastIndex) {
       parts.push(
         <span key={`text-${key++}`}>
@@ -38,7 +40,7 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
       parts.push(
         <strong
           key={`bolditalic-${key++}`}
-          className="font-bold italic text-amber-300"
+          className="font-bold italic text-gray-900 dark:text-white"
         >
           {match[2]}
         </strong>,
@@ -46,14 +48,20 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
     } else if (match[3]) {
       // Bold text (**text**)
       parts.push(
-        <strong key={`bold-${key++}`} className="font-bold text-amber-300">
+        <strong
+          key={`bold-${key++}`}
+          className="font-bold text-gray-950 dark:text-white"
+        >
           {match[4]}
         </strong>,
       );
     } else if (match[5]) {
       // Italic text (*text*)
       parts.push(
-        <em key={`italic-${key++}`} className="italic text-amber-200">
+        <em
+          key={`italic-${key++}`}
+          className="italic text-gray-700 dark:text-gray-300"
+        >
           {match[6]}
         </em>,
       );
@@ -62,7 +70,7 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
       parts.push(
         <code
           key={`code-${key++}`}
-          className="px-1.5 py-0.5 bg-gray-900/50 border border-amber-500/30 rounded text-amber-400 font-mono text-xs"
+          className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-red-600 dark:text-red-400 font-mono text-xs"
         >
           {match[8]}
         </code>,
@@ -70,7 +78,6 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
     } else if (match[9]) {
       // URL match
       const url = match[9];
-      // Extract property name from URL if it's a property link
       const propertyMatch = url.match(/\/explore\/([^\/]+)$/);
       const displayText = propertyMatch
         ? propertyMatch[1]
@@ -86,7 +93,7 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-amber-400 hover:text-amber-300 underline underline-offset-2 font-medium inline-flex items-center gap-1 break-words"
+          className="text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 underline underline-offset-2 font-semibold inline-flex items-center gap-1 break-words"
         >
           {displayText}
           <svg
@@ -109,7 +116,6 @@ function parseMessageContent(content: string): (string | React.ReactElement)[] {
     lastIndex = match.index + match[0].length;
   }
 
-  // Add remaining text
   if (lastIndex < content.length) {
     parts.push(
       <span key={`text-${key++}`}>{content.substring(lastIndex)}</span>,
@@ -124,7 +130,7 @@ export function CustomChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi there! I'm here to help you with any questions you have!",
+      content: "Hi! 👋 What are you looking for today?",
       timestamp: new Date(),
     },
   ]);
@@ -133,6 +139,9 @@ export function CustomChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
+
+  const emmaAvatar =
+    "https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=256&auto=format&fit=crop";
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -239,35 +248,12 @@ export function CustomChatWidget() {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            whileHover={{ scale: 1.1 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-4 right-4 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-yellow-500 via-amber-500 to-yellow-600 shadow-2xl shadow-amber-500/50 transition-all duration-300 hover:shadow-amber-500/70 sm:bottom-6 sm:right-6"
+            className="fixed bottom-4 right-4 z-[9999] flex h-16 w-16 items-center justify-center rounded-full bg-amber-500 hover:bg-amber-600 shadow-xl transition-all duration-300 sm:bottom-6 sm:right-6"
           >
-            <motion.div
-              animate={{
-                rotate: [0, 10, -10, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 3,
-              }}
-            >
-              <MessageCircle className="h-7 w-7 text-white" />
-            </motion.div>
-            <motion.div
-              className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-yellow-500"
-              animate={{
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-              }}
-            >
-              <Sparkles className="h-3 w-3 text-white" />
-            </motion.div>
+            <MessageCircle className="h-7 w-7 text-white" />
           </motion.button>
         )}
       </AnimatePresence>
@@ -277,139 +263,173 @@ export function CustomChatWidget() {
         {isOpen && (
           <motion.div
             ref={chatWindowRef}
-            initial={{ opacity: 0, y: 100, scale: 0.8 }}
+            initial={{ opacity: 0, y: 100, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.8 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 right-0 z-50 flex h-[calc(var(--vh,1vh)*100)] w-full flex-col overflow-hidden border-amber-300/10 bg-gradient-to-br from-black via-gray-900/50 to-black shadow-2xl shadow-amber-500/20 backdrop-blur-xl sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-3xl"
+            exit={{ opacity: 0, y: 100, scale: 0.95 }}
+            transition={{ type: "spring", damping: 25, stiffness: 350 }}
+            className="fixed bottom-0 right-0 z-[9999] flex h-[calc(var(--vh,1vh)*100)] w-full flex-col overflow-hidden bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 shadow-2xl sm:bottom-6 sm:right-6 sm:h-[650px] sm:w-[420px] sm:rounded-3xl"
           >
             {/* Header */}
-            <div className="relative flex items-center justify-between border-b border-amber-300/10 bg-gradient-to-r from-amber-600/30 via-yellow-600/30 to-amber-600/30 p-5 backdrop-blur-xl">
+            <div className="relative flex items-center justify-between  border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-3">
               <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-yellow-600 shadow-lg shadow-amber-500/50">
-                    <Sparkles className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-black bg-emerald-500"></div>
-                </div>
                 <div>
-                  <h3 className="font-semibold text-white">
-                    Emma <span className="font-light">(Ai)</span>
+                  <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                    Ali
                   </h3>
-                  <p className="text-xs text-amber-200">
-                    Online • Ready to help
+                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    Online
                   </p>
                 </div>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
+              <button
                 onClick={() => setIsOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
               >
                 <X className="h-4 w-4" />
-              </motion.button>
+              </button>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 space-y-4 overflow-y-auto p-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-amber-500/20">
-              {messages.map((message, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
+            {/* Chat Body Container */}
+            <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-950 p-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-200">
+              {/* Agent Large Profile Mockup (Centered at start) */}
+              <div className="flex flex-col items-center justify-center my-6">
+                <div className="relative mb-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={emmaAvatar}
+                    alt="Ali"
+                    className="h-20 w-20 rounded-full object-cover shadow-md ring-4 ring-amber-50 dark:ring-amber-900/30"
+                  />
+                  <span className="absolute bottom-0 right-1 block h-4.5 w-4.5 rounded-full border-3 border-white dark:border-gray-950 bg-emerald-500" />
+                </div>
+                <h4 className="font-semibold text-gray-900 dark:text-white text-base">
+                  Ali
+                </h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  AI Assistant
+                </p>
+              </div>
+
+              {/* Disclaimer / Privacy Consent Box */}
+              <div className="mb-6 rounded-[22px] border border-gray-100 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-900/30 p-4 text-center">
+                <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                  By using the chat feature, you agree to our terms and
+                  acknowledge our privacy policy.
+                </p>
+              </div>
+
+              {/* Message List */}
+              <div className="space-y-4">
+                {messages.map((message, index) => (
                   <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                      message.role === "user"
-                        ? "bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-lg shadow-amber-500/30"
-                        : "bg-gray-800/50 text-gray-100 backdrop-blur-sm border border-amber-300/10"
+                    key={index}
+                    className={`flex items-end gap-2.5 ${
+                      message.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                      {parseMessageContent(message.content)}
-                    </div>
-                    <p
-                      className={`mt-1 text-xs ${
+                    {/* Bot Avatar */}
+                    {message.role === "assistant" && (
+                      <div className="relative h-8 w-8 flex-shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={emmaAvatar}
+                          alt="Ali"
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                        <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border-2 border-white dark:border-gray-950 bg-emerald-500" />
+                      </div>
+                    )}
+
+                    <div
+                      className={`max-w-[75%] rounded-[22px] px-4 py-3 text-sm shadow-sm ${
                         message.role === "user"
-                          ? "text-amber-200"
-                          : "text-gray-400"
+                          ? "bg-amber-500 text-white"
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                       }`}
                     >
-                      {message.timestamp.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-start"
-                >
-                  <div className="rounded-2xl border border-amber-300/10 bg-gray-800/50 px-4 py-3 backdrop-blur-sm">
-                    <div className="flex gap-1">
-                      <motion.div
-                        animate={{ y: [0, -8, 0] }}
-                        transition={{
-                          duration: 0.6,
-                          repeat: Infinity,
-                          delay: 0,
-                        }}
-                        className="h-2 w-2 rounded-full bg-amber-400"
-                      />
-                      <motion.div
-                        animate={{ y: [0, -8, 0] }}
-                        transition={{
-                          duration: 0.6,
-                          repeat: Infinity,
-                          delay: 0.2,
-                        }}
-                        className="h-2 w-2 rounded-full bg-amber-400"
-                      />
-                      <motion.div
-                        animate={{ y: [0, -8, 0] }}
-                        transition={{
-                          duration: 0.6,
-                          repeat: Infinity,
-                          delay: 0.4,
-                        }}
-                        className="h-2 w-2 rounded-full bg-amber-400"
-                      />
+                      <div className="leading-relaxed whitespace-pre-wrap break-words">
+                        {parseMessageContent(message.content)}
+                      </div>
                     </div>
                   </div>
-                </motion.div>
-              )}
-              <div ref={messagesEndRef} />
+                ))}
+
+                {isTyping && (
+                  <div className="flex items-end gap-2.5 justify-start">
+                    <div className="relative h-8 w-8 flex-shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={emmaAvatar}
+                        alt="Ali"
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                      <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border-2 border-white dark:border-gray-950 bg-emerald-500" />
+                    </div>
+                    <div className="rounded-[22px] bg-gray-100 dark:bg-gray-800 px-4 py-3.5">
+                      <div className="flex gap-1.5 items-center justify-center h-2">
+                        <motion.div
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: 0,
+                          }}
+                          className="h-1.5 w-1.5 rounded-full bg-gray-400"
+                        />
+                        <motion.div
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: 0.2,
+                          }}
+                          className="h-1.5 w-1.5 rounded-full bg-gray-400"
+                        />
+                        <motion.div
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: 0.4,
+                          }}
+                          className="h-1.5 w-1.5 rounded-full bg-gray-400"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
             </div>
 
-            {/* Input */}
-            <div className="border-t border-amber-300/10 bg-gradient-to-r from-amber-600/20 via-yellow-600/20 to-amber-600/20 p-4 backdrop-blur-xl">
-              <form onSubmit={handleSubmit} className="flex gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Type your message..."
-                  className="flex-1 rounded-xl border border-amber-300/10 bg-black/20 px-4 py-3 text-sm text-white placeholder-gray-400 backdrop-blur-sm transition-all focus:border-amber-500/50 focus:bg-black/30 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-                />
+            {/* Input Panel */}
+            <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+              <form
+                onSubmit={handleSubmit}
+                className="flex items-center gap-2.5"
+              >
+                {/* Input Field */}
+                <div className="relative flex-1">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Message..."
+                    className="w-full rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-5 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-amber-500 focus:bg-white dark:focus:bg-gray-800 focus:outline-none transition duration-200"
+                  />
+                </div>
+
+                {/* Circular Send Button */}
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="submit"
                   disabled={!inputValue.trim() || isTyping}
-                  className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-lg shadow-amber-500/30 transition-all hover:shadow-amber-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-500 hover:bg-amber-600 text-white shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="h-5 w-5" />
+                  <ArrowUp className="h-5 w-5" />
                 </motion.button>
               </form>
             </div>
