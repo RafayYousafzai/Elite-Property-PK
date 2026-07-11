@@ -88,6 +88,37 @@ export default function RequestCallbackPage() {
         throw new Error(responseData.message || "Failed to submit lead");
       }
 
+      // 1.5. EmailJS Integration (REST API client)
+      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+      if (serviceId && templateId && publicKey) {
+        try {
+          await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              service_id: serviceId,
+              template_id: templateId,
+              user_id: publicKey,
+              template_params: {
+                full_name: formData.fullName,
+                phone_number: formData.phoneNumber,
+                budget_range: formData.budgetRange,
+                purpose: formData.purpose,
+                looking_for: formData.lookingFor,
+                submitted_at: new Date().toLocaleString(),
+              },
+            }),
+          });
+        } catch (emailErr) {
+          console.error("Failed to send email notification via EmailJS:", emailErr);
+        }
+      } else {
+        console.warn("⚠️ EmailJS environment variables are not configured. Email submission skipped.");
+      }
+
       // 2. Meta Pixel & Conversions API Tracking
       const eventId = crypto.randomUUID();
 
