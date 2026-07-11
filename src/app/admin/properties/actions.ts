@@ -87,7 +87,8 @@ export async function createProperty(propertyData: PropertyData) {
 
     // Revalidate cache
     revalidatePath("/admin/properties");
-    revalidatePath("/properties");
+    revalidatePath("/explore");
+    revalidatePath("/");
 
     return {
       success: true,
@@ -150,9 +151,10 @@ export async function updateProperty(id: string, propertyData: PropertyData) {
 
     // Revalidate pages
     revalidatePath("/admin/properties");
-    revalidatePath("/properties");
-    if (updatedSlug) {
-      revalidatePath(`/properties/${updatedSlug}`);
+    revalidatePath("/explore");
+    revalidatePath("/");
+    if (data && data.slug) {
+      revalidatePath(`/explore/${data.slug}`);
     }
 
     return {
@@ -185,6 +187,13 @@ export async function deleteProperty(id: string) {
       };
     }
 
+    // Fetch property slug before deleting to revalidate its cache
+    const { data: propToDelete } = await supabase
+      .from("properties")
+      .select("slug")
+      .eq("id", id)
+      .single();
+
     const { error } = await supabase.from("properties").delete().eq("id", id);
 
     if (error) {
@@ -197,7 +206,11 @@ export async function deleteProperty(id: string) {
 
     // Revalidate the properties page cache
     revalidatePath("/admin/properties");
-    revalidatePath("/properties");
+    revalidatePath("/explore");
+    revalidatePath("/");
+    if (propToDelete && propToDelete.slug) {
+      revalidatePath(`/explore/${propToDelete.slug}`);
+    }
 
     return {
       success: true,
@@ -210,3 +223,51 @@ export async function deleteProperty(id: string) {
     };
   }
 }
+
+export async function togglePropertyFeatured(id: string, isFeatured: boolean) {
+  try {
+    const supabase = await createClient(cookies());
+
+    // Verify user is authenticated
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        success: false,
+        error: "You must be authenticated to update properties",
+      };
+    }
+
+    const { error } = await supabase
+      .from("properties")
+      .update({ is_featured: isFeatured })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Database error:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    // Revalidate the properties cache and homepage cache
+    revalidatePath("/admin/properties");
+    revalidatePath("/explore");
+    revalidatePath("/");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred",
+    };
+  }
+}
+

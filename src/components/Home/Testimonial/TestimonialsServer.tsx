@@ -1,9 +1,8 @@
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { createStaticClient } from "@/utils/supabase/static";
 import TestimonialsClient from "./index";
 
 export default async function Testimonials() {
-  const supabase = await createClient(cookies());
+  const supabase = createStaticClient();
 
   const { data: testimonials } = await supabase
     .from("testimonials")
@@ -13,3 +12,4 @@ export default async function Testimonials() {
 
   return <TestimonialsClient testimonials={testimonials || []} />;
 }
+

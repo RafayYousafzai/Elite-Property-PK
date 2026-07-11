@@ -15,10 +15,16 @@ import {
 import VideoShowcase from "@/components/shared/video-showcase";
 import LocationMap from "@/components/Home/Office";
 
+// Cache the homepage statically for 24 hours (86400 seconds) as a fallback.
+// The cache is automatically revalidated on-demand whenever a change is made from the admin panel.
+export const revalidate = 86400;
+
+
 export default async function Home() {
   // Fetch properties from Supabase
   // const properties = await getProperties();
   const featuredProperties = await getFeaturedProperties();
+
 
   return (
     <main>

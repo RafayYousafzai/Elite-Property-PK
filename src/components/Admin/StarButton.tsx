@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updatePropertyFeaturedStatus } from "@/lib/supabase/properties";
+import { togglePropertyFeatured } from "@/app/admin/properties/actions";
 import { StarIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 
@@ -22,10 +22,12 @@ export default function StarButton({
   const toggleFeatured = async () => {
     setLoading(true);
     try {
-      const success = await updatePropertyFeaturedStatus(propertyId, !featured);
-      if (success) {
+      const result = await togglePropertyFeatured(propertyId, !featured);
+      if (result.success) {
         setFeatured(!featured);
         onStatusChange?.(!featured);
+      } else {
+        console.error("Failed to update featured status:", result.error);
       }
     } catch (error) {
       console.error("Error updating featured status:", error);
@@ -33,6 +35,7 @@ export default function StarButton({
       setLoading(false);
     }
   };
+
 
   return (
     <button

@@ -65,7 +65,6 @@ const Categories = () => {
                   width={680}
                   height={386}
                   className="w-full h-[350px] md:h-auto object-cover"
-                  unoptimized={true}
                 />
               </Link>
               <Link
@@ -105,7 +104,6 @@ const Categories = () => {
                   width={680}
                   height={386}
                   className="w-full h-[350px] md:h-auto object-cover"
-                  unoptimized={true}
                 />
               </Link>
               <Link
@@ -145,7 +143,6 @@ const Categories = () => {
                   width={680}
                   height={386}
                   className="w-full h-[350px] md:h-auto object-cover"
-                  unoptimized={true}
                 />
               </Link>
               <Link

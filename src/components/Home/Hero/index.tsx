@@ -17,6 +17,7 @@ const Hero: React.FC = () => {
           alt="Hero Background"
           fill // Changed layout="fill" to the recommended `fill` prop
           className="object-cover object-center"
+          priority={true}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />

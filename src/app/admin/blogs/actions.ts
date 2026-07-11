@@ -153,6 +153,7 @@ export async function createBlog(blogData: BlogData) {
     // Revalidate cache
     revalidatePath("/admin/blogs");
     revalidatePath("/blogs");
+    revalidatePath("/");
     revalidatePath(`/blogs/${slug}`);
 
     return { success: true, data };
@@ -212,6 +213,7 @@ export async function updateBlog(id: string, blogData: Partial<BlogData>) {
     // Revalidate cache
     revalidatePath("/admin/blogs");
     revalidatePath("/blogs");
+    revalidatePath("/");
     if (data.slug) {
       revalidatePath(`/blogs/${data.slug}`);
     }
@@ -251,6 +253,7 @@ export async function deleteBlog(id: string) {
     // Revalidate cache
     revalidatePath("/admin/blogs");
     revalidatePath("/blogs");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error) {
@@ -290,6 +293,7 @@ export async function toggleBlogPublished(id: string, isPublished: boolean) {
 
     revalidatePath("/admin/blogs");
     revalidatePath("/blogs");
+    revalidatePath("/");
 
     return { success: true, data };
   } catch (error) {

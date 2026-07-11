@@ -1,12 +1,11 @@
-import { createClient as createServerClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { createStaticClient } from "@/utils/supabase/static";
 import { transformDatabaseProperty } from "./properties";
 import { Property } from "@/types/property";
 
 // Server-side function to fetch properties
 export async function getProperties(): Promise<Property[]> {
   try {
-    const supabase = await createServerClient(cookies());
+    const supabase = createStaticClient();
 
     const { data, error } = await supabase
       .from("properties")
@@ -30,7 +29,7 @@ export async function getPropertyBySlugServer(
   slug: string
 ): Promise<Property | null> {
   try {
-    const supabase = await createServerClient(cookies());
+    const supabase = createStaticClient();
 
     const { data, error } = await supabase
       .from("properties")
@@ -53,7 +52,7 @@ export async function getPropertyBySlugServer(
 // Server-side function to fetch featured properties only
 export async function getFeaturedProperties(): Promise<Property[]> {
   try {
-    const supabase = await createServerClient(cookies());
+    const supabase = createStaticClient();
 
     const { data, error } = await supabase
       .from("properties")
@@ -72,3 +71,4 @@ export async function getFeaturedProperties(): Promise<Property[]> {
     return [];
   }
 }
+

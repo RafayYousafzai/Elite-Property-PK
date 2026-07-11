@@ -1,6 +1,6 @@
 import React from "react";
 import BlogCard from "@/components/shared/Blog/blogCard";
-import { getAllBlogs } from "@/app/admin/blogs/actions";
+import { getPublishedBlogsStatic } from "@/lib/supabase/blogs-static";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 
@@ -17,9 +17,8 @@ interface Blog {
 }
 
 const BlogSmallServer = async () => {
-  // Fetch published blogs from database
-  const result = await getAllBlogs(false); // Only published
-  const dbBlogs: Blog[] = result.success && result.data ? result.data : [];
+  // Fetch published blogs from database statically
+  const dbBlogs = await getPublishedBlogsStatic();
 
   // Transform database blogs to match BlogCard interface
   const blogs = dbBlogs.slice(0, 3).map((blog) => ({
@@ -31,6 +30,7 @@ const BlogSmallServer = async () => {
     detail: blog.excerpt || "",
     tag: blog.tag || "General",
   }));
+
 
   return (
     <>

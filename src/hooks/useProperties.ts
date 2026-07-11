@@ -17,10 +17,10 @@ interface UsePropertiesReturn {
   applyFilters: (filters: SearchFilters) => Promise<void>;
 }
 
-export function useProperties(): UsePropertiesReturn {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function useProperties(initialProperties: Property[] = []): UsePropertiesReturn {
+  const [properties, setProperties] = useState<Property[]>(initialProperties);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>(initialProperties);
+  const [isLoading, setIsLoading] = useState(initialProperties.length === 0);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProperties = useCallback(async () => {
