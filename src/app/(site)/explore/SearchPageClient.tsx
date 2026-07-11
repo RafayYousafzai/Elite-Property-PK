@@ -109,6 +109,13 @@ export default function SearchPageClient({
     return () => clearTimeout(timer);
   }, [searchValue, filters.searchQuery]);
 
+  // Sync searchValue when filters.searchQuery changes externally (e.g. from sidebar clicks or clearing)
+  useEffect(() => {
+    if (filters.searchQuery !== searchValue) {
+      setSearchValue(filters.searchQuery);
+    }
+  }, [filters.searchQuery]);
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
