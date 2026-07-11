@@ -20,6 +20,7 @@ const navigationItems = [
   { name: "Team", href: "/team" },
   { name: "Contact", href: "/contactus" },
   { name: "Blogs", href: "/blogs" },
+  { name: "Request a Call Back", href: "/request-callback" },
 ];
 
 const Header: React.FC = () => {
@@ -187,10 +188,10 @@ const Header: React.FC = () => {
                     isActive
                       ? "text-primary font-medium"
                       : isHomepage
-                      ? sticky
-                        ? "text-dark dark:text-white hover:text-primary"
-                        : "text-white hover:text-primary"
-                      : "text-dark dark:text-white hover:text-primary"
+                        ? sticky
+                          ? "text-dark dark:text-white hover:text-primary"
+                          : "text-white hover:text-primary"
+                        : "text-dark dark:text-white hover:text-primary"
                   }`}
                 >
                   {item.name}

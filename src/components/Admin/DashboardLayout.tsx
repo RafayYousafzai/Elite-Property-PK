@@ -16,6 +16,7 @@ import {
   MoonIcon,
   ArrowRightEndOnRectangleIcon,
   NewspaperIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 
 interface DashboardLayoutProps {
@@ -108,6 +109,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       name: "Blogs",
       href: "/admin/blogs",
       icon: NewspaperIcon,
+    },
+    {
+      name: "Leads",
+      href: "/admin/leads",
+      icon: EnvelopeIcon,
     },
     // {
     //   name: "Analytics",
