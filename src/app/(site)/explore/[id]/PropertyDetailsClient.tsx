@@ -51,33 +51,6 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
           }
         );
       }
-
-      // Send to server for CAPI
-      try {
-        await fetch("/api/meta-events", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            event_name: "ViewContent",
-            event_id: eventId, // Same ID for deduplication
-            event_time: Math.floor(Date.now() / 1000),
-            event_source_url: window.location.href,
-            user_data: {
-              client_user_agent: navigator.userAgent,
-            },
-            custom_data: {
-              content_name: property.name,
-              content_category: property.property_type,
-              content_ids: [property.id],
-              content_type: "product",
-              value: Number(property.rate) || 0,
-              currency: "PKR",
-            },
-          }),
-        });
-      } catch (error) {
-        console.error("Failed to send ViewContent CAPI event:", error);
-      }
     };
 
     sendViewContentEvent();
@@ -281,7 +254,7 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                     </div>
                   </Link>
                   <button
-                    onClick={async () => {
+                    onClick={() => {
                       const eventId = crypto.randomUUID();
                       if (typeof window !== "undefined" && window.fbq) {
                         window.fbq(
@@ -297,30 +270,6 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                             eventID: eventId,
                           }
                         );
-                      }
-
-                      try {
-                        await fetch("/api/meta-events", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            event_name: "Lead",
-                            event_id: eventId,
-                            event_time: Math.floor(Date.now() / 1000),
-                            event_source_url: window.location.href,
-                            user_data: {
-                              client_user_agent: navigator.userAgent,
-                            },
-                            custom_data: {
-                              content_name: property.name,
-                              content_category: "WhatsApp Contact",
-                              value: Number(property.rate) || 0,
-                              currency: "PKR",
-                            },
-                          }),
-                        });
-                      } catch (error) {
-                        console.error("Failed to send CAPI event:", error);
                       }
 
                       window.open(

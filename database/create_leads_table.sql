@@ -21,3 +21,8 @@ CREATE POLICY "Allow public insert to leads" ON leads
 CREATE POLICY "Allow authenticated read to leads" ON leads
     FOR SELECT 
     USING (auth.role() = 'authenticated');
+
+-- Allow authenticated users to delete leads
+CREATE POLICY "Allow authenticated delete of leads" ON leads
+    FOR DELETE
+    USING (auth.role() = 'authenticated');

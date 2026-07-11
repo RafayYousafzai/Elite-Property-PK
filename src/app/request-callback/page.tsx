@@ -122,7 +122,7 @@ export default function RequestCallbackPage() {
       // 2. Meta Pixel & Conversions API Tracking
       const eventId = crypto.randomUUID();
 
-      // Browser-side Pixel
+      // Browser-side Pixel (Stape CAPIG automatically routes this to the server-side Conversions API)
       if (typeof window !== "undefined" && window.fbq) {
         window.fbq(
           "track",
@@ -138,31 +138,6 @@ export default function RequestCallbackPage() {
             eventID: eventId,
           },
         );
-      }
-
-      // Server-side Conversions API (CAPI)
-      try {
-        await fetch("/api/meta-events", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            event_name: "Lead",
-            event_id: eventId,
-            event_time: Math.floor(Date.now() / 1000),
-            event_source_url: window.location.href,
-            user_data: {
-              client_user_agent: navigator.userAgent,
-            },
-            custom_data: {
-              content_name: "Call Back Request",
-              content_category: "Landing Page Lead",
-              value: 0,
-              currency: "PKR",
-            },
-          }),
-        });
-      } catch (error) {
-        console.error("Failed to send Meta CAPI event:", error);
       }
 
       setStatus("success");

@@ -6,6 +6,17 @@ import { cookies } from "next/headers";
 export async function getAllLeads() {
   try {
     const supabase = await createClient(cookies());
+
+    // Verify user is authenticated
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return { success: false, error: "You must be authenticated to view leads" };
+    }
+
     const { data, error } = await supabase
       .from("leads")
       .select("*")
@@ -25,6 +36,17 @@ export async function getAllLeads() {
 export async function deleteLead(id: string) {
   try {
     const supabase = await createClient(cookies());
+
+    // Verify user is authenticated
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return { success: false, error: "You must be authenticated to delete leads" };
+    }
+
     const { error } = await supabase.from("leads").delete().eq("id", id);
 
     if (error) {
