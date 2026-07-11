@@ -51,8 +51,8 @@ export default function RequestCallbackPage() {
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
-    budgetRange: budgetOptions[0],
-    purpose: purposeOptions[0].value,
+    budgetRange: "",
+    purpose: "",
     lookingFor: "",
   });
 
@@ -61,7 +61,13 @@ export default function RequestCallbackPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.phoneNumber || !formData.lookingFor) {
+    if (
+      !formData.fullName ||
+      !formData.phoneNumber ||
+      !formData.lookingFor ||
+      !formData.budgetRange ||
+      !formData.purpose
+    ) {
       setStatus("error");
       return;
     }
@@ -122,11 +128,11 @@ export default function RequestCallbackPage() {
       // 2. Meta Pixel & Conversions API Tracking
       const eventId = crypto.randomUUID();
 
-      // Browser-side Pixel (Stape CAPIG automatically routes this to the server-side Conversions API)
+      // Browser-side Pixel
       if (typeof window !== "undefined" && window.fbq) {
         window.fbq(
-          "trackCustom",
-          "Form Submit",
+          "track",
+          "Lead",
           {
             content_name: "Call Back Request",
             content_category: "Landing Page Lead",
@@ -140,12 +146,37 @@ export default function RequestCallbackPage() {
         );
       }
 
+      // Server-side Conversions API (CAPI)
+      try {
+        await fetch("/api/meta-events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event_name: "Lead",
+            event_id: eventId,
+            event_time: Math.floor(Date.now() / 1000),
+            event_source_url: window.location.href,
+            user_data: {
+              client_user_agent: navigator.userAgent,
+            },
+            custom_data: {
+              content_name: "Call Back Request",
+              content_category: "Landing Page Lead",
+              value: 0,
+              currency: "PKR",
+            },
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to send Meta CAPI event:", error);
+      }
+
       setStatus("success");
       setFormData({
         fullName: "",
         phoneNumber: "",
-        budgetRange: budgetOptions[0],
-        purpose: purposeOptions[0].value,
+        budgetRange: "",
+        purpose: "",
         lookingFor: "",
       });
     } catch (err) {
@@ -252,9 +283,10 @@ export default function RequestCallbackPage() {
             <Select
               isRequired
               label="Budget Range"
+              placeholder="Select Option"
               variant="flat"
               size="lg"
-              selectedKeys={[formData.budgetRange]}
+              selectedKeys={formData.budgetRange ? [formData.budgetRange] : []}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0];
                 setFormData((prev) => ({
@@ -275,9 +307,10 @@ export default function RequestCallbackPage() {
             <Select
               isRequired
               label="Purpose"
+              placeholder="Select Option"
               variant="flat"
               size="lg"
-              selectedKeys={[formData.purpose]}
+              selectedKeys={formData.purpose ? [formData.purpose] : []}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0];
                 setFormData((prev) => ({
