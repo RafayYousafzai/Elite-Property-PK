@@ -93,7 +93,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
   if (!images || images.length === 0) {
     return (
-      <div className="mt-8">
+      <div>
         {photoSphere ? (
           <div className="grid grid-cols-12 gap-6">
             {/* Empty space for consistency */}
@@ -157,7 +157,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-6 mt-8">
+      <div className="grid grid-cols-12 gap-6">
         {/* Main Image Carousel - Left Side */}
         <div
           className={`${photoSphere ? "lg:col-span-8" : "col-span-12"
@@ -166,7 +166,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
           <div className="relative group">
             {/* Main Image */}
             <div
-              className="relative h-96 lg:h-[500px] cursor-pointer overflow-hidden rounded-2xl"
+              className="relative h-60 md:h-80 lg:h-[500px] cursor-pointer overflow-hidden rounded-2xl"
               onClick={() => openLightbox(currentIndex)}
             >
               <Image

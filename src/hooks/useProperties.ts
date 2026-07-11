@@ -56,10 +56,8 @@ export function useProperties(): UsePropertiesReturn {
     }
   }, []);
 
-  // Initial load and real-time updates
+  // Real-time updates subscription only (no initial fetch here because search page immediately applies filters on mount)
   useEffect(() => {
-    fetchProperties();
-
     // Set up real-time subscription
     const supabase = createClient();
     const channel = supabase

@@ -155,7 +155,8 @@ export default function Details() {
   }
 
   return (
-    <section className="!pt-44 pb-20 relative bg-gray-50 dark:bg-gray-950">
+    <>
+      <section className="!pt-24 md:!pt-44 pb-32 md:pb-20 relative bg-gray-50 dark:bg-gray-950">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
         <div className="grid grid-cols-12 items-end gap-6 mb-8">
           <div className="lg:col-span-8 col-span-12">
@@ -183,7 +184,7 @@ export default function Details() {
                 </span>
               )}
             </div>
-            <h1 className="lg:text-5xl text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
+            <h1 className="lg:text-4xl text-2xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
               {property.name}
             </h1>
             <div className="flex items-start gap-2.5 mb-2">
@@ -213,82 +214,207 @@ export default function Details() {
           </div>
         </div>
 
-        <div className="mb-10">
-          <ImageCarousel
-            images={property.images || []}
-            photoSphere={property.photo_sphere || null}
-          />
+        {/* Top Section Grid: Image Carousel (Left) & Pricing/Contact Card (Right) on Desktop */}
+        <div className="grid grid-cols-12 gap-8 mb-10">
+          {/* Left Column: Carousel & Mobile CTA & Property Overview */}
+          <div className="lg:col-span-8 col-span-12 space-y-6">
+            <ImageCarousel
+              images={property.images || []}
+              photoSphere={property.photo_sphere || null}
+            />
+            {/* Mobile-only Price & CTA Card (Shown directly below carousel) */}
+            <div className="lg:hidden bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Price</span>
+                <span className="text-2xl font-black text-primary">
+                  {formatNumberShort(Number(property.rate))}
+                </span>
+              </div>
+              <div className="flex gap-3">
+                <a
+                  href="tel:+923344111778"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary hover:bg-primary-600 text-white font-bold text-xs uppercase tracking-wider transition active:scale-95 shadow-sm"
+                >
+                  <Icon icon="solar:phone-calling-linear" className="w-4.5 h-4.5" />
+                  <span>Call Agent</span>
+                </a>
+                <a
+                  href={`https://wa.me/+923344111778?text=${encodeURIComponent(`Hi, I'm interested in: ${property.name} (${formatNumberShort(Number(property.rate))})`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-black/10 dark:border-white/10 text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider transition active:scale-95 shadow-sm bg-white dark:bg-slate-900"
+                >
+                  <Icon icon="ph:whatsapp-logo-fill" className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>WhatsApp</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Mobile-only Compact Property Overview Card */}
+            <div className="lg:hidden border border-gray-200 dark:border-gray-800 p-4 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
+              <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3">
+                Property Overview
+              </h4>
+              <div className="grid grid-cols-2 gap-2.5">
+                {property.beds !== null && (
+                  <div className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-850">
+                    <Icon
+                      icon="ph:bed"
+                      width={18}
+                      height={18}
+                      className="text-amber-600 dark:text-amber-500 shrink-0"
+                    />
+                    <div>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Beds</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mt-0.5">
+                        {property.beds}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {property.baths !== null && (
+                  <div className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-850">
+                    <Icon
+                      icon="ph:bathtub"
+                      width={18}
+                      height={18}
+                      className="text-amber-600 dark:text-amber-500 shrink-0"
+                    />
+                    <div>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Baths</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mt-0.5">
+                        {property.baths}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-850">
+                  <Icon
+                    icon="ph:ruler"
+                    width={18}
+                    height={18}
+                    className="text-amber-600 dark:text-amber-500 shrink-0"
+                  />
+                  <div>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Area</p>
+                    <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mt-0.5 truncate max-w-[80px]">
+                      {property.area} {property.area_unit || "Sq Ft"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-850">
+                  <Icon
+                    icon="ph:house"
+                    width={18}
+                    height={18}
+                    className="text-amber-600 dark:text-amber-500 shrink-0"
+                  />
+                  <div>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Type</p>
+                    <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mt-0.5 capitalize truncate max-w-[80px]">
+                      {property.property_type.replace(/-/g, " ")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Pricing & Contact Sidebar Card (Desktop Only) */}
+          <div className="lg:col-span-4 col-span-12 hidden lg:flex flex-col gap-6">
+            {/* Price Box */}
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">
+                Price
+              </p>
+              <h4 className="text-gray-900 dark:text-white text-4xl font-bold mb-1">
+                {formatNumberShort(Number(property.rate))}
+              </h4>
+              <div className="h-1 w-16 bg-amber-500 rounded-full mt-3"></div>
+            </div>
+
+            {/* Compact Contact Box */}
+            <div className="bg-white p-5 rounded-xl relative overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm">
+              <div className="relative z-10">
+                <h4 className="text-gray-900 text-lg font-bold mb-1">
+                  Interested?
+                </h4>
+                <p className="text-gray-600 text-xs mb-4">
+                  Contact us for more details
+                </p>
+                <Link
+                  href="tel:+923344111778"
+                  className="py-2.5 px-4 bg-primary hover:bg-primary/90 text-white rounded-xl w-full block text-center transition duration-200 font-bold mb-3 shadow-sm text-sm"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Icon icon="solar:phone-calling-linear" width={18} height={18} />
+                    Call Agent
+                  </div>
+                </Link>
+                <button
+                  onClick={async () => {
+                    const eventId = crypto.randomUUID();
+                    if (typeof window !== "undefined" && window.fbq) {
+                      window.fbq(
+                        "track",
+                        "Lead",
+                        {
+                          content_name: property.name,
+                          content_category: "WhatsApp Contact",
+                          value: Number(property.rate) || 0,
+                          currency: "PKR",
+                        },
+                        {
+                          eventID: eventId,
+                        }
+                      );
+                    }
+
+                    try {
+                      await fetch("/api/meta-events", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          event_name: "Lead",
+                          event_id: eventId,
+                          event_time: Math.floor(Date.now() / 1000),
+                          event_source_url: window.location.href,
+                          user_data: {
+                            client_user_agent: navigator.userAgent,
+                          },
+                          custom_data: {
+                            content_name: property.name,
+                            content_category: "WhatsApp Contact",
+                            value: Number(property.rate) || 0,
+                            currency: "PKR",
+                          },
+                        }),
+                      });
+                    } catch (error) {
+                      console.error("Failed to send CAPI event:", error);
+                    }
+
+                    window.open(
+                      `https://wa.me/+923344111778?text=${encodeURIComponent(
+                        `I'm interested in ${property.name}`
+                      )}`,
+                      "_blank"
+                    );
+                  }}
+                  className="py-2.5 px-4 border border-black/10 dark:border-white/10 text-slate-800 dark:text-slate-200 rounded-xl w-full block text-center hover:bg-black/5 dark:hover:bg-white/5 transition duration-200 font-bold shadow-sm text-sm"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Icon icon="ph:whatsapp-logo-fill" width={18} height={18} className="text-emerald-600 dark:text-emerald-400" />
+                    WhatsApp
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-12 gap-8">
           <div className="lg:col-span-8 col-span-12 space-y-8">
-            <div className="bg-white dark:bg-gray-900 rounded-xl p-8 border border-gray-200 dark:border-gray-800 shadow-sm">
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
-                Property Overview
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {property.beds !== null && (
-                  <div className="flex flex-col items-center text-center p-5 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-amber-200 dark:hover:border-amber-900/50 transition-colors">
-                    <Icon
-                      icon="ph:bed"
-                      width={32}
-                      height={32}
-                      className="text-amber-600 dark:text-amber-500 mb-3"
-                    />
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {property.beds}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      Bedroom{property.beds !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                )}
-                {property.baths !== null && (
-                  <div className="flex flex-col items-center text-center p-5 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-amber-200 dark:hover:border-amber-900/50 transition-colors">
-                    <Icon
-                      icon="ph:bathtub"
-                      width={32}
-                      height={32}
-                      className="text-amber-600 dark:text-amber-500 mb-3"
-                    />
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {property.baths}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      Bathroom{property.baths !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                )}
-                <div className="flex flex-col items-center text-center p-5 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-amber-200 dark:hover:border-amber-900/50 transition-colors">
-                  <Icon
-                    icon="ph:ruler"
-                    width={32}
-                    height={32}
-                    className="text-amber-600 dark:text-amber-500 mb-3"
-                  />
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {property.area}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {property.area_unit || "Area"}
-                  </p>
-                </div>
-                <div className="flex flex-col items-center text-center p-5 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-amber-200 dark:hover:border-amber-900/50 transition-colors">
-                  <Icon
-                    icon="ph:house"
-                    width={32}
-                    height={32}
-                    className="text-amber-600 dark:text-amber-500 mb-3"
-                  />
-                  <p className="text-lg font-bold text-gray-900 dark:text-white capitalize">
-                    {property.property_type.replace(/-/g, " ")}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Type
-                  </p>
-                </div>
-              </div>
-            </div>
 
             {property.constructed_covered_area && (
               <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-amber-200 dark:border-amber-900/50">
@@ -381,29 +507,93 @@ export default function Details() {
               </div>
             )}
 
+            {/* Mobile-only Property Details (Shown above Features & Amenities on phone) */}
+            <div className="lg:hidden border border-gray-200 dark:border-gray-800 p-4 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
+              <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3">
+                Property Details
+              </h4>
+              <div className="space-y-1">
+                {property.property_type && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-500 text-xs font-medium">Type</span>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white capitalize">
+                      {property.property_type.replace(/-/g, " ")}
+                    </span>
+                  </div>
+                )}
+                {property.is_sold ? (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-500 text-xs font-medium">Status</span>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">Sold</span>
+                  </div>
+                ) : property.purpose ? (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-500 text-xs font-medium">Purpose</span>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">For {property.purpose}</span>
+                  </div>
+                ) : null}
+                {property.city && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-500 text-xs font-medium">City</span>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">{property.city}</span>
+                  </div>
+                )}
+                {property.phase && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-500 text-xs font-medium">Phase</span>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">{property.phase}</span>
+                  </div>
+                )}
+                {property.sector && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-500 text-xs font-medium">Sector</span>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">{property.sector}</span>
+                  </div>
+                )}
+                {property.street && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="text-gray-500 text-xs font-medium">Street</span>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">{property.street}</span>
+                  </div>
+                )}
+                {property.created_at && (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-500 text-xs font-medium">Listed</span>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">
+                      {new Date(property.created_at).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {property.features && Object.keys(property.features).length > 0 && (
-              <div className="bg-white dark:bg-gray-900 rounded-xl p-8 border border-gray-200 dark:border-gray-800">
-                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+              <div className="bg-white dark:bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-800">
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-3 md:mb-5">
                   Features & Amenities
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                   {Object.entries(property.features).map(([key, value]) => (
                     <div
                       key={key}
-                      className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800"
+                      className="flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800"
                     >
                       <Icon
                         icon="ph:check-circle-fill"
-                        width={20}
-                        height={20}
+                        width={16}
+                        height={16}
                         className="text-amber-600 dark:text-amber-500 flex-shrink-0"
                       />
                       <div>
-                        <p className="text-base font-medium text-gray-900 dark:text-white capitalize">
+                        <p className="text-xs md:text-sm font-medium text-gray-900 dark:text-white capitalize">
                           {key.replace(/_/g, " ")}
                         </p>
                         {typeof value !== "boolean" && (
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                          <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400">
                             {String(value)}
                           </p>
                         )}
@@ -466,99 +656,76 @@ export default function Details() {
           </div>
 
           <div className="lg:col-span-4 col-span-12 space-y-6">
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-xl   ">
-              <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">
-                Price
-              </p>
-              <h4 className="text-gray-900 dark:text-white text-4xl font-bold mb-1">
-                {formatNumberShort(Number(property.rate))}
+            {/* Compact Property Overview Widget (Desktop Only) */}
+            <div className="hidden lg:block border border-gray-200 dark:border-gray-800 p-4 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
+              <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
+                Property Overview
               </h4>
-              <div className="h-1 w-16 bg-amber-500 rounded-full mt-3"></div>
-            </div>
-
-            <div className="bg-white p-8 rounded-xl relative overflow-hidden">
-              <div className="relative z-10">
-                <h4 className="text-gray-900 text-2xl font-bold mb-2">
-                  Interested?
-                </h4>
-                <p className="text-gray-600 text-sm mb-6">
-                  Contact us for more details
-                </p>
-                <button
-                  onClick={async () => {
-                    // Generate a unique event ID for deduplication
-                    const eventId = crypto.randomUUID();
-
-                    // Send event to Meta Pixel (browser-side)
-                    if (typeof window !== "undefined" && window.fbq) {
-                      window.fbq(
-                        "track",
-                        "Lead",
-                        {
-                          content_name: property.name,
-                          content_category: "WhatsApp Contact",
-                          value: Number(property.rate) || 0,
-                          currency: "PKR",
-                        },
-                        {
-                          eventID: eventId, // Same ID for deduplication
-                        }
-                      );
-                    }
-
-                    // Send event to server for CAPI
-                    try {
-                      await fetch("/api/meta-events", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          event_name: "Lead",
-                          event_id: eventId, // Same ID for deduplication
-                          event_time: Math.floor(Date.now() / 1000),
-                          event_source_url: window.location.href, // Current page URL
-                          user_data: {
-                            client_user_agent: navigator.userAgent,
-                          },
-                          custom_data: {
-                            content_name: property.name,
-                            content_category: "WhatsApp Contact",
-                            value: Number(property.rate) || 0,
-                            currency: "PKR",
-                          },
-                        }),
-                      });
-                    } catch (error) {
-                      console.error("Failed to send CAPI event:", error);
-                    }
-
-                    // Open WhatsApp
-                    window.open(
-                      `https://wa.me/+923344111778?text=${encodeURIComponent(
-                        `I'm interested in ${property.name}`
-                      )}`,
-                      "_blank"
-                    );
-                  }}
-                  className="py-3.5 px-6 bg-white text-gray-900 rounded-lg w-full block text-center hover:bg-amber-50 hover:text-amber-600 transition-colors duration-300 font-semibold mb-3"
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <Icon icon="ph:whatsapp-logo-fill" width={22} height={22} />
-                    WhatsApp
+              <div className="grid grid-cols-2 gap-2.5">
+                {property.beds !== null && (
+                  <div className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-850 hover:border-amber-200 dark:hover:border-amber-900/50 transition-colors">
+                    <Icon
+                      icon="ph:bed"
+                      width={18}
+                      height={18}
+                      className="text-amber-600 dark:text-amber-500 shrink-0"
+                    />
+                    <div>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Beds</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mt-0.5">
+                        {property.beds}
+                      </p>
+                    </div>
                   </div>
-                </button>
-                <Link
-                  href="tel:+923344111778"
-                  className="py-3.5 px-6 bg-gray-100 text-gray-900 rounded-lg w-full block text-center hover:bg-gray-200 transition-colors duration-300 font-semibold"
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <Icon icon="ph:phone-fill" width={22} height={22} />
-                    Call Now
+                )}
+                {property.baths !== null && (
+                  <div className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-850 hover:border-amber-200 dark:hover:border-amber-900/50 transition-colors">
+                    <Icon
+                      icon="ph:bathtub"
+                      width={18}
+                      height={18}
+                      className="text-amber-600 dark:text-amber-500 shrink-0"
+                    />
+                    <div>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Baths</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mt-0.5">
+                        {property.baths}
+                      </p>
+                    </div>
                   </div>
-                </Link>
+                )}
+                <div className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-850 hover:border-amber-200 dark:hover:border-amber-900/50 transition-colors">
+                  <Icon
+                    icon="ph:ruler"
+                    width={18}
+                    height={18}
+                    className="text-amber-600 dark:text-amber-500 shrink-0"
+                  />
+                  <div>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Area</p>
+                    <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mt-0.5 truncate max-w-[80px]">
+                      {property.area} {property.area_unit || "Sq Ft"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-850 hover:border-amber-200 dark:hover:border-amber-900/50 transition-colors">
+                  <Icon
+                    icon="ph:house"
+                    width={18}
+                    height={18}
+                    className="text-amber-600 dark:text-amber-500 shrink-0"
+                  />
+                  <div>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Type</p>
+                    <p className="text-xs font-bold text-gray-900 dark:text-white leading-none mt-0.5 capitalize truncate max-w-[80px]">
+                      {property.property_type.replace(/-/g, " ")}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="border border-gray-200 dark:border-gray-800 p-6 rounded-xl bg-white dark:bg-gray-900">
+            <div className="hidden lg:block border border-gray-200 dark:border-gray-800 p-6 rounded-xl bg-white dark:bg-gray-900">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-5">
                 Property Details
               </h4>
@@ -655,5 +822,7 @@ export default function Details() {
         </div>
       </div>
     </section>
+
+  </>
   );
 }
