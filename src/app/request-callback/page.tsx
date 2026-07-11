@@ -125,8 +125,8 @@ export default function RequestCallbackPage() {
       // Browser-side Pixel (Stape CAPIG automatically routes this to the server-side Conversions API)
       if (typeof window !== "undefined" && window.fbq) {
         window.fbq(
-          "track",
-          "Lead",
+          "trackCustom",
+          "Form Submit",
           {
             content_name: "Call Back Request",
             content_category: "Landing Page Lead",
