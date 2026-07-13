@@ -17,43 +17,93 @@ import {
   ArrowRightEndOnRectangleIcon,
   NewspaperIcon,
   EnvelopeIcon,
+  UserGroupIcon,
+  BellIcon,
 } from "@heroicons/react/24/outline";
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-interface SidebarItem {
-  name: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: number;
-}
-
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<{ id: string; email: string; name: string; role: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = useState<{ id: string; title: string; message: string; is_read: boolean; created_at: string }[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated) {
+            setProfile(data.user);
+          } else {
+            router.push("/admin/login");
+          }
+        } else {
+          router.push("/admin/login");
+        }
+      } catch (err) {
+        console.error("Failed to load session profile:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    getUser();
-  }, [supabase.auth]);
+    fetchProfile();
+  }, [router]);
 
   useEffect(() => {
-    // Check for saved dark mode preference
+    if (!profile) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("crm_notifications")
+          .select("*")
+          .eq("user_id", profile.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        if (!error && data) {
+          setNotifications(data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchNotifications();
+
+    const channel = supabase
+      .channel("crm-notifications-channel")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "crm_notifications",
+          filter: `user_id=eq.${profile.id}`,
+        },
+        (payload) => {
+          setNotifications((prev) => [payload.new as any, ...prev].slice(0, 10));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile, supabase]);
+
+  useEffect(() => {
     const savedDarkMode = localStorage.getItem("darkMode") === "true";
     setDarkMode(savedDarkMode);
     if (savedDarkMode) {
@@ -78,53 +128,69 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   };
 
-  const sidebarItems: SidebarItem[] = [
+  const markAsRead = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("crm_notifications")
+        .update({ is_read: true })
+        .eq("id", id);
+      if (!error) {
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const isAdmin = profile?.role === "admin";
+
+  const sidebarItems = [
     {
       name: "Dashboard",
       href: "/admin/dashboard",
       icon: HomeIcon,
     },
+    ...(isAdmin
+      ? [
+          {
+            name: "Properties",
+            href: "/admin/properties",
+            icon: BuildingOfficeIcon,
+          },
+          {
+            name: "Create Property",
+            href: "/admin/properties/create",
+            icon: PlusIcon,
+          },
+          {
+            name: "Testimonials",
+            href: "/admin/testimonials",
+            icon: UserCircleIcon,
+          },
+          {
+            name: "Teams",
+            href: "/admin/team",
+            icon: UserCircleIcon,
+          },
+          {
+            name: "Blogs",
+            href: "/admin/blogs",
+            icon: NewspaperIcon,
+          },
+          {
+            name: "CRM Agents",
+            href: "/admin/agents",
+            icon: UserGroupIcon,
+          },
+        ]
+      : []),
     {
-      name: "Properties",
-      href: "/admin/properties",
-      icon: BuildingOfficeIcon,
-      // badge: 12,
-    },
-    {
-      name: "Create Property",
-      href: "/admin/properties/create",
-      icon: PlusIcon,
-    },
-    {
-      name: "Testimonials",
-      href: "/admin/testimonials",
-      icon: UserCircleIcon,
-    },
-    {
-      name: "Teams",
-      href: "/admin/team",
-      icon: UserCircleIcon,
-    },
-    {
-      name: "Blogs",
-      href: "/admin/blogs",
-      icon: NewspaperIcon,
-    },
-    {
-      name: "Leads",
+      name: "Leads CRM",
       href: "/admin/leads",
       icon: EnvelopeIcon,
     },
-    // {
-    //   name: "Analytics",
-    //   href: "/admin/analytics",
-    //   icon: ChartBarIcon,
-    // },
-    // {
-    //   name: "Settings",
-    //   href: "/admin/settings",
-    //   icon: Cog6ToothIcon,
-    // },
   ];
 
   if (loading) {
@@ -151,7 +217,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         darkMode ? "dark" : ""
       }`}
     >
-      {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-50 lg:hidden bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
@@ -159,7 +224,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         />
       )}
 
-      {/* Sidebar */}
       <div
         className={`
         ${
@@ -175,7 +239,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         border-r border-gray-200 dark:border-gray-700
       `}
       >
-        {/* Sidebar Header */}
         <div className="flex items-center justify-between h-16 px-6 bg-primary">
           {!sidebarCollapsed && (
             <h1 className="text-white text-xl font-bold tracking-tight">
@@ -196,7 +259,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="mt-8 px-4 space-y-2">
           {sidebarItems.map((item, index) => {
             const isActive = pathname === item.href;
@@ -214,10 +276,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   }
                 `}
                 onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  animationDelay: `${index * 100}ms`,
-                  animation: `slideIn 0.5s ease-out forwards`,
-                }}
               >
                 <item.icon
                   className={`
@@ -230,32 +288,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   }
                 `}
                 />
-                {!sidebarCollapsed && (
-                  <>
-                    <span className="flex-1">{item.name}</span>
-                    {item.badge && (
-                      <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full animate-pulse">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
+                {!sidebarCollapsed && <span className="flex-1">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
-        {/* User Section */}
         {!sidebarCollapsed && (
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900">
             <div className="flex items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
               <UserCircleIcon className="h-10 w-10 text-gray-400 dark:text-gray-300" />
               <div className="ml-3 flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {user?.email}
+                  {profile?.name}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Administrator
+                <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                  {profile?.role === "admin" ? "Administrator" : "Agent"}
                 </p>
               </div>
             </div>
@@ -263,12 +311,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         )}
       </div>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top navigation */}
         <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="flex-1 px-4 flex justify-between items-center sm:px-6">
-            {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="lg:hidden p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -276,23 +321,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Bars3Icon className="h-6 w-6" />
             </button>
 
-            {/* Search */}
-            <div className="flex-1 max-w-lg mx-4 lg:mx-8">
-              {/* <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white text-sm transition-colors"
-                  placeholder="Search properties, users, or content..."
-                />
-              </div> */}
-            </div>
+            <div className="flex-1 max-w-lg mx-4 lg:mx-8"></div>
 
-            {/* Right side actions */}
             <div className="flex items-center space-x-4">
-              {/* Dark mode toggle */}
               <button
                 onClick={toggleDarkMode}
                 className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -304,15 +335,66 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 )}
               </button>
 
-              {/* Notifications */}
-              {/* <button className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative">
-                <BellIcon className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs font-semibold text-white">3</span>
-                </span>
-              </button> */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
+                >
+                  <BellIcon className="h-5 w-5" />
+                  {notifications.filter((n) => !n.is_read).length > 0 && (
+                    <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full animate-ping"></span>
+                  )}
+                </button>
 
-              {/* Logout */}
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                    <div className="p-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+                      <span className="font-semibold text-sm">Notifications</span>
+                      {notifications.filter((n) => !n.is_read).length > 0 && (
+                        <span className="text-xs bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded-full font-medium">
+                          {notifications.filter((n) => !n.is_read).length} New
+                        </span>
+                      )}
+                    </div>
+                    <div className="max-h-64 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+                      {notifications.length > 0 ? (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            onClick={() => {
+                              markAsRead(notif.id);
+                              setShowNotifications(false);
+                            }}
+                            className={`p-3 text-left transition-colors cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                              !notif.is_read ? "bg-amber-50/50 dark:bg-amber-950/10" : ""
+                            }`}
+                          >
+                            <p className="text-xs font-semibold text-gray-900 dark:text-white">
+                              {notif.title}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
+                              {notif.message}
+                            </p>
+                            <span className="text-[10px] text-gray-400 mt-1 block">
+                              {new Date(notif.created_at).toLocaleDateString([], {
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center py-6 text-xs text-gray-500">
+                          No notifications yet.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={handleLogout}
                 className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-200 hover:shadow-md transform hover:scale-105"
@@ -324,17 +406,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </div>
 
-        {/* Main content area */}
         <main className="flex-1 w-full">
           <div className="py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div
-                style={{
-                  animation: "fadeInUp 0.8s ease-out forwards",
-                }}
-              >
-                {children}
-              </div>
+              <div>{children}</div>
             </div>
           </div>
         </main>
