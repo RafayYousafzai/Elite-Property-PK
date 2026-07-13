@@ -58,14 +58,6 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Meta CAPI Gateway (via Stape) */}
-        <Script id="meta-capi-gateway" strategy="afterInteractive">
-          {`
-            fbq('set', 'autoConfig', false, '1763559634157665');
-            fbq('set', 'endpoint', 'https://capig.stape.pm');
-            fbq('set', 'test_event_code', 'TEST90746', '1763559634157665');
-          `}
-        </Script>
 
         <noscript>
           <img
