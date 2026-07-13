@@ -24,7 +24,7 @@ export default function RootLayout({
   session: unknown;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Meta Pixel Code */}
         <Script id="facebook-pixel" strategy="afterInteractive">

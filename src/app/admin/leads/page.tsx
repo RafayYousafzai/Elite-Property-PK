@@ -31,6 +31,7 @@ import {
   UserIcon,
   ClockIcon,
   ChatBubbleLeftRightIcon,
+  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import {
   getAllLeads,
@@ -72,19 +73,15 @@ interface Note {
 const STAGES = [
   "New",
   "Contacted",
-  "Meeting Scheduled",
-  "Proposal Sent",
-  "Closed Won",
-  "Closed Lost",
+  "Won",
+  "Lost",
 ];
 
-const STAGE_COLORS: Record<string, "warning" | "primary" | "secondary" | "info" | "success" | "danger"> = {
+const STAGE_COLORS: Record<string, "warning" | "primary" | "success" | "danger"> = {
   New: "warning",
   Contacted: "primary",
-  "Meeting Scheduled": "secondary",
-  "Proposal Sent": "info" as any, // fallback colors
-  "Closed Won": "success",
-  "Closed Lost": "danger",
+  Won: "success",
+  Lost: "danger",
 };
 
 export default function LeadsPage() {
@@ -94,6 +91,13 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
   
+  // Real-time Filtering & Search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterPreset, setFilterPreset] = useState<"all" | "my" | "unassigned">("all");
+
+  // Local storage priority stars
+  const [starredLeads, setStarredLeads] = useState<Record<string, boolean>>({});
+
   // Modals state
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -106,19 +110,31 @@ export default function LeadsPage() {
 
   useEffect(() => {
     fetchInitialData();
+    try {
+      const stored = localStorage.getItem("crm_starred_leads");
+      if (stored) setStarredLeads(JSON.parse(stored));
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
+
+  const toggleStar = (leadId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updated = { ...starredLeads, [leadId]: !starredLeads[leadId] };
+    setStarredLeads(updated);
+    localStorage.setItem("crm_starred_leads", JSON.stringify(updated));
+    toast.success(updated[leadId] ? "Lead prioritized" : "Priority removed");
+  };
 
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      // 1. Fetch current profile
       const authRes = await fetch("/api/auth/me");
       if (authRes.ok) {
         const authData = await authRes.json();
         if (authData.authenticated) {
           setProfile(authData.user);
           
-          // 2. Fetch leads
           const leadsRes = await getAllLeads();
           if (leadsRes.success && leadsRes.data) {
             setLeads(leadsRes.data as Lead[]);
@@ -126,7 +142,6 @@ export default function LeadsPage() {
             toast.error(leadsRes.error || "Failed to load leads");
           }
 
-          // 3. Fetch agents if admin
           if (authData.user.role === "admin") {
             const agentsRes = await getAllAgents();
             if (agentsRes.success && agentsRes.data) {
@@ -164,13 +179,11 @@ export default function LeadsPage() {
     setDeleteId(null);
   };
 
-  const openDeleteModal = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const openDeleteModal = (id: string) => {
     setDeleteId(id);
     onDeleteOpen();
   };
 
-  // Drag and Drop Handlers
   const handleDragStart = (e: React.DragEvent, id: string) => {
     e.dataTransfer.setData("text/plain", id);
   };
@@ -183,7 +196,6 @@ export default function LeadsPage() {
     e.preventDefault();
     const id = e.dataTransfer.getData("text/plain");
     
-    // Optimistic UI update
     const previousLeads = [...leads];
     setLeads((prev) =>
       prev.map((l) => (l.id === id ? { ...l, status: targetStatus } : l))
@@ -191,18 +203,18 @@ export default function LeadsPage() {
 
     const result = await updateLeadStatus(id, targetStatus);
     if (result.success) {
-      toast.success("Lead stage updated!");
+      toast.success(`Moved to ${targetStatus}`);
       refreshLeads();
     } else {
-      toast.error(result.error || "Failed to update lead stage");
-      setLeads(previousLeads); // Revert
+      toast.error(result.error || "Failed to update stage");
+      setLeads(previousLeads);
     }
   };
 
   const handleStatusChange = async (leadId: string, newStatus: string) => {
     const result = await updateLeadStatus(leadId, newStatus);
     if (result.success) {
-      toast.success(`Moved lead to ${newStatus}`);
+      toast.success(`Moved to ${newStatus}`);
       if (selectedLead && selectedLead.id === leadId) {
         setSelectedLead({ ...selectedLead, status: newStatus });
       }
@@ -246,7 +258,7 @@ export default function LeadsPage() {
     if (result.success && result.data) {
       setNotes((prev) => [...prev, result.data as Note]);
       setNewNote("");
-      toast.success("Note added");
+      toast.success("Note logged");
     } else {
       toast.error(result.error || "Failed to save note");
     }
@@ -255,155 +267,261 @@ export default function LeadsPage() {
 
   const isAdmin = profile?.role === "admin";
 
+  const filteredLeads = leads.filter((lead) => {
+    const searchMatch =
+      lead.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.phone_number.includes(searchQuery) ||
+      lead.looking_for.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (!searchMatch) return false;
+
+    if (filterPreset === "my") {
+      return lead.assigned_to === profile?.id;
+    }
+    if (filterPreset === "unassigned") {
+      return !lead.assigned_to;
+    }
+    return true;
+  });
+
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        {/* Header Section */}
+      <div className="space-y-6 max-w-[1600px] mx-auto px-4 py-2">
+        
+        {/* Minimal Header Toolbar matches mockup exactly */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <EnvelopeIcon className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                Leads CRM
-              </h1>
-              <p className="mt-1 text-gray-600 dark:text-gray-400">
-                Track client inquiries, assign agents, and monitor pipeline stages
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-extrabold text-zinc-900 dark:text-white font-sans tracking-tight">Leads CRM</h1>
           </div>
-          
-          <div className="flex items-center gap-3">
-            {/* View Mode Toggle */}
-            <div className="flex items-center bg-gray-100 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700">
-              <Button
-                isIconOnly
-                size="sm"
-                variant={viewMode === "kanban" ? "solid" : "light"}
-                color={viewMode === "kanban" ? "warning" : "default"}
-                onPress={() => setViewMode("kanban")}
-                className="rounded-lg font-semibold"
-              >
-                <Squares2X2Icon className="h-4 w-4" />
-              </Button>
-              <Button
-                isIconOnly
-                size="sm"
-                variant={viewMode === "list" ? "solid" : "light"}
-                color={viewMode === "list" ? "warning" : "default"}
-                onPress={() => setViewMode("list")}
-                className="rounded-lg font-semibold"
-              >
-                <QueueListIcon className="h-4 w-4" />
-              </Button>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search Input */}
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <MagnifyingGlassIcon className="h-4 w-4 text-zinc-400" />
+              </span>
+              <input
+                type="text"
+                placeholder="Search leads, phones..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:w-64 pl-9 pr-3.5 py-2 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-250 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-zinc-400 placeholder-zinc-450 font-medium shadow-xs"
+              />
             </div>
 
-            <Button
-              variant="flat"
-              color="warning"
-              size="lg"
-              startContent={<ArrowPathIcon className="h-5 w-5" />}
-              onPress={fetchInitialData}
-              className="font-semibold rounded-xl"
-            >
-              Refresh
-            </Button>
+            {/* Pill Filters */}
+            <div className="flex bg-zinc-200/60 dark:bg-zinc-800/80 p-1 rounded-xl">
+              {([
+                { key: "all", label: "All" },
+                { key: "my", label: "My Leads" },
+                { key: "unassigned", label: "Unassigned" }
+              ] as const).map((preset) => (
+                <button
+                  key={preset.key}
+                  onClick={() => setFilterPreset(preset.key)}
+                  className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    filterPreset === preset.key
+                      ? "bg-zinc-300 dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-xs"
+                      : "text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+
+            {/* View Mode & Refresh */}
+            <div className="flex items-center gap-2">
+              <div className="flex bg-zinc-200/60 dark:bg-zinc-800/80 p-1 rounded-xl">
+                <button
+                  onClick={() => setViewMode("kanban")}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    viewMode === "kanban"
+                      ? "bg-white dark:bg-zinc-750 text-zinc-900 dark:text-white shadow-xs border border-zinc-200/50"
+                      : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  <Squares2X2Icon className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    viewMode === "list"
+                      ? "bg-white dark:bg-zinc-750 text-zinc-900 dark:text-white shadow-xs border border-zinc-200/50"
+                      : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  <QueueListIcon className="h-4 w-4" />
+                </button>
+              </div>
+
+              <button
+                onClick={fetchInitialData}
+                className="p-2.5 bg-white hover:bg-zinc-50 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-650 dark:text-zinc-300 border border-zinc-250 dark:border-zinc-700 rounded-xl shadow-xs transition"
+              >
+                <ArrowPathIcon className="h-4.5 w-4.5" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* CRM Content */}
+        {/* CRM Content Area */}
         {loading ? (
-          <div className="flex justify-center items-center py-20">
+          <div className="flex justify-center items-center py-24">
             <Spinner size="lg" color="warning" />
           </div>
         ) : viewMode === "kanban" ? (
-          /* Kanban Board View */
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-start overflow-x-auto pb-4">
+          
+          /* Kanban Board View - Scrollable columns */
+          <div className="flex overflow-x-auto gap-5 pb-6 snap-x snap-mandatory scrollbar-none select-none outline-none">
             {STAGES.map((stage) => {
-              const stageLeads = leads.filter((l) => l.status === stage);
+              const stageLeads = filteredLeads.filter((l) => l.status === stage);
+              
+              const stageColorClass = 
+                stage === "New" ? "bg-amber-500" :
+                stage === "Contacted" ? "bg-sky-500" :
+                stage === "Won" ? "bg-emerald-500" :
+                "bg-zinc-400";
+
               return (
                 <div
                   key={stage}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, stage)}
-                  className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-4 border border-gray-200/50 dark:border-gray-800 min-w-[220px] flex flex-col min-h-[500px] transition-colors hover:bg-gray-100/50 dark:hover:bg-gray-900/80"
+                  className="bg-[#f4f6f8] dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800/80 w-[290px] sm:w-[320px] shrink-0 snap-start flex flex-col h-fit"
                 >
-                  {/* Column Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-sm text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full bg-${STAGE_COLORS[stage] || "default"}`} />
-                      {stage}
-                    </h3>
-                    <Chip size="sm" variant="flat" color={STAGE_COLORS[stage] || "default"}>
+                  {/* Column Title */}
+                  <div className="flex items-center justify-between mb-4 px-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${stageColorClass}`} />
+                      <span className="font-extrabold text-sm text-zinc-900 dark:text-zinc-200 tracking-tight">
+                        {stage}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-600 bg-zinc-200 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
                       {stageLeads.length}
-                    </Chip>
+                    </span>
                   </div>
 
-                  {/* Column Cards */}
-                  <div className="space-y-3 flex-1 overflow-y-auto">
+                  {/* Cards Feed */}
+                  <div className="space-y-3 flex-1">
                     {stageLeads.map((lead) => {
                       const assignedAgent = agents.find((a) => a.id === lead.assigned_to);
+                      const isStarred = starredLeads[lead.id] || false;
+                      const agentInitials = assignedAgent ? assignedAgent.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "?";
+
                       return (
                         <div
                           key={lead.id}
                           draggable
                           onDragStart={(e) => handleDragStart(e, lead.id)}
                           onClick={() => openDetailsModal(lead)}
-                          className="bg-white dark:bg-gray-850 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 cursor-pointer hover:shadow-md hover:border-amber-500/30 transition-all transform hover:-translate-y-0.5"
+                          className="bg-white dark:bg-zinc-900 p-4 rounded-xl shadow-xs border border-zinc-200 dark:border-zinc-800/60 cursor-grab active:cursor-grabbing hover:shadow-sm hover:border-zinc-350 transition-all flex flex-col gap-3 relative overflow-hidden group"
                         >
-                          <p className="font-bold text-sm text-gray-900 dark:text-white truncate">
-                            {lead.full_name}
-                          </p>
-                          <p className="text-xs text-amber-600 dark:text-amber-500 font-semibold mt-1">
-                            {lead.budget_range}
-                          </p>
-                          
-                          <div className="flex flex-wrap gap-1 mt-2.5">
-                            <Chip size="sm" variant="flat" className="text-[10px] capitalize">
-                              {lead.looking_for}
-                            </Chip>
-                            <Chip size="sm" variant="flat" className="text-[10px] capitalize">
-                              {lead.purpose}
-                            </Chip>
+                          {/* Card Title & Star */}
+                          <div className="flex items-start justify-between gap-3">
+                            <p className="font-bold text-[13px] text-zinc-900 dark:text-white leading-tight">
+                              {lead.full_name}
+                            </p>
+                            <button
+                              onClick={(e) => toggleStar(lead.id, e)}
+                              className="text-zinc-300 hover:text-yellow-450 transition"
+                            >
+                              <span className={`text-sm leading-none ${isStarred ? "text-yellow-455" : ""}`}>
+                                ★
+                              </span>
+                            </button>
                           </div>
 
-                          {/* Agent Assignment Info */}
-                          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-[10px] text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <UserIcon className="h-3 w-3" />
-                              {assignedAgent ? assignedAgent.name : "Unassigned"}
+                          {/* Budget Tag Row */}
+                          <div className="space-y-2">
+                            <div className="text-[11px] text-zinc-500 font-bold flex items-center gap-1.5">
+                              <span>Budget</span>
+                              <span className="inline-flex text-[10px] font-extrabold text-white bg-[#f97316] px-2 py-0.5 rounded-md">
+                                {lead.budget_range}
+                              </span>
+                            </div>
+                            
+                            {/* Option tags */}
+                            <div className="flex flex-wrap gap-1">
+                              <span className="text-[9px] text-zinc-650 bg-zinc-200/60 px-1.5 py-0.5 rounded font-extrabold tracking-wide uppercase">
+                                {lead.looking_for}
+                              </span>
+                              <span className="text-[9px] text-zinc-650 bg-zinc-200/60 px-1.5 py-0.5 rounded font-extrabold tracking-wide uppercase">
+                                {lead.purpose}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Footer User initial avatar & Assigned Agent name */}
+                          <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center gap-2 text-[10px] text-zinc-500 font-bold">
+                            <div
+                              title={assignedAgent ? `Assigned to: ${assignedAgent.name}` : "Unassigned"}
+                              className={`w-5.5 h-5.5 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 ${
+                                assignedAgent 
+                                  ? "bg-zinc-600 text-white" 
+                                  : "bg-zinc-150 dark:bg-zinc-850 text-zinc-500 border border-dashed border-zinc-300 dark:border-zinc-700"
+                              }`}
+                            >
+                              {agentInitials}
+                            </div>
+                            <span className="text-[10px] text-zinc-650 font-bold truncate max-w-[150px]">
+                              {assignedAgent ? `Agent: ${assignedAgent.name}` : "Unassigned"}
                             </span>
+                          </div>
+
+                          {/* Three Buttons Side-by-Side */}
+                          <div className="flex gap-2 items-center">
+                            <a
+                              href={`tel:${lead.phone_number}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex-1 flex items-center justify-center py-2 bg-[#f97316] hover:bg-[#ea580c] text-white rounded-lg text-[11px] font-extrabold shadow-xs transition"
+                            >
+                              Call Client
+                            </a>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDetailsModal(lead);
+                              }}
+                              className="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg text-[11px] font-extrabold shadow-xs transition"
+                            >
+                              Assign
+                            </button>
+
                             {isAdmin && (
-                              <Button
-                                isIconOnly
-                                size="sm"
-                                variant="light"
-                                color="danger"
-                                className="h-5 w-5 min-w-5 p-0"
-                                onPress={(e) => openDeleteModal(lead.id, e)}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openDeleteModal(lead.id);
+                                }}
+                                className="p-2 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 text-red-650 rounded-lg transition"
                               >
-                                <TrashIcon className="h-3.5 w-3.5" />
-                              </Button>
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
                             )}
                           </div>
+
                         </div>
                       );
                     })}
 
                     {stageLeads.length === 0 && (
-                      <div className="border border-dashed border-gray-300 dark:border-gray-800 rounded-xl py-8 text-center text-xs text-gray-400">
-                        Drag leads here
+                      <div className="border border-dashed border-zinc-300 dark:border-zinc-800/60 rounded-xl py-12 text-center text-xs text-zinc-400 select-none bg-white/40">
+                        Drop lead card here
                       </div>
                     )}
                   </div>
+
                 </div>
               );
             })}
           </div>
         ) : (
-          /* List View (Table) */
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+          
+          /* Polished List View Table */
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xs overflow-hidden border border-zinc-200 dark:border-zinc-800">
             <Table
               aria-label="Campaign leads list table"
               classNames={{
@@ -412,48 +530,48 @@ export default function LeadsPage() {
             >
               <TableHeader>
                 <TableColumn>DATE</TableColumn>
-                <TableColumn>NAME</TableColumn>
+                <TableColumn>CLIENT NAME</TableColumn>
                 <TableColumn>BUDGET</TableColumn>
                 <TableColumn>LOOKING FOR</TableColumn>
-                <TableColumn>STATUS</TableColumn>
+                <TableColumn>STATUS STAGE</TableColumn>
                 <TableColumn>ASSIGNED AGENT</TableColumn>
                 <TableColumn>ACTIONS</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No leads received yet.">
-                {leads.map((lead) => {
+              <TableBody emptyContent="No leads match your active filters.">
+                {filteredLeads.map((lead) => {
                   const assignedAgent = agents.find((a) => a.id === lead.assigned_to);
                   return (
                     <TableRow
                       key={lead.id}
-                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+                      className="cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850/60 transition"
                       onClick={() => openDetailsModal(lead)}
                     >
                       <TableCell>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-zinc-500 font-bold">
                           {format(new Date(lead.created_at), "MMM d, yyyy h:mm a")}
                         </span>
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-bold text-sm text-gray-900 dark:text-white">
+                          <p className="font-bold text-sm text-zinc-900 dark:text-white">
                             {lead.full_name}
                           </p>
                           <a
                             href={`tel:${lead.phone_number}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="text-xs font-medium text-amber-600 hover:underline"
+                            className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline"
                           >
                             {lead.phone_number}
                           </a>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Chip size="sm" variant="flat" color="warning" className="font-semibold">
+                        <span className="text-xs font-extrabold text-white bg-[#f97316] px-2.5 py-1 rounded-lg">
                           {lead.budget_range}
-                        </Chip>
+                        </span>
                       </TableCell>
                       <TableCell>
-                        <span className="text-xs capitalize bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-lg">
+                        <span className="text-xs font-bold bg-zinc-150 dark:bg-zinc-800 px-2.5 py-1 rounded-lg capitalize text-zinc-650 dark:text-zinc-300">
                           {lead.looking_for} ({lead.purpose})
                         </span>
                       </TableCell>
@@ -462,7 +580,7 @@ export default function LeadsPage() {
                           size="sm"
                           variant="flat"
                           color={STAGE_COLORS[lead.status] || "default"}
-                          className="font-semibold"
+                          className="font-bold uppercase tracking-wider text-xs"
                         >
                           {lead.status}
                         </Chip>
@@ -473,9 +591,9 @@ export default function LeadsPage() {
                             <select
                               value={lead.assigned_to || "none"}
                               onChange={(e) => handleAgentAssignment(lead.id, e.target.value)}
-                              className="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-1.5 px-2 text-gray-700 dark:text-gray-300"
+                              className="text-xs font-bold rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-850 py-1.5 px-2 text-zinc-700 dark:text-zinc-305 shadow-xs focus:outline-none"
                             >
-                              <option value="none">Assign Agent...</option>
+                              <option value="none">Unassigned</option>
                               {agents.map((agent) => (
                                 <option key={agent.id} value={agent.id}>
                                   {agent.name}
@@ -484,32 +602,29 @@ export default function LeadsPage() {
                             </select>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                          <span className="text-xs text-zinc-700 dark:text-zinc-300 font-extrabold">
                             {assignedAgent ? assignedAgent.name : "Unassigned"}
                           </span>
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                          <Button
-                            size="sm"
-                            variant="flat"
-                            color="warning"
-                            onPress={() => openDetailsModal(lead)}
-                            className="font-semibold"
+                          <button
+                            onClick={() => openDetailsModal(lead)}
+                            className="bg-[#f97316] hover:bg-[#ea580c] text-white font-extrabold text-xs px-3 py-1.5 rounded-lg shadow-xs transition"
                           >
-                            Open Details
-                          </Button>
+                            Details & Logs
+                          </button>
                           {isAdmin && (
-                            <Button
-                              isIconOnly
-                              size="sm"
-                              color="danger"
-                              variant="light"
-                              onPress={(e) => openDeleteModal(lead.id, e)}
+                            <button
+                              className="p-1.5 hover:bg-red-50 dark:hover:bg-red-955/20 text-red-550 rounded-lg transition"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteModal(lead.id);
+                              }}
                             >
                               <TrashIcon className="h-4 w-4" />
-                            </Button>
+                            </button>
                           )}
                         </div>
                       </TableCell>
@@ -520,200 +635,248 @@ export default function LeadsPage() {
             </Table>
           </div>
         )}
-      </div>
-
-      {/* Details & Notes Modal */}
-      <Modal
-        isOpen={isDetailsOpen}
-        onClose={onDetailsClose}
-        size="2xl"
-        scrollBehavior="inside"
-        placement="center"
-      >
-        <ModalContent>
-          {selectedLead && (
-            <>
-              <ModalHeader className="flex flex-col gap-1 border-b border-gray-100 dark:border-gray-800">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold">{selectedLead.full_name}</h2>
-                  <Chip
-                    size="sm"
-                    variant="flat"
-                    color={STAGE_COLORS[selectedLead.status] || "default"}
-                    className="font-bold uppercase tracking-wider"
-                  >
-                    {selectedLead.status}
-                  </Chip>
-                </div>
-                <p className="text-xs text-gray-500 font-normal">
-                  Submitted: {format(new Date(selectedLead.created_at), "MMMM d, yyyy h:mm a")}
+      </div>      {/* Pure Tailwind CSS Custom Modal Overlay */}
+      {isDetailsOpen && selectedLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden w-full max-w-4xl h-auto flex flex-col animate-in zoom-in-95 duration-200">
+            
+            {/* Custom Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900">
+              <div>
+                <h2 className="text-lg font-extrabold text-zinc-950 dark:text-white flex items-center gap-1.5">
+                  {selectedLead.full_name}
+                  {starredLeads[selectedLead.id] && (
+                    <span className="text-yellow-450 text-sm">★</span>
+                  )}
+                </h2>
+                <p className="text-[10px] text-zinc-500 font-semibold mt-0.5">
+                  Received: {format(new Date(selectedLead.created_at), "MMMM d, yyyy h:mm a")}
                 </p>
-              </ModalHeader>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[9px] font-bold text-zinc-650 bg-zinc-150 dark:bg-zinc-800 px-2.5 py-0.5 rounded-full border border-zinc-300/40">
+                  ID: #{selectedLead.id.slice(0, 8)}
+                </span>
+                <button
+                  onClick={onDetailsClose}
+                  className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-250 text-base font-bold p-1 transition"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Split Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-zinc-200 dark:divide-zinc-800">
               
-              <ModalBody className="py-6 space-y-6">
-                {/* Lead Info Summary */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
-                  <div>
-                    <span className="text-[10px] text-gray-500 uppercase tracking-wide block">Phone</span>
-                    <a
-                      href={`tel:${selectedLead.phone_number}`}
-                      className="text-sm font-semibold text-amber-600 hover:underline"
-                    >
-                      {selectedLead.phone_number}
-                    </a>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-gray-500 uppercase tracking-wide block">Budget</span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                      {selectedLead.budget_range}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-gray-500 uppercase tracking-wide block">Looking For</span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
-                      {selectedLead.looking_for}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-gray-500 uppercase tracking-wide block">Purpose</span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
-                      {selectedLead.purpose}
-                    </span>
+              {/* Left Column - Core Info */}
+              <div className="col-span-1 md:col-span-7 p-6 space-y-5">
+                <div>
+                  <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider block mb-2">
+                    Pipeline Progress
+                  </span>
+                  <div className="grid grid-cols-4 gap-1 p-1 bg-zinc-100 dark:bg-zinc-955 rounded-xl border border-zinc-200 dark:border-zinc-800/60 shadow-inner">
+                    {STAGES.map((stage) => {
+                      const isActive = selectedLead.status === stage;
+                      return (
+                        <button
+                          key={stage}
+                          onClick={() => handleStatusChange(selectedLead.id, stage)}
+                          className={`py-1.5 text-xs font-extrabold rounded-lg transition-all text-center ${
+                            isActive
+                              ? "bg-amber-505 text-white shadow-xs bg-amber-500"
+                              : "text-zinc-600 dark:text-zinc-405 hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-white"
+                          }`}
+                        >
+                          {stage}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Status and Agent Modifiers (Side-by-side) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
-                      Lead Stage Status
+                <div className="space-y-3.5">
+                  <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider block">
+                    Lead Details
+                  </span>
+                  <div className="grid grid-cols-2 gap-4 bg-[#f8f9fa] dark:bg-zinc-955/40 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
+                    <div className="space-y-1">
+                      <span className="text-[9px] text-zinc-450 font-bold uppercase tracking-wide block">Phone contact</span>
+                      <a
+                        href={`tel:${selectedLead.phone_number}`}
+                        className="text-xs font-extrabold text-[#f97316] hover:underline"
+                      >
+                        {selectedLead.phone_number}
+                      </a>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <span className="text-[9px] text-zinc-450 font-bold uppercase tracking-wide block">Budget range</span>
+                      <span className="text-xs font-extrabold text-zinc-950 dark:text-white">
+                        {selectedLead.budget_range}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[9px] text-zinc-455 font-bold uppercase tracking-wide block">Interested In</span>
+                      <span className="text-xs font-extrabold text-zinc-955 dark:text-white capitalize">
+                        {selectedLead.looking_for}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[9px] text-zinc-455 font-bold uppercase tracking-wide block">Deal Purpose</span>
+                      <span className="text-xs font-extrabold text-zinc-955 dark:text-white capitalize">
+                        {selectedLead.purpose}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Agent Assignment Modifier */}
+                {isAdmin && (
+                  <div className="space-y-1.5 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                    <label className="text-[9px] text-zinc-500 font-extrabold uppercase tracking-wide block">
+                      Assign CRM Lead Agent
                     </label>
                     <select
-                      value={selectedLead.status}
-                      onChange={(e) => handleStatusChange(selectedLead.id, e.target.value)}
-                      className="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 p-2.5 text-gray-700 dark:text-gray-300 shadow-sm"
+                      value={selectedLead.assigned_to || "none"}
+                      onChange={(e) => handleAgentAssignment(selectedLead.id, e.target.value)}
+                      className="w-full text-xs font-bold rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-850 p-2.5 text-zinc-750 dark:text-zinc-350 shadow-xs focus:outline-none focus:ring-1 focus:ring-zinc-400"
                     >
-                      {STAGES.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
+                      <option value="none">Unassigned (Claimable)</option>
+                      {agents.map((agent) => (
+                        <option key={agent.id} value={agent.id}>
+                          {agent.name}
                         </option>
                       ))}
                     </select>
                   </div>
+                )}
+              </div>
 
-                  {isAdmin && (
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
-                        Assigned CRM Agent
-                      </label>
-                      <select
-                        value={selectedLead.assigned_to || "none"}
-                        onChange={(e) => handleAgentAssignment(selectedLead.id, e.target.value)}
-                        className="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 p-2.5 text-gray-700 dark:text-gray-300 shadow-sm"
-                      >
-                        <option value="none">Unassigned</option>
-                        {agents.map((agent) => (
-                          <option key={agent.id} value={agent.id}>
-                            {agent.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-
-                {/* Notes log section */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
-                    <ChatBubbleLeftRightIcon className="h-5 w-5 text-amber-500" />
-                    <h3 className="font-bold text-sm">Action Notes Log</h3>
+              {/* Right Column - Chatter Timeline */}
+              <div className="col-span-1 md:col-span-5 p-6 bg-zinc-50/50 dark:bg-zinc-955/20 flex flex-col justify-between min-h-[380px] max-h-[460px]">
+                
+                <div className="flex flex-col flex-1 overflow-hidden">
+                  <div className="flex items-center gap-1.5 pb-2 mb-2 border-b border-zinc-200 dark:border-zinc-850">
+                    <ChatBubbleLeftRightIcon className="h-4.5 w-4.5 text-[#f97316]" />
+                    <h3 className="font-extrabold text-[9px] uppercase tracking-wider text-zinc-500">
+                      Chatter Logs Timeline
+                    </h3>
                   </div>
 
-                  {/* Notes Timeline */}
-                  <div className="space-y-4 max-h-48 overflow-y-auto pr-2">
+                  {/* Notes Feed scroll container */}
+                  <div className="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-thin">
                     {notes.length > 0 ? (
-                      notes.map((note) => (
-                        <div
-                          key={note.id}
-                          className="bg-gray-50 dark:bg-gray-900/30 p-3.5 rounded-xl border border-gray-150/40 dark:border-gray-800/80 space-y-1 animate-in fade-in duration-200"
-                        >
-                          <div className="flex justify-between items-center text-[10px]">
-                            <span className="font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                              <UserIcon className="h-3 w-3" />
-                              {note.author_name}
-                            </span>
-                            <span className="text-gray-400 flex items-center gap-1">
-                              <ClockIcon className="h-3 w-3" />
-                              {format(new Date(note.created_at), "MMM d, yyyy h:mm a")}
-                            </span>
+                      notes.map((note) => {
+                        const noteInitials = note.author_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+                        return (
+                          <div
+                            key={note.id}
+                            className="bg-white dark:bg-zinc-900 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800/80 flex items-start gap-2.5 shadow-xs"
+                          >
+                            <div className="w-6.5 h-6.5 rounded-full bg-amber-500/10 text-amber-600 flex items-center justify-center text-[9px] font-bold shrink-0">
+                              {noteInitials}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-center text-[9px] text-zinc-450 font-bold mb-0.5">
+                                <span className="text-zinc-705 dark:text-zinc-350 truncate max-w-[100px]">
+                                  {note.author_name}
+                                </span>
+                                <span className="font-medium">
+                                  {format(new Date(note.created_at), "MMM d, h:mm a")}
+                                </span>
+                              </div>
+                              <p className="text-xs text-zinc-800 dark:text-zinc-300 leading-relaxed font-bold break-words">
+                                {note.note}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
-                            {note.note}
-                          </p>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
-                      <p className="text-center py-6 text-xs text-gray-400">
-                        No internal logs or notes written yet.
-                      </p>
+                      <div className="h-full flex flex-col items-center justify-center py-6 text-center text-xs text-zinc-400 font-bold">
+                        No follow-up action logs registered.
+                      </div>
                     )}
                   </div>
-
-                  {/* Write Note Form */}
-                  <form onSubmit={handleAddNote} className="space-y-3 pt-2">
-                    <Textarea
-                      isRequired
-                      placeholder="Write an action note or follow-up update..."
-                      value={newNote}
-                      onValueChange={setNewNote}
-                      variant="flat"
-                      rows={2}
-                      className="w-full"
-                    />
-                    <div className="flex justify-end">
-                      <Button
-                        type="submit"
-                        color="warning"
-                        size="sm"
-                        isLoading={savingNote}
-                        className="font-semibold text-white px-5 rounded-lg"
-                      >
-                        Add Log Note
-                      </Button>
-                    </div>
-                  </form>
                 </div>
-              </ModalBody>
-              
-              <ModalFooter className="border-t border-gray-100 dark:border-gray-800">
-                <Button variant="light" onPress={onDetailsClose}>
-                  Close CRM Details
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
 
-      {/* Delete Confirmation Modal */}
-      <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
-        <ModalContent>
-          <ModalHeader>Delete Client Lead</ModalHeader>
-          <ModalBody>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                {/* Form 업데이트 */}
+                <form onSubmit={handleAddNote} className="space-y-2 mt-3 pt-2.5 border-t border-zinc-200 dark:border-zinc-800">
+                  <Textarea
+                    isRequired
+                    placeholder="Log client call update..."
+                    value={newNote}
+                    onValueChange={setNewNote}
+                    variant="bordered"
+                    size="sm"
+                    minRows={1.5}
+                    className="w-full text-xs"
+                    classNames={{
+                      input: "text-xs font-semibold",
+                      inputWrapper: "border-zinc-300 dark:border-zinc-750 bg-white dark:bg-zinc-900 focus-within:border-amber-500",
+                    }}
+                  />
+                  <div className="flex justify-end">
+                    <Button
+                      type="submit"
+                      color="warning"
+                      size="sm"
+                      isLoading={savingNote}
+                      className="font-extrabold text-xs text-white px-4 rounded-lg bg-[#f97316] hover:bg-[#ea580c]"
+                    >
+                      Log Update
+                    </Button>
+                  </div>
+                </form>
+
+              </div>
+
+            </div>
+
+            {/* Custom Footer */}
+            <div className="flex justify-end items-center px-6 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900">
+              <button
+                onClick={onDetailsClose}
+                className="bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold text-xs px-5 py-2 rounded-xl shadow-xs transition"
+              >
+                Done Editing
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Pure Tailwind CSS Custom Delete Confirmation Modal Overlay */}
+      {isDeleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden w-full max-w-md h-auto flex flex-col p-6 space-y-4 animate-in zoom-in-95 duration-150">
+            <h3 className="text-base font-extrabold text-zinc-950 dark:text-white">
+              Remove Client Record
+            </h3>
+            <p className="text-zinc-600 dark:text-zinc-400 text-xs leading-relaxed font-bold">
               Are you sure you want to permanently delete this lead record? This action will remove all notes logs and cannot be undone.
             </p>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="light" onPress={onDeleteClose}>
-              Cancel
-            </Button>
-            <Button color="danger" onPress={handleDelete} className="font-semibold">
-              Delete
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <div className="flex justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+              <button
+                onClick={onDeleteClose}
+                className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-850 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 font-extrabold text-xs px-4 py-2 rounded-xl transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition shadow-xs"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
