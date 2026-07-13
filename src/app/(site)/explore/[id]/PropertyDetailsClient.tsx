@@ -29,10 +29,7 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
   useEffect(() => {
     if (!property) return;
 
-    const sendViewContentEvent = async () => {
-      // Generate unique event ID for deduplication
-      const eventId = crypto.randomUUID();
-
+    const sendViewContentEvent = () => {
       // Send to Meta Pixel (browser-side)
       if (typeof window !== "undefined" && window.fbq) {
         window.fbq(
@@ -45,9 +42,6 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
             content_type: "product",
             value: Number(property.rate) || 0,
             currency: "PKR",
-          },
-          {
-            eventID: eventId, // Deduplication ID
           }
         );
       }
@@ -255,7 +249,6 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                   </Link>
                   <button
                     onClick={() => {
-                      const eventId = crypto.randomUUID();
                       if (typeof window !== "undefined" && window.fbq) {
                         window.fbq(
                           "track",
@@ -265,9 +258,6 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                             content_category: "WhatsApp Contact",
                             value: Number(property.rate) || 0,
                             currency: "PKR",
-                          },
-                          {
-                            eventID: eventId,
                           }
                         );
                       }

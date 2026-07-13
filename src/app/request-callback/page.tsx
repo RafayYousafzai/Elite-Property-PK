@@ -125,50 +125,19 @@ export default function RequestCallbackPage() {
         console.warn("⚠️ EmailJS environment variables are not configured. Email submission skipped.");
       }
 
-      // 2. Meta Pixel & Conversions API Tracking
-      const eventId = crypto.randomUUID();
-
-      // Browser-side Pixel
+      // Meta Pixel Tracking
       if (typeof window !== "undefined" && window.fbq) {
         window.fbq(
-          "track",
-          "Lead",
+          "trackCustom",
+          "Form Submit",
           {
             content_name: "Call Back Request",
             content_category: "Landing Page Lead",
             value: 0,
             currency: "PKR",
             predicted_ltv: 0,
-          },
-          {
-            eventID: eventId,
-          },
+          }
         );
-      }
-
-      // Server-side Conversions API (CAPI)
-      try {
-        await fetch("/api/meta-events", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            event_name: "Lead",
-            event_id: eventId,
-            event_time: Math.floor(Date.now() / 1000),
-            event_source_url: window.location.href,
-            user_data: {
-              client_user_agent: navigator.userAgent,
-            },
-            custom_data: {
-              content_name: "Call Back Request",
-              content_category: "Landing Page Lead",
-              value: 0,
-              currency: "PKR",
-            },
-          }),
-        });
-      } catch (error) {
-        console.error("Failed to send Meta CAPI event:", error);
       }
 
       setStatus("success");
