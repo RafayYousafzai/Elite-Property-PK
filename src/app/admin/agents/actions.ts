@@ -49,6 +49,23 @@ export async function createAgent(email: string, password: string, name: string)
       return { success: false, error: "Unauthorized. Admin permissions required." };
     }
 
+    if (password.length < 6) {
+      return { success: false, error: "Password must be at least 6 characters long." };
+    }
+
+    const supabase = await createServerSupabase(cookies());
+
+    // Check if email already exists in crm_users
+    const { data: existingUser } = await supabase
+      .from("crm_users")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (existingUser) {
+      return { success: false, error: "An account with this email address already exists." };
+    }
+
     // Create raw client that doesn't modify admin cookies
     const authClient = createRawSupabase(supabaseUrl, supabaseKey, {
       auth: {
@@ -86,7 +103,9 @@ export async function deleteAgent(agentId: string) {
     }
 
     const supabase = await createServerSupabase(cookies());
-    const { error } = await supabase.from("crm_users").delete().eq("id", agentId);
+    
+    // Call the security definer function via RPC to delete the user from auth.users
+    const { error } = await supabase.rpc("delete_user_by_id", { user_uuid: agentId });
 
     if (error) throw error;
 
@@ -94,6 +113,6 @@ export async function deleteAgent(agentId: string) {
     return { success: true };
   } catch (err: any) {
     console.error("Failed to delete agent:", err);
-    return { success: false, error: err.message };
+    return { success: false, error: err.message || "Failed to delete agent" };
   }
 }

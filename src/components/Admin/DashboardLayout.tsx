@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useMemo } from "react";
 import { User } from "@supabase/supabase-js";
 import {
   HomeIcon,
@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -152,33 +152,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       href: "/admin/dashboard",
       icon: HomeIcon,
     },
+    {
+      name: "Properties",
+      href: "/admin/properties",
+      icon: BuildingOfficeIcon,
+    },
+    {
+      name: "Create Property",
+      href: "/admin/properties/create",
+      icon: PlusIcon,
+    },
+    {
+      name: "Testimonials",
+      href: "/admin/testimonials",
+      icon: UserCircleIcon,
+    },
+    {
+      name: "Teams",
+      href: "/admin/team",
+      icon: UserCircleIcon,
+    },
+    {
+      name: "Blogs",
+      href: "/admin/blogs",
+      icon: NewspaperIcon,
+    },
     ...(isAdmin
       ? [
-          {
-            name: "Properties",
-            href: "/admin/properties",
-            icon: BuildingOfficeIcon,
-          },
-          {
-            name: "Create Property",
-            href: "/admin/properties/create",
-            icon: PlusIcon,
-          },
-          {
-            name: "Testimonials",
-            href: "/admin/testimonials",
-            icon: UserCircleIcon,
-          },
-          {
-            name: "Teams",
-            href: "/admin/team",
-            icon: UserCircleIcon,
-          },
-          {
-            name: "Blogs",
-            href: "/admin/blogs",
-            icon: NewspaperIcon,
-          },
           {
             name: "CRM Agents",
             href: "/admin/agents",

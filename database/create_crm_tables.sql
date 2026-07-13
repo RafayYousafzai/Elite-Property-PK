@@ -16,7 +16,7 @@ CREATE POLICY "Allow authenticated read to crm_users" ON public.crm_users
 
 CREATE POLICY "Allow admin crud to crm_users" ON public.crm_users
     FOR ALL USING (
-        (SELECT role FROM public.crm_users WHERE id = auth.uid()) = 'admin'
+        (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
     );
 
 -- 2. Create function to automatically mirror auth.users into public.crm_users
@@ -119,3 +119,29 @@ CREATE POLICY "Allow users to read their own notifications" ON public.crm_notifi
 
 CREATE POLICY "Allow users to update their own notifications" ON public.crm_notifications
     FOR UPDATE USING (user_id = auth.uid());
+
+-- 6. Create RPC function to allow admins to delete agents from auth.users
+CREATE OR REPLACE FUNCTION public.delete_user_by_id(user_uuid UUID)
+RETURNS VOID AS $$
+BEGIN
+    -- Check if executing user has admin role
+    IF (SELECT role FROM public.crm_users WHERE id = auth.uid()) = 'admin' THEN
+        DELETE FROM auth.users WHERE id = user_uuid;
+    ELSE
+        RAISE EXCEPTION 'Only administrators can delete users.';
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 7. Auto-confirm email addresses for newly registered agents programmatically
+CREATE OR REPLACE FUNCTION public.auto_confirm_user_email()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.email_confirmed_at = COALESCE(NEW.email_confirmed_at, now());
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created_confirm_email
+    BEFORE INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.auto_confirm_user_email();

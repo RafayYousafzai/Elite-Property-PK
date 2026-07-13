@@ -21,7 +21,27 @@ export async function GET() {
       .single();
 
     if (profileError || !profile) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
+      // Auto-create profile in crm_users to prevent redirect loops and lockouts
+      const { data: newProfile, error: insertError } = await supabase
+        .from("crm_users")
+        .insert({
+          id: user.id,
+          email: user.email!,
+          name: user.user_metadata?.name || "Administrator",
+          role: user.user_metadata?.role || "agent", // Sync role from metadata
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("Failed to auto-create crm profile:", insertError);
+        return NextResponse.json({ authenticated: false }, { status: 401 });
+      }
+
+      return NextResponse.json({
+        authenticated: true,
+        user: newProfile,
+      });
     }
 
     return NextResponse.json({
