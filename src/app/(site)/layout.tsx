@@ -1,5 +1,6 @@
 import Header from "@/components/Layout/Header";
 import Footer from "@/components/Layout/Footer";
+import CallbackPopup from "@/components/shared/CallbackPopup";
 import { ReactNode } from "react";
 
 interface SiteLayoutProps {
@@ -11,6 +12,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
     <>
       <Header />
       {children}
+      <CallbackPopup />
       <Footer />
     </>
   );
