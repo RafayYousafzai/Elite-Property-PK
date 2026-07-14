@@ -5,7 +5,9 @@ import { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Blog Grids | Elite Property ",
+  title: "Real Estate Blogs & Insights | Elite Property Exchange",
+  description: "Stay updated with latest real estate market analysis, property investment tips, and trends in DHA Islamabad, DHA Rawalpindi, and surrounding luxury markets.",
+  keywords: ["real estate blog islamabad", "property investment tips pakistan", "dha islamabad updates", "pakistan real estate news"],
 };
 
 const Blog = () => {

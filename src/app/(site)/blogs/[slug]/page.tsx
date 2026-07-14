@@ -14,46 +14,45 @@ export async function generateMetadata({ params }: PageProps) {
   const data = await params;
   const result = await getBlogBySlug(data.slug);
 
-  const siteName = process.env.SITE_NAME || "Elite Property";
-  const authorName = process.env.AUTHOR_NAME || "Elite Property Team";
+  const siteName = "Elite Property Exchange";
+  const authorName = "Elite Property Team";
 
   if (result.success && result.data) {
     const blog = result.data;
-    const metadata = {
-      title: `${blog.title || "Blog Post"} | ${siteName}`,
-      description: blog.excerpt || blog.detail || "",
+    const title = `${blog.title || "Blog Post"} | ${siteName}`;
+    const description = blog.excerpt || blog.detail || "";
+    const coverImage = blog.cover_image || "";
+
+    return {
+      title,
+      description,
       author: blog.author || authorName,
       robots: {
         index: true,
         follow: true,
-        nocache: true,
-        googleBot: {
-          index: true,
-          follow: false,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
+      },
+      openGraph: {
+        title,
+        description,
+        type: "article",
+        publishedTime: blog.published_at,
+        authors: [blog.author || authorName],
+        images: coverImage ? [{ url: coverImage }] : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: coverImage ? [coverImage] : [],
       },
     };
-
-    return metadata;
   } else {
     return {
       title: "Not Found",
       description: "No blog article has been found",
-      author: authorName,
       robots: {
         index: false,
         follow: false,
-        nocache: false,
-        googleBot: {
-          index: false,
-          follow: false,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -69,9 +68,36 @@ export default async function Post({ params }: PageProps) {
 
   const blog = result.data;
   const content = await markdownToHtml(blog.content || "");
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eliteproperty.pk";
+
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": blog.title,
+    "image": blog.cover_image ? [blog.cover_image] : [],
+    "datePublished": blog.published_at || new Date().toISOString(),
+    "dateModified": blog.published_at || new Date().toISOString(),
+    "author": {
+      "@type": "Person",
+      "name": blog.author || "Elite Property Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Elite Property Exchange",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteUrl}/elite-logo-brown.png`
+      }
+    },
+    "description": blog.excerpt || blog.detail || ""
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+      />
       <section className="relative !pt-44 pb-0!">
         <div className="container max-w-8xl mx-auto md:px-0 px-4">
           <div>

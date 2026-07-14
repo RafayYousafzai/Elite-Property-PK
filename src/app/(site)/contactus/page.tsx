@@ -4,7 +4,9 @@ import Link from "next/link";
 import { Metadata } from "next";
 import LocationMap from "@/components/Home/Office";
 export const metadata: Metadata = {
-  title: "Contact Us | Elite Property",
+  title: "Contact Us | Elite Property Exchange",
+  description: "Get in touch with Elite Property Exchange. Contact our expert real estate agents for consultations, bookings, or inquiries in DHA Islamabad.",
+  keywords: ["contact elite property", "dha islamabad real estate office", "real estate agent contact islamabad"],
 };
 
 export default function ContactUs() {

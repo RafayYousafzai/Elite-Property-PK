@@ -64,5 +64,47 @@ export default async function PropertyDetailsPage({ params }: PageProps) {
     notFound();
   }
 
-  return <PropertyDetailsClient property={property} />;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eliteproperty.pk";
+  const mainImage = property.images && property.images.length > 0
+    ? (typeof property.images[0] === "string" ? property.images[0] : property.images[0].src)
+    : "";
+
+  const listingSchema = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    "name": property.name,
+    "description": property.description || `Premium property listing: ${property.name} in DHA Islamabad.`,
+    "url": `${siteUrl}/explore/${property.slug}`,
+    "image": mainImage ? [mainImage] : [],
+    "datePosted": property.created_at || new Date().toISOString(),
+    "offers": {
+      "@type": "Offer",
+      "price": property.rate,
+      "priceCurrency": "PKR",
+      "businessFunction": property.purpose === "rent" ? "http://purl.org/goodrelations/v1#Rent" : "http://purl.org/goodrelations/v1#Sell"
+    },
+    "about": {
+      "@type": "SingleFamilyResidence",
+      "name": property.name,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": property.city || "Islamabad",
+        "addressRegion": "Punjab",
+        "addressCountry": "PK",
+        "streetAddress": property.location
+      },
+      "numberOfBedrooms": property.beds || undefined,
+      "numberOfBathroomsTotal": property.baths || undefined
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
+      />
+      <PropertyDetailsClient property={property} />
+    </>
+  );
 }
