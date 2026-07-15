@@ -46,7 +46,7 @@ export default function HeroSearchBar() {
   // Generate Phase options
   const phases = Array.from({ length: 10 }, (_, i) => ({
     value: `Phase ${i + 1}`,
-    label: `Phase ${i + 1}`,
+    label: `DHA Phase ${i + 1}`,
   }));
 
   const handleSearch = () => {

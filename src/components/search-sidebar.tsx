@@ -212,7 +212,7 @@ export default function SearchSidebar({
                     })
                   }
                 >
-                  {type.value}
+                  DHA {type.value}
                 </Chip>
               ))}
             </div>

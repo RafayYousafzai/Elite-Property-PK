@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Bed, Bath, Maximize, Eye } from "lucide-react";
 import Image from "next/image";
 import { Property } from "@/types/property";
+import { formatLocation } from "@/lib/utils";
 
 interface PropertyCardProps {
   property: Property;
@@ -51,7 +52,7 @@ export default function PropertyCard({ property, type }: PropertyCardProps) {
           </h3>
           <div className="flex items-center gap-1 mt-1 text-muted-foreground">
             <MapPin className="h-4 w-4" />
-            <span className="text-sm">{property.location}</span>
+            <span className="text-sm">{formatLocation(property.location)}</span>
           </div>
         </div>
 

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
-import { cn } from "@/lib/utils";
+import { cn, formatLocation } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { properties } from "@/app/api/property";
@@ -118,7 +118,7 @@ export const ParallaxScroll = ({
                 <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                      <p className="text-sm  mb-1">{property.location}</p>{" "}
+                      <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
                       <p className="text-sm "> {property.area} sqft</p>
                     </div>
 
@@ -152,7 +152,7 @@ export const ParallaxScroll = ({
                 <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                      <p className="text-sm  mb-1">{property.location}</p>{" "}
+                      <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
                       <p className="text-sm "> {property.area} sqft</p>
                     </div>
 
@@ -186,7 +186,7 @@ export const ParallaxScroll = ({
                 <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                      <p className="text-sm  mb-1">{property.location}</p>{" "}
+                      <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
                       {/* <p className="text-sm "> {property.area} sqft</p> */}
                     </div>
 
@@ -221,7 +221,7 @@ export const ParallaxScroll = ({
                   <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
                     <div className="absolute bottom-4 left-4 text-white ">
                       <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                        <p className="text-sm  mb-1">{property.location}</p>{" "}
+                        <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
                         <p className="text-sm "> {property.area} sqft</p>
                       </div>
 

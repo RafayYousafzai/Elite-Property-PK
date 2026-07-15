@@ -7,6 +7,7 @@ import Link from "next/link";
 import ImageCarousel from "@/components/shared/ImageCarousel";
 import GoogleMap from "@/components/shared/GoogleMap";
 import formatNumberShort from "@/lib/formatNumberShort";
+import { formatLocation } from "@/lib/utils";
 
 // Extend Window interface for Meta Pixel
 declare global {
@@ -52,13 +53,24 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
 
   return (
     <>
+      <style>{`
+        @keyframes executive-shake {
+          0%, 85%, 100% { transform: translateX(0); }
+          88%, 92%, 96% { transform: translateX(-2px); }
+          90%, 94%, 98% { transform: translateX(2px); }
+        }
+        .executive-shake-card {
+          animation: executive-shake 5s ease-in-out infinite;
+        }
+      `}</style>
       <section className="!pt-24 md:!pt-44 pb-32 md:pb-20 relative bg-gray-50 dark:bg-gray-950">
         <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
-          <div className="grid grid-cols-12 items-end gap-6 mb-8">
+          <div className="grid grid-cols-12 items-center gap-6 mb-8">
+            {/* Left Column: Title & Location Details */}
             <div className="lg:col-span-8 col-span-12">
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 {property.is_sold ? (
-                  <span className="px-4 py-1.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-500 rounded-lg text-sm font-medium">
+                  <span className="px-4 py-1.5 bg-red-50 dark:bg-red-955/30 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-500 rounded-lg text-sm font-medium">
                     SOLD
                   </span>
                 ) : (
@@ -74,39 +86,79 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                   </span>
                 )}
                 {property.is_featured && (
-                  <span className="px-4 py-1.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-500 rounded-lg text-sm font-medium flex items-center gap-1.5">
+                  <span className="px-4 py-1.5 bg-amber-50 dark:bg-amber-955/30 border border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-500 rounded-lg text-sm font-medium flex items-center gap-1.5">
                     <Icon icon="ph:star-fill" width={14} height={14} />
                     Featured
                   </span>
                 )}
               </div>
+              
               <h1 className="lg:text-4xl text-2xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
                 {property.name}
               </h1>
-              <div className="flex items-start gap-2.5 mb-2">
-                <Icon
-                  icon="ph:map-pin"
-                  width={22}
-                  height={22}
-                  className="text-gray-500 dark:text-gray-400 flex-shrink-0 mt-1"
-                />
-                <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed">
-                  {property.location}
-                </p>
+              
+              <div className="flex flex-row items-center justify-between gap-4 mt-2">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Icon
+                      icon="ph:map-pin"
+                      width={18}
+                      height={18}
+                      className="text-gray-500 dark:text-gray-400 flex-shrink-0"
+                    />
+                    <p className="text-gray-600 dark:text-gray-400 text-sm font-extrabold leading-none">
+                      {formatLocation(property.location)}
+                    </p>
+                  </div>
+                  {property.city && (
+                    <div className="flex items-center gap-2">
+                      <Icon
+                        icon="ph:buildings"
+                        width={16}
+                        height={16}
+                        className="text-gray-500 dark:text-gray-400 flex-shrink-0"
+                      />
+                      <p className="text-gray-500 dark:text-gray-400 text-xs font-semibold leading-none">
+                        {property.city}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Mobile-only Callback Pulse Button */}
+                <div className="lg:hidden block shrink-0">
+                  <Link
+                    href="/request-callback"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#d4af37] hover:bg-[#c19d2f] text-white rounded-xl text-[10px] font-black uppercase tracking-wider shadow-sm hover:shadow-md executive-shake-card"
+                  >
+                    <Icon icon="solar:phone-calling-bold" className="w-3.5 h-3.5" />
+                    <span>Request Call</span>
+                  </Link>
+                </div>
               </div>
-              {property.city && (
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    icon="ph:buildings"
-                    width={20}
-                    height={20}
-                    className="text-gray-500 dark:text-gray-400"
-                  />
-                  <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                    {property.city}
+            </div>
+
+            {/* Right Column: Desktop Callback Panel (lg:col-span-4, hidden on mobile) */}
+            <div className="lg:col-span-4 col-span-12 hidden lg:block">
+              <div className="border border-[#d4af37]/30 dark:border-zinc-800 bg-gradient-to-br from-[#d4af37]/[0.05] to-transparent dark:bg-zinc-900 rounded-2xl p-6 flex flex-col justify-between min-h-[145px] hover:shadow-md transition-all duration-300 executive-shake-card shadow-xs">
+                <div className="space-y-2">
+                  <h4 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight leading-tight uppercase">
+                    Want an Executive Call Back?
+                  </h4>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold leading-relaxed">
+                    Discuss pricing, installment plans, and DHA listings with our executive property experts.
                   </p>
                 </div>
-              )}
+                
+                <div className="pt-4 mt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                  <Link
+                    href="/request-callback"
+                    className="w-full inline-flex items-center justify-center py-2.5 bg-[#d4af37] hover:bg-[#c19d2f] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xs hover:shadow-md hover:scale-[1.01] transition-all duration-150"
+                  >
+                    Request Call Back
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -408,8 +460,10 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                   )}
                   {property.phase && (
                     <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-800">
-                      <span className="text-gray-500 text-xs font-medium">Phase</span>
-                      <span className="text-xs font-bold text-gray-900 dark:text-white">{property.phase}</span>
+                      <span className="text-gray-500 text-xs font-medium">DHA Phase</span>
+                      <span className="text-xs font-bold text-gray-900 dark:text-white">
+                        {property.phase.toLowerCase().startsWith("dha") ? property.phase : `DHA ${property.phase}`}
+                      </span>
                     </div>
                   )}
                   {property.sector && (
@@ -640,10 +694,10 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                   {property.phase && (
                     <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800">
                       <span className="text-gray-600 dark:text-gray-400 text-sm">
-                        Phase
+                        DHA Phase
                       </span>
                       <span className="text-gray-900 dark:text-white font-semibold text-sm">
-                        {property.phase}
+                        {property.phase.toLowerCase().startsWith("dha") ? property.phase : `DHA ${property.phase}`}
                       </span>
                     </div>
                   )}

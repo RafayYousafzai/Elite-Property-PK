@@ -3,6 +3,7 @@ import { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import Link from "next/link";
+import { formatLocation } from "@/lib/utils";
 
 const timeAgo = (dateStr?: string) => {
   if (!dateStr) return "Recently";
@@ -99,7 +100,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, 
               </Link>
               <p className="text-sm font-normal text-black/50 dark:text-white/50 flex items-center gap-1 mt-1">
                 <Icon icon={"ph:map-pin"} width={16} height={16} />
-                {location}
+                {formatLocation(location)}
               </p>
               {property_type && (
                 <p className="text-xs text-black/60 dark:text-white/60 mt-1 capitalize">
@@ -263,7 +264,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, 
             {/* Location */}
             <div className="flex items-center gap-1 text-[10px] text-black/50 dark:text-white/50">
               <Icon icon="ph:map-pin" className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">{location}</span>
+              <span className="truncate">{formatLocation(location)}</span>
             </div>
 
             {/* Specs & Time Row */}

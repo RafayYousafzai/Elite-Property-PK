@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@heroui/react";
 import formatNumberShort from "@/lib/formatNumberShort";
+import { formatLocation } from "@/lib/utils";
 
 interface FeaturedPropertyProps {
   properties: Property[];
@@ -99,7 +100,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
               className="text-dark/50 dark:text-white/50"
             />
             <p className="text-dark/50 dark:text-white/50 text-base">
-              {currentProperty.location}
+              {formatLocation(currentProperty.location)}
             </p>
           </div>
         </div>
@@ -184,7 +185,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                   className="text-dark/50 dark:text-white/50"
                 />
                 <p className="text-dark/50 dark:text-white/50 text-base">
-                  {currentProperty.location}
+                  {formatLocation(currentProperty.location)}
                 </p>
               </div>
             </div>
