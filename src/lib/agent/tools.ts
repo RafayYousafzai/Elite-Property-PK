@@ -17,21 +17,46 @@ async function saveLead(sessionId: string, data: Record<string, any>) {
     return "Supabase credentials not configured.";
   }
 
-  // Ensure default fallback values so NOT NULL constraints in 'leads' table are never violated
+  const cleanUrl = SUPABASE_URL.endsWith("/") ? SUPABASE_URL.slice(0, -1) : SUPABASE_URL;
+
+  // 1. Fetch existing lead details for this session to prevent upsert field overrides
+  let existingData: Record<string, any> = {};
+  try {
+    const fetchRes = await fetch(`${cleanUrl}/rest/v1/elite_chatbot_leads?session_id=eq.${sessionId}`, {
+      method: "GET",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+    });
+    if (fetchRes.ok) {
+      const rows = await fetchRes.json();
+      if (rows && rows.length > 0) {
+        existingData = rows[0];
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to fetch existing lead record for merging:", err);
+  }
+
+  // 2. Merge existing database values with the new incoming updates
+  const merged = {
+    ...existingData,
+    ...clean,
+  };
+
   const leadPayload = {
     session_id: sessionId,
-    full_name: clean.full_name || clean.name || "Chatbot Visitor",
-    phone_number: clean.phone_number || clean.phone || "Pending",
-    budget_range: clean.budget_range || "Pending",
-    purpose: clean.purpose || "Pending",
-    looking_for: clean.looking_for || clean.product_of_interest || "Pending",
-    is_complete: Boolean(clean.is_complete),
+    full_name: merged.full_name || merged.name || null,
+    phone_number: merged.phone_number || merged.phone || null,
+    budget_range: merged.budget_range || null,
+    purpose: merged.purpose || null,
+    looking_for: merged.looking_for || merged.product_of_interest || null,
+    is_complete: Boolean(merged.is_complete),
     updated_at: new Date().toISOString(),
   };
 
-  const cleanUrl = SUPABASE_URL.endsWith("/") ? SUPABASE_URL.slice(0, -1) : SUPABASE_URL;
-
-  // 1. Try upserting to 'elite_chatbot_leads' table
+  // 3. Try upserting to 'elite_chatbot_leads' table
   let res = await fetch(`${cleanUrl}/rest/v1/elite_chatbot_leads?on_conflict=session_id`, {
     method: "POST",
     headers: {
@@ -43,7 +68,7 @@ async function saveLead(sessionId: string, data: Record<string, any>) {
     body: JSON.stringify(leadPayload),
   });
 
-  // 2. Fallback to 'leads' table
+  // 4. Fallback to 'leads' table (using default fallbacks only here to satisfy NOT NULL constraints if table lacks them)
   if (!res.ok) {
     const errText = await res.text();
     console.warn("Primary elite_chatbot_leads save failed, attempting fallback to leads table:", errText);
@@ -57,11 +82,11 @@ async function saveLead(sessionId: string, data: Record<string, any>) {
         Prefer: "return=minimal",
       },
       body: JSON.stringify({
-        full_name: leadPayload.full_name,
-        phone_number: leadPayload.phone_number,
-        budget_range: leadPayload.budget_range,
-        purpose: leadPayload.purpose,
-        looking_for: leadPayload.looking_for,
+        full_name: leadPayload.full_name || "Chatbot Visitor",
+        phone_number: leadPayload.phone_number || "Pending",
+        budget_range: leadPayload.budget_range || "Pending",
+        purpose: leadPayload.purpose || "Pending",
+        looking_for: leadPayload.looking_for || "Pending",
       }),
     });
 
