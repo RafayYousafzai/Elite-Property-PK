@@ -26,6 +26,29 @@ const navigationItems = [
 const Header: React.FC = () => {
   const [sticky, setSticky] = useState(false);
   const [navbarOpen, setNavbarOpen] = useState(false);
+  
+  // Rotating Announcements State
+  const announcements = [
+    { text: "Prime DHA Plots Selling Fast", highlight: "Reserve Yours Today." },
+    { text: "Limited Listings in DHA Phase 2", highlight: "Act Now." },
+    { text: "Don't Miss Out", highlight: "New Listings Added Daily." },
+    { text: "Book a Viewing", highlight: "Before It's Gone." },
+    { text: "High-Demand DHA Properties", highlight: "Inquire Today." }
+  ];
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [announcementFade, setAnnouncementFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnnouncementFade(false);
+      setTimeout(() => {
+        setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
+        setAnnouncementFade(true);
+      }, 500);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -88,13 +111,23 @@ const Header: React.FC = () => {
   const isHomepage = pathname === "/" || pathname === "/about";
 
   return (
-    <header
-      className={`fixed h-20 md:h-24 py-1 z-50 w-full transition-all duration-300 lg:px-0 px-4  ${
-        sticky
-          ? "top-0 bg-white dark:bg-dark shadow-md"
-          : "top-1 bg-transparent "
-      }  ${hidden ? "-translate-y-full" : "translate-y-0 "}`}
-    >
+    <>
+      {/* Top Fixed Announcement Bar */}
+      <div className="fixed top-0 left-0 w-full h-9 bg-zinc-950 dark:bg-black border-b border-[#d4af37]/20 flex items-center justify-center z-[100] px-4 select-none">
+        <div className={`transition-all duration-500 ease-in-out flex items-center gap-1.5 justify-center text-center text-xs md:text-sm tracking-wide ${announcementFade ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+          <span className="text-white/95 font-semibold font-sans">{announcements[announcementIndex].text}</span>
+          <span className="text-white/30 font-light mx-1">—</span>
+          <span className="text-[#d4af37] font-black uppercase tracking-wider text-[11px] md:text-xs">{announcements[announcementIndex].highlight}</span>
+        </div>
+      </div>
+
+      <header
+        className={`fixed h-20 md:h-24 py-1 z-50 w-full transition-all duration-300 lg:px-0 px-4  ${
+          sticky
+            ? "top-9 bg-white dark:bg-dark shadow-md"
+            : "top-10 bg-transparent "
+        }  ${hidden ? "-translate-y-full" : "translate-y-0 "}`}
+      >
       <nav
         className={`w-auto mx-auto max-w-8xl flex items-center justify-between py-0 pt-2 md:py-4 duration-300 ${
           sticky ? " dark:bg-dark top-5 px-4 " : "shadow-none top-0"
@@ -338,7 +371,8 @@ const Header: React.FC = () => {
         </div>
       </nav>
     </header>
-  );
+  </>
+);
 };
 
 export default Header;
