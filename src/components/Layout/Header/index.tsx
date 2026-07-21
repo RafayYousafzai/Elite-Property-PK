@@ -113,19 +113,19 @@ const Header: React.FC = () => {
   return (
     <>
       {/* Top Fixed Announcement Bar */}
-      <div className="fixed top-0 left-0 w-full h-9 bg-zinc-950 dark:bg-black border-b border-[#d4af37]/20 flex items-center justify-center z-[100] px-4 select-none">
-        <div className={`transition-all duration-500 ease-in-out flex items-center gap-1.5 justify-center text-center text-xs md:text-sm tracking-wide ${announcementFade ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+      <div className="fixed top-0 left-0 w-full h-11 bg-zinc-950 dark:bg-black border-b border-[#d4af37]/20 flex items-center justify-center z-[100] px-4 select-none">
+        <div className={`transition-all duration-500 ease-in-out flex items-center gap-1.5 justify-center text-center text-sm md:text-[15px] tracking-wide ${announcementFade ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
           <span className="text-white/95 font-semibold font-sans">{announcements[announcementIndex].text}</span>
           <span className="text-white/30 font-light mx-1">—</span>
-          <span className="text-[#d4af37] font-black uppercase tracking-wider text-[11px] md:text-xs">{announcements[announcementIndex].highlight}</span>
+          <span className="text-[#d4af37] font-black uppercase tracking-wider text-xs md:text-sm">{announcements[announcementIndex].highlight}</span>
         </div>
       </div>
 
       <header
         className={`fixed h-20 md:h-24 py-1 z-50 w-full transition-all duration-300 lg:px-0 px-4  ${
           sticky
-            ? "top-9 bg-white dark:bg-dark shadow-md"
-            : "top-10 bg-transparent "
+            ? "top-11 bg-white dark:bg-dark shadow-md"
+            : "top-12 bg-transparent "
         }  ${hidden ? "-translate-y-full" : "translate-y-0 "}`}
       >
       <nav
