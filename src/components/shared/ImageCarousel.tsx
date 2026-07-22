@@ -24,6 +24,9 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const thumbnailsRef = React.useRef<HTMLDivElement>(null);
 
+  const getImageSrc = (image: string | PropertyImage) =>
+    typeof image === "string" ? image : image?.src;
+
   // Keyboard navigation
   React.useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -88,7 +91,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   };
 
   const lightboxSlides = images.map((image) => ({
-    src: image,
+    src: getImageSrc(image),
   }));
 
   if (!images || images.length === 0) {
@@ -160,8 +163,9 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
       <div className="grid grid-cols-12 gap-6">
         {/* Main Image Carousel - Left Side */}
         <div
-          className={`${photoSphere ? "lg:col-span-8" : "col-span-12"
-            } col-span-12`}
+          className={`${
+            photoSphere ? "lg:col-span-8" : "col-span-12"
+          } col-span-12`}
         >
           <div className="relative group">
             {/* Main Image */}
@@ -170,7 +174,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
               onClick={() => openLightbox(currentIndex)}
             >
               <Image
-                src={images[currentIndex]}
+                src={getImageSrc(images[currentIndex])}
                 alt={`Property Image ${currentIndex + 1}`}
                 width={800}
                 height={500}
@@ -242,13 +246,14 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                   <button
                     key={index}
                     onClick={() => setCurrentIndex(index)}
-                    className={`flex-shrink-0 relative overflow-hidden rounded-lg transition-all duration-300 ${index === currentIndex
+                    className={`flex-shrink-0 relative overflow-hidden rounded-lg transition-all duration-300 ${
+                      index === currentIndex
                         ? "ring-2 ring-primary scale-105"
                         : "hover:scale-105 opacity-70 hover:opacity-100"
-                      }`}
+                    }`}
                   >
                     <Image
-                      src={image}
+                      src={getImageSrc(image)}
                       alt={`Thumbnail ${index + 1}`}
                       width={80}
                       height={60}
