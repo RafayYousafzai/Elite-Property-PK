@@ -53,15 +53,44 @@ export default function ChatWidget() {
 
   const [isEmbedded, setIsEmbedded] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
-  const [bubbleText, setBubbleText] = useState("Looking for DHA or Bahria plots?");
+  const [bubbleText, setBubbleText] = useState(
+    "Looking for DHA or Bahria plots?",
+  );
   const hasAutoOpenedRef = useRef(false);
   const introTimerRef = useRef<number | null>(null);
+  const autoCloseTimerRef = useRef<number | null>(null);
   const bubbleTimerRef = useRef<number | null>(null);
   const bubbleHideTimerRef = useRef<number | null>(null);
   const pickRandomBubbleMessage = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * BUBBLE_MESSAGES.length);
     return BUBBLE_MESSAGES[randomIndex];
   }, []);
+
+  const clearAutoCloseTimer = useCallback(() => {
+    if (autoCloseTimerRef.current) {
+      window.clearTimeout(autoCloseTimerRef.current);
+      autoCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const handleUserInteraction = useCallback(() => {
+    clearAutoCloseTimer();
+  }, [clearAutoCloseTimer]);
+
+  const scheduleAutoClose = useCallback(() => {
+    clearAutoCloseTimer();
+    autoCloseTimerRef.current = window.setTimeout(() => {
+      clearAutoCloseTimer();
+      setIsOpen(false);
+      setShowBubble(false);
+    }, 3000);
+  }, [clearAutoCloseTimer, setIsOpen]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      clearAutoCloseTimer();
+    }
+  }, [messages.length, clearAutoCloseTimer]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -74,11 +103,12 @@ export default function ChatWidget() {
         hasAutoOpenedRef.current = true;
         setIsOpen(true);
         setShowBubble(false);
+        scheduleAutoClose();
       }, 1800);
     }, 0);
 
     return () => window.clearTimeout(setupTimer);
-  }, [setIsOpen]);
+  }, [scheduleAutoClose, setIsOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -104,6 +134,8 @@ export default function ChatWidget() {
     if (!hasAutoOpenedRef.current) {
       return;
     }
+
+    clearAutoCloseTimer();
 
     if (introTimerRef.current) {
       window.clearTimeout(introTimerRef.current);
@@ -149,7 +181,7 @@ export default function ChatWidget() {
     };
 
     scheduleNextBubble();
-  }, [isOpen, pickRandomBubbleMessage]);
+  }, [clearAutoCloseTimer, isOpen, pickRandomBubbleMessage]);
 
   useEffect(() => {
     return () => {
@@ -162,6 +194,9 @@ export default function ChatWidget() {
       if (bubbleHideTimerRef.current) {
         window.clearTimeout(bubbleHideTimerRef.current);
       }
+      if (autoCloseTimerRef.current) {
+        window.clearTimeout(autoCloseTimerRef.current);
+      }
     };
   }, []);
 
@@ -173,7 +208,11 @@ export default function ChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const avatarSrc = avatar_url;
-  const quickPrompts = ["Looking to Buy", "Investment Options", "Request Callback"];
+  const quickPrompts = [
+    "Looking to Buy",
+    "Investment Options",
+    "Request Callback",
+  ];
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -227,6 +266,7 @@ export default function ChatWidget() {
   };
 
   const onSend = (e?: FormEvent) => {
+    handleUserInteraction();
     if (e && e.preventDefault) e.preventDefault();
     if (!input.trim() && !image) return;
 
@@ -261,8 +301,9 @@ export default function ChatWidget() {
     >
       {isOpen && (
         <Card
+          onClick={handleUserInteraction}
           className={`w-[95vw] max-w-105 sm:w-110 md:w-115 ${
-            isMessageEmpty ? "h-72" : "h-160"
+            isMessageEmpty ? "h-56" : "h-160"
           } p-0 rounded-3xl shadow-2xl/10`}
         >
           <ChatHeader
@@ -286,14 +327,17 @@ export default function ChatWidget() {
               isEmptyConversationState={isMessageEmpty}
               quickPrompts={quickPrompts}
               onQuickPromptSelect={(prompt) => {
+                handleUserInteraction();
                 let message = "";
 
                 if (prompt === "Looking to Buy") {
-                  message = "I am looking to buy a property in Pakistan. What options do you have?";
+                  message =
+                    "I am looking to buy a property in Pakistan. What options do you have?";
                 } else if (prompt === "Investment Options") {
                   message = "I want to explore high-ROI investment options.";
                 } else if (prompt === "Request Callback") {
-                  message = "I would like to request a callback from a consultant.";
+                  message =
+                    "I would like to request a callback from a consultant.";
                 } else {
                   message = prompt;
                 }
@@ -314,6 +358,7 @@ export default function ChatWidget() {
             isLoading={isProcessing}
             onImageClear={clearAttachment}
             onImageUpload={(e) => {
+              handleUserInteraction();
               if (e.target.files && e.target.files[0]) {
                 const file = e.target.files[0];
                 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -330,7 +375,10 @@ export default function ChatWidget() {
                 setImage(URL.createObjectURL(file));
               }
             }}
-            onInputChange={(value) => setInput(value)}
+            onInputChange={(value) => {
+              handleUserInteraction();
+              setInput(value);
+            }}
             onInputKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -356,11 +404,10 @@ export default function ChatWidget() {
             }`}
             aria-hidden="true"
           >
-            <div className="relative rounded-[22px] bg-white px-5 py-3 shadow-[0_18px_45px_rgba(0,0,0,0.16)] ring-1 ring-black/5">
-              <p className="whitespace-nowrap text-[18px] leading-none text-[#222]">
+            <div className="relative rounded-[22px] bg-white p-3 ring-1 ring-black/5">
+              <p className="whitespace-nowrap text-small leading-none text-[#222]">
                 {bubbleText}
               </p>
-              <span className="absolute -right-1.25 top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 bg-white ring-1 ring-black/5" />
             </div>
           </div>
 
