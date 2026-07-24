@@ -181,6 +181,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                 width={800}
                 height={500}
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                unoptimized={true}
                 priority
               />
 
@@ -260,6 +261,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                       width={80}
                       height={60}
                       className="w-20 h-16 object-cover"
+                      unoptimized={true}
                       loading="lazy"
                     />
                   </button>

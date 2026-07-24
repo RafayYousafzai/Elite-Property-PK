@@ -6,31 +6,18 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    formats: ["image/avif", "image/webp"],
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-      },
-      {
-        protocol: "https",
-        hostname: "*.unsplash.com",
-      },
       {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
       {
         protocol: "https",
-        hostname: "plus.unsplash.com",
+        hostname: "unsplash.com",
       },
       {
         protocol: "https",
-        hostname: "*.ytimg.com",
-      },
-      {
-        protocol: "https",
-        hostname: "i.ytimg.com",
+        hostname: "ferratisports.com",
       },
       {
         protocol: "https",
@@ -42,7 +29,19 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "ferratisports.com",
+        hostname: "apxliioxqwlepmejxziq.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "eqwshdwdmvfqbeuqknkn.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
       },
     ],
   },
