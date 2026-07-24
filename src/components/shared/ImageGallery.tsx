@@ -4,12 +4,16 @@ import Image from "next/image";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
+import { getImageUrl } from "@/lib/utils";
+
 interface PropertyImage {
-  src: string;
+  src?: string;
+  url?: string;
+  path?: string;
 }
 
 interface ImageGalleryProps {
-  images: PropertyImage[];
+  images: (string | PropertyImage)[];
   maxVisible?: number;
 }
 
@@ -20,8 +24,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const getImageSrc = (image: string | PropertyImage) =>
-    typeof image === "string" ? image : image?.src;
+  const getImageSrc = (image: string | PropertyImage) => getImageUrl(image);
 
   const openLightbox = (index: number) => {
     setLightboxIndex(index);

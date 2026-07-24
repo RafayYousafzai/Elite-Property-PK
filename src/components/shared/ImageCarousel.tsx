@@ -5,13 +5,16 @@ import { Icon } from "@iconify/react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import PhotoSphereViewer from "./PhotoSphereViewer";
+import { getImageUrl } from "@/lib/utils";
 
 interface PropertyImage {
-  src: string;
+  src?: string;
+  url?: string;
+  path?: string;
 }
 
 interface ImageCarouselProps {
-  images: PropertyImage[];
+  images: (string | PropertyImage)[];
   photoSphere?: string | null;
 }
 
@@ -24,8 +27,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const thumbnailsRef = React.useRef<HTMLDivElement>(null);
 
-  const getImageSrc = (image: string | PropertyImage) =>
-    typeof image === "string" ? image : image?.src;
+  const getImageSrc = (image: string | PropertyImage) => getImageUrl(image);
 
   // Keyboard navigation
   React.useEffect(() => {

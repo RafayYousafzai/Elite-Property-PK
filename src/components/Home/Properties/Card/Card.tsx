@@ -3,7 +3,7 @@ import { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatLocation } from "@/lib/utils";
+import { formatLocation, getImageUrl } from "@/lib/utils";
 
 const timeAgo = (dateStr?: string) => {
   if (!dateStr) return "Recently";
@@ -40,13 +40,8 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, 
     created_at,
   } = item;
 
-  // Get the main image URL
-  const mainImage =
-    images && images.length > 0
-      ? typeof images[0] === "string"
-        ? images[0]
-        : images[0].src
-      : "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  // Get the main image URL using robust getImageUrl helper
+  const mainImage = getImageUrl(images && images.length > 0 ? images[0] : null);
 
   const formattedPrice = formatNumberShort(Number(rate)).replace("Rs", "PKR");
 
@@ -76,6 +71,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, 
                 width={440}
                 height={300}
                 priority={priority}
+                unoptimized={true}
                 className="w-full h-72 object-cover rounded-t-2xl group-hover:brightness-50 group-hover:scale-125 transition duration-300 delay-75"
               />
             )}
@@ -200,6 +196,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, 
                   width={180}
                   height={144}
                   priority={priority}
+                  unoptimized={true}
                   className="w-full h-full object-cover"
                 />
               )}

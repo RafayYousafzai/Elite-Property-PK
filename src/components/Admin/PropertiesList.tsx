@@ -18,6 +18,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import formatNumberShort from "@/lib/formatNumberShort";
+import { getImageUrl } from "@/lib/utils";
 
 interface Property {
   id: string;
@@ -286,15 +287,11 @@ export default function PropertiesList({
                       <div className="relative group">
                         <Image
                           className="h-20 w-20 lg:h-24 lg:w-24 rounded-xl object-cover ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-500 transition-all duration-200"
-                          src={
-                            typeof property.images[0] === "string"
-                              ? property.images[0]
-                              : property.images[0]?.src ||
-                                "/images/properties/property1/image-2.jpg"
-                          }
+                          src={getImageUrl(property.images?.[0])}
                           alt={property.name}
                           width={96}
                           height={96}
+                          unoptimized={true}
                         />
                         {property.is_featured && (
                           <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">

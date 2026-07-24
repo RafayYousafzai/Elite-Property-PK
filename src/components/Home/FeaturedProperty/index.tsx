@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@heroui/react";
 import formatNumberShort from "@/lib/formatNumberShort";
-import { formatLocation } from "@/lib/utils";
+import { formatLocation, getImageUrl } from "@/lib/utils";
 
 interface FeaturedPropertyProps {
   properties: Property[];
@@ -117,10 +117,11 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                   currentProperty.images.map((image, index) => (
                     <CarouselItem key={index}>
                       <Image
-                        src={typeof image === "string" ? image : image.src}
+                        src={getImageUrl(image)}
                         alt={currentProperty.name}
                         width={680}
                         height={530}
+                        unoptimized={true}
                         className="rounded-2xl w-none h-[350px] object-cover md:h-540"
                       />
                     </CarouselItem>

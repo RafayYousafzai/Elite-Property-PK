@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Bed, Bath, Maximize, Eye } from "lucide-react";
 import Image from "next/image";
 import { Property } from "@/types/property";
-import { formatLocation } from "@/lib/utils";
+import { formatLocation, getImageUrl } from "@/lib/utils";
 
 interface PropertyCardProps {
   property: Property;
@@ -20,13 +20,11 @@ export default function PropertyCard({ property, type }: PropertyCardProps) {
     <Card className="property-card-hover bg-card border-border overflow-hidden group">
       <div className="relative overflow-hidden">
         <Image
-          src={
-            property.images[0] ||
-            "/placeholder.svg?height=250&width=400&query=luxury property"
-          }
+          src={getImageUrl(property.images?.[0])}
           alt={property.name}
           width={400}
           height={250}
+          unoptimized={true}
           className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute top-3 left-3">

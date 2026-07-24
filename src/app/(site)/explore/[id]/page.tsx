@@ -3,6 +3,8 @@ import PropertyDetailsClient from "./PropertyDetailsClient";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
+import { getImageUrl } from "@/lib/utils";
+
 type PageProps = {
   params: Promise<{ id: string }>;
 };
@@ -27,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${property.name} | ${siteName}`;
   const description = property.description || `Explore ${property.name} in DHA Islamabad. Premium listings by Elite Property Exchange.`;
   const mainImage = property.images && property.images.length > 0
-    ? (typeof property.images[0] === "string" ? property.images[0] : property.images[0].src)
+    ? getImageUrl(property.images[0])
     : undefined;
 
   return {
@@ -66,7 +68,7 @@ export default async function PropertyDetailsPage({ params }: PageProps) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eliteproperty.pk";
   const mainImage = property.images && property.images.length > 0
-    ? (typeof property.images[0] === "string" ? property.images[0] : property.images[0].src)
+    ? getImageUrl(property.images[0])
     : "";
 
   const listingSchema = {
