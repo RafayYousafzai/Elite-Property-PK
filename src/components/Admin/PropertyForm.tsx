@@ -335,6 +335,44 @@ export default function PropertyForm({
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const compressImageFile = (file: File, maxWidth = 1920, quality = 0.82): Promise<Blob> => {
+    return new Promise((resolve) => {
+      if (!file.type.startsWith("image/")) {
+        return resolve(file);
+      }
+      const img = document.createElement("img");
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob(
+              (blob) => {
+                resolve(blob || file);
+              },
+              "image/jpeg",
+              quality
+            );
+          } else {
+            resolve(file);
+          }
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const uploadImagesToSupabase = async (
     images: (File | string)[]
   ): Promise<string[]> => {
@@ -350,15 +388,18 @@ export default function PropertyForm({
 
       // Case 2: New File
       if (image instanceof File) {
-        const fileExt = image.name.split(".").pop() ?? "jpg";
+        const fileExt = "jpg";
         const fileName = `${Math.random()
           .toString(36)
           .substring(2)}-${Date.now()}.${fileExt}`;
         const filePath = `properties/${fileName}`;
 
+        // Compress high-resolution images before uploading
+        const compressedBlob = await compressImageFile(image);
+
         const { error } = await supabase.storage
           .from("property-images")
-          .upload(filePath, image);
+          .upload(filePath, compressedBlob, { contentType: "image/jpeg" });
 
         if (error) {
           console.error("Error uploading image:", error);
