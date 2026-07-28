@@ -1,5 +1,7 @@
+"use client";
+
 import React, { FC } from "react";
-import Image from "next/image";
+import { Image } from "@heroui/react";
 import { Blog } from "@/types/blog";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -16,10 +18,7 @@ const BlogCard: FC<{ blog: Blog }> = ({ blog }) => {
         <Image
           src={coverImage!}
           alt="image"
-          className="transition group-hover:scale-110"
-          width={190}
-          height={163}
-          style={{ width: "100%", height: "100%" }}
+          className="w-full h-full object-cover"
         />
       </div>
       <div className="flex justify-between items-center">

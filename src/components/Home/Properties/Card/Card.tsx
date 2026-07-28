@@ -1,7 +1,9 @@
+"use client";
+
 import formatNumberShort from "@/lib/formatNumberShort";
 import { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
-import Image from "next/image";
+import { Image } from "@heroui/react";
 import Link from "next/link";
 import { formatLocation, getImageUrl } from "@/lib/utils";
 
@@ -66,13 +68,10 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, 
           <Link href={`/explore/${slug}`}>
             {mainImage && (
               <Image
+                removeWrapper
                 src={mainImage}
                 alt={name}
-                width={440}
-                height={300}
-                priority={priority}
-                unoptimized={true}
-                className="w-full h-72 object-cover rounded-t-2xl group-hover:brightness-50 group-hover:scale-125 transition duration-300 delay-75"
+                className="w-full h-72 object-cover rounded-t-2xl"
               />
             )}
           </Link>
@@ -191,12 +190,9 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, 
             <Link href={`/explore/${slug}`} className="block w-full h-full">
               {mainImage && (
                 <Image
+                  removeWrapper
                   src={mainImage}
                   alt={name}
-                  width={180}
-                  height={144}
-                  priority={priority}
-                  unoptimized={true}
                   className="w-full h-full object-cover"
                 />
               )}
