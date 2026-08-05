@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import { TeamMemberFormData } from "@/types/team";
+import { uploadFileToR2 } from "@/lib/upload-r2";
 
 interface TeamMemberFormProps {
   initialData: TeamMemberFormData;
@@ -20,6 +21,7 @@ export function TeamMemberForm({
 }: TeamMemberFormProps) {
   const [formData, setFormData] = useState<TeamMemberFormData>(initialData);
   const [specialtyInput, setSpecialtyInput] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (
@@ -34,16 +36,19 @@ export function TeamMemberForm({
     setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // In a real app, you would upload to storage here
-      // For now, we'll use a local object URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, image: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const publicUrl = await uploadFileToR2(file, "team");
+      setFormData((prev) => ({ ...prev, image: publicUrl }));
+    } catch (error) {
+      console.error("Error uploading team member image:", error);
+      alert("Failed to upload image");
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -132,10 +137,15 @@ export function TeamMemberForm({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center gap-2"
+                disabled={uploadingImage}
+                className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center gap-2 disabled:opacity-50"
               >
-                <Icon icon="ph:upload" width={20} />
-                Upload Image
+                <Icon
+                  icon={uploadingImage ? "ph:spinner" : "ph:upload"}
+                  width={20}
+                  className={uploadingImage ? "animate-spin" : ""}
+                />
+                {uploadingImage ? "Uploading..." : "Upload Image"}
               </button>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Recommended: 400x400px, JPG or PNG

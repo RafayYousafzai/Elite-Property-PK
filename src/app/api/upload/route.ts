@@ -1,43 +1,60 @@
-import { supabase } from "@/lib/supabase";
-
-export const runtime = "edge";
+import { uploadToR2 } from "@/lib/r2";
 
 export async function POST(req: Request) {
   try {
-    const { fileName, fileType, sessionId = "anonymous" } = await req.json();
+    const contentType = req.headers.get("content-type") || "";
 
-    if (!fileName) {
-      return new Response(JSON.stringify({ error: "Missing fileName" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData();
+      const file = formData.get("file") as File | null;
+      const folder = (formData.get("folder") as string) || "uploads";
+
+      if (!file) {
+        return Response.json({ error: "No file provided" }, { status: 400 });
+      }
+
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const { publicUrl, key } = await uploadToR2(
+        buffer,
+        fileName,
+        file.type || "image/jpeg",
+        folder
+      );
+
+      return Response.json({ publicUrl, key });
+    } else {
+      const body = await req.json();
+      const { fileName, fileType = "image/jpeg", folder = "uploads" } = body;
+
+      if (!fileName) {
+        return Response.json({ error: "Missing fileName" }, { status: 400 });
+      }
+
+      const fileExt = fileName.split(".").pop() || "jpg";
+      const generatedName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const { publicUrl, key } = await uploadToR2(
+        Buffer.from(""),
+        generatedName,
+        fileType,
+        folder
+      );
+
+      return Response.json({ publicUrl, key });
     }
-
-    const fileExt = fileName.split(".").pop() || "png";
-    const fileNameOnStorage = `${sessionId}/${Date.now()}.${fileExt}`;
-    const filePath = `public/${fileNameOnStorage}`;
-
-    const { data, error } = await supabase.storage
-      .from("property-uploads")
-      .createSignedUploadUrl(filePath);
-
-    if (error) {
-      throw error;
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("property-uploads").getPublicUrl(filePath);
-
-    return Response.json({
-      signedUrl: data.signedUrl,
-      publicUrl,
-    });
   } catch (error: any) {
     console.error("Upload API Crash:", error);
-    return new Response(JSON.stringify({ error: error?.message || "Upload error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    const errorMessage =
+      error?.Code === "Unauthorized" || error?.name === "Unauthorized"
+        ? "Cloudflare R2 Unauthorized: Please verify your R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY credentials in .env"
+        : error?.message || "Upload error";
+
+    return Response.json(
+      { error: errorMessage },
+      { status: 500 }
+    );
   }
 }

@@ -13,7 +13,7 @@ import {
 } from "@heroui/react";
 import { PlusIcon, Upload } from "lucide-react";
 import { createTestimonial, TestimonialData } from "../actions";
-import { createClient } from "@/utils/supabase/client";
+import { uploadFileToR2 } from "@/lib/upload-r2";
 
 export const dynamic = "force-dynamic";
 
@@ -40,23 +40,7 @@ export default function CreateTestimonialPage() {
 
     setUploadingImage(true);
     try {
-      const supabase = createClient();
-      const fileExt = file.name.split(".").pop() ?? "jpg";
-      const fileName = `${Math.random()
-        .toString(36)
-        .substring(2)}-${Date.now()}.${fileExt}`;
-      const filePath = `testimonials/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("property-images")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("property-images").getPublicUrl(filePath);
-
+      const publicUrl = await uploadFileToR2(file, "testimonials");
       setFormData((prev) => ({ ...prev, image: publicUrl }));
       setImagePreview(publicUrl);
     } catch (error) {

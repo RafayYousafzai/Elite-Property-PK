@@ -16,6 +16,7 @@ import {
 } from "@heroui/react";
 import { Upload, X } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { uploadFileToR2 } from "@/lib/upload-r2";
 
 export interface BlogFormData {
   title: string;
@@ -162,7 +163,7 @@ export default function BlogForm({
     setAuthorImagePreview(null);
   };
 
-  const uploadImageToSupabase = async (
+  const uploadImageToR2 = async (
     image: File | string | null,
     folder: string
   ): Promise<string | undefined> => {
@@ -171,28 +172,8 @@ export default function BlogForm({
     // If already a URL, return it
     if (typeof image === "string") return image;
 
-    // Upload new file
-    const supabase = createClient();
-    const fileExt = image.name.split(".").pop() ?? "jpg";
-    const fileName = `${Math.random()
-      .toString(36)
-      .substring(2)}-${Date.now()}.${fileExt}`;
-    const filePath = `${folder}/${fileName}`;
-
-    const { error } = await supabase.storage
-      .from("property-images")
-      .upload(filePath, image);
-
-    if (error) {
-      console.error("Error uploading image:", error);
-      throw new Error(`Failed to upload image: ${image.name}`);
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("property-images").getPublicUrl(filePath);
-
-    return publicUrl;
+    // Upload new file to R2
+    return await uploadFileToR2(image, folder);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -201,14 +182,14 @@ export default function BlogForm({
     try {
       setUploadingImages(true);
 
-      // Upload images
-      const coverImageUrl = await uploadImageToSupabase(
+      // Upload images to Cloudflare R2
+      const coverImageUrl = await uploadImageToR2(
         formData.cover_image || null,
-        "blog-covers"
+        "blogs"
       );
-      const authorImageUrl = await uploadImageToSupabase(
+      const authorImageUrl = await uploadImageToR2(
         formData.author_image || null,
-        "blog-authors"
+        "blogs"
       );
 
       // Call parent's onSubmit

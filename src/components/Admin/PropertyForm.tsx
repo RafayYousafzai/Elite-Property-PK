@@ -24,6 +24,7 @@ import LocationAutocomplete from "../shared/LocationAutocomplete";
 import FeaturesAmenitiesModal from "./features-amenities-modal";
 import { CubeIcon } from "@heroicons/react/24/solid";
 import { createClient } from "@/utils/supabase/client";
+import { uploadFileToR2 } from "@/lib/upload-r2";
 import {
   DndContext,
   closestCenter,
@@ -373,10 +374,9 @@ export default function PropertyForm({
     });
   };
 
-  const uploadImagesToSupabase = async (
+  const uploadImagesToR2 = async (
     images: (File | string)[]
   ): Promise<string[]> => {
-    const supabase = createClient();
     const uploadedUrls: string[] = [];
 
     for (const image of images) {
@@ -388,28 +388,9 @@ export default function PropertyForm({
 
       // Case 2: New File
       if (image instanceof File) {
-        const fileExt = "jpg";
-        const fileName = `${Math.random()
-          .toString(36)
-          .substring(2)}-${Date.now()}.${fileExt}`;
-        const filePath = `properties/${fileName}`;
-
         // Compress high-resolution images before uploading
         const compressedBlob = await compressImageFile(image);
-
-        const { error } = await supabase.storage
-          .from("property-images")
-          .upload(filePath, compressedBlob, { contentType: "image/jpeg" });
-
-        if (error) {
-          console.error("Error uploading image:", error);
-          throw new Error(`Failed to upload image: ${image.name}`);
-        }
-
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("property-images").getPublicUrl(filePath);
-
+        const publicUrl = await uploadFileToR2(compressedBlob, "properties", image.name);
         uploadedUrls.push(publicUrl);
       }
     }
@@ -423,8 +404,8 @@ export default function PropertyForm({
     try {
       setUploadingImages(true);
 
-      // Upload images to Supabase storage
-      const uploadedImages = await uploadImagesToSupabase(
+      // Upload images to Cloudflare R2
+      const uploadedImages = await uploadImagesToR2(
         formData.images || []
       );
       console.log(uploadedImages, "uploadedImages");
@@ -437,7 +418,7 @@ export default function PropertyForm({
           photo_sphereUrl = formData.photo_sphere;
         } else {
           // Otherwise, upload the file
-          const photo_sphereUrls = await uploadImagesToSupabase([
+          const photo_sphereUrls = await uploadImagesToR2([
             formData.photo_sphere,
           ]);
           photo_sphereUrl = photo_sphereUrls[0];
