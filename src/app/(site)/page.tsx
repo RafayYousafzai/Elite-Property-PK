@@ -129,7 +129,7 @@ export default async function Home() {
         ]}
       />
 
-      <FeaturedProperty properties={[featuredProperties[0]]} />
+      <FeaturedProperty properties={featuredProperties} />
       <LocationMap />
       <BlogSmall />
       {/* <Plots /> */}
