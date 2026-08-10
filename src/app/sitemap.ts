@@ -28,12 +28,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let propertyRoutes: MetadataRoute.Sitemap = [];
   try {
     const properties = await getProperties();
-    propertyRoutes = properties.map((property) => ({
-      url: `${siteUrl}/explore/${property.slug}`,
-      lastModified: property.updated_at ? new Date(property.updated_at) : new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    }));
+    propertyRoutes = properties.map((property) => {
+      const images = property.images
+        ? property.images.map((img) => (typeof img === "string" ? img : img.src)).filter(Boolean)
+        : [];
+      return {
+        url: `${siteUrl}/explore/${property.slug}`,
+        lastModified: property.updated_at ? new Date(property.updated_at) : new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+        images,
+      };
+    });
   } catch (error) {
     console.error("Error generating property sitemap routes:", error);
   }
@@ -44,7 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = createStaticClient();
     const { data: blogs } = await supabase
       .from("blogs")
-      .select("slug, published_at")
+      .select("slug, published_at, cover_image")
       .eq("is_published", true)
       .order("published_at", { ascending: false });
 
@@ -54,6 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: blog.published_at ? new Date(blog.published_at) : new Date(),
         changeFrequency: "weekly" as const,
         priority: 0.6,
+        images: blog.cover_image ? [blog.cover_image] : [],
       }));
     }
   } catch (error) {
