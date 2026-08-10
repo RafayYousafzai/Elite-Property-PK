@@ -66,7 +66,7 @@ export default async function PropertyDetailsPage({ params }: PageProps) {
     notFound();
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eliteproperty.pk";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
   const mainImage = property.images && property.images.length > 0
     ? getImageUrl(property.images[0])
     : "";

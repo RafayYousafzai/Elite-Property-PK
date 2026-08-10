@@ -3,7 +3,7 @@ import { getProperties } from "@/lib/supabase/properties-server";
 import { createStaticClient } from "@/utils/supabase/static";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eliteproperty.pk";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
 
   // 1. Static Pages
   const staticRoutes = [
@@ -12,6 +12,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/contactus",
     "/explore",
     "/blogs",
+    "/team",
+    "/documentation",
+    "/request-callback",
     "/privacy",
     "/terms",
   ].map((route) => ({

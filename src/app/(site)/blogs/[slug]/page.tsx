@@ -68,7 +68,7 @@ export default async function Post({ params }: PageProps) {
 
   const blog = result.data;
   const content = await markdownToHtml(blog.content || "");
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eliteproperty.pk";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
 
   const blogSchema = {
     "@context": "https://schema.org",

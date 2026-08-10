@@ -11,7 +11,7 @@ import { Analytics } from "@vercel/analytics/react";
 
 const font = Bricolage_Grotesque({ subsets: ["latin"] });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eliteproperty.pk";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

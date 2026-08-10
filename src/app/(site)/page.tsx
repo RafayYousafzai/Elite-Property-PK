@@ -33,7 +33,7 @@ export default async function Home() {
   // const properties = await getProperties();
   const featuredProperties = await getFeaturedProperties();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eliteproperty.pk";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
   const agentSchema = {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
