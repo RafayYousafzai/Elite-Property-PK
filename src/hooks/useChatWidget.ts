@@ -95,8 +95,8 @@ const safeSliceMessages = (messages: any[], targetLimit: number): any[] => {
   return messages.slice(startIndex);
 };
 
-export function useChatWidget() {
-  const [isOpen, setIsOpen] = useState(false);
+export function useChatWidget(options?: { initialOpen?: boolean }) {
+  const [isOpen, setIsOpen] = useState(options?.initialOpen ?? false);
   const [input, setInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
@@ -124,18 +124,6 @@ export function useChatWidget() {
   const [hasSentFollowUp, setHasSentFollowUp] = useState(() => {
     return sessionData?.hasSentFollowUp || false;
   });
-
-  useEffect(() => {
-    fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ping: true }),
-    }).catch((err) => {
-      console.warn("Failed to pre-warm the chat API:", err);
-    });
-  }, []);
 
   const { messages, sendMessage, status, error, setMessages } = useChat({
     transport: new DefaultChatTransport({

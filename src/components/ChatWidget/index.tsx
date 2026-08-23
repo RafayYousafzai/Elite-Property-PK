@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import ChatWidget from "./ChatWidget";
+import ChatLauncher from "./ChatLauncher";
 
 export function CustomChatWidget() {
-  return <ChatWidget />;
+  return <ChatLauncher />;
 }
 
-export default ChatWidget;
+export default ChatLauncher;

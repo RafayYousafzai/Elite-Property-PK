@@ -38,7 +38,11 @@ function SobaanAvatar() {
   );
 }
 
-export default function ChatWidget() {
+export default function ChatWidget({
+  defaultOpen = false,
+}: {
+  defaultOpen?: boolean;
+}) {
   const {
     isOpen,
     setIsOpen,
@@ -49,14 +53,16 @@ export default function ChatWidget() {
     isProcessing,
     handleSubmit,
     sendText,
-  } = useChatWidget();
+  } = useChatWidget({ initialOpen: defaultOpen });
 
   const [isEmbedded, setIsEmbedded] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [bubbleText, setBubbleText] = useState(
     "Looking for DHA or Bahria plots?",
   );
-  const hasAutoOpenedRef = useRef(false);
+  // Seeded true when opened via the launcher button so the closed-state
+  // bubble rotation resumes correctly if the user later minimizes the panel.
+  const hasAutoOpenedRef = useRef(defaultOpen);
   const introTimerRef = useRef<number | null>(null);
   const autoCloseTimerRef = useRef<number | null>(null);
   const bubbleTimerRef = useRef<number | null>(null);

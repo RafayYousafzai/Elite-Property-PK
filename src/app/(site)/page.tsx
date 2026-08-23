@@ -5,11 +5,11 @@ import BlogSmall from "@/components/shared/Blog/BlogSmallServer";
 import GetInTouch from "@/components/Home/GetInTouch";
 import FAQ from "@/components/Home/FAQs";
 import Services from "@/components/Home/Services";
+import TestimonialsServer from "@/components/Home/Testimonial/TestimonialsServer";
 import {
   HomeParallaxSection,
   HomeVideoSection,
   HomeLocationSection,
-  HomeTestimonialSection,
 } from "@/components/Home/HomeClientSections";
 import {
   getFeaturedProperties,
@@ -90,7 +90,7 @@ export default async function Home() {
       <br />
       <br />
       <br />
-      <HomeTestimonialSection />
+      <TestimonialsServer />
       <br />
       <br />
       <br />

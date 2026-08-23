@@ -18,11 +18,6 @@ const LocationMap = dynamic(
   { ssr: false }
 );
 
-const Testimonial = dynamic(
-  () => import("@/components/Home/Testimonial/TestimonialsServer"),
-  { ssr: false }
-);
-
 const videoList = [
   {
     id: "1",
@@ -82,8 +77,4 @@ export function HomeVideoSection() {
 
 export function HomeLocationSection() {
   return <LocationMap />;
-}
-
-export function HomeTestimonialSection() {
-  return <Testimonial />;
 }

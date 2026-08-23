@@ -12,7 +12,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaTiktok } from "react-icons/fa";
+
+const TiktokIcon = (props) => (
+  <svg viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" {...props}>
+    <path d="M448 209.9a210.1 210.1 0 0 1-122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3v88.4a74.6 74.6 0 1 0 52.2 71.2V0h88.1a121.2 121.2 0 0 0 1.9 22.2h.1a122.2 122.2 0 0 0 54.1 80.9 121.7 121.7 0 0 0 66.6 19.9z" />
+  </svg>
+);
 
 const LocationMap = () => {
   const officeLocation = {
@@ -216,7 +221,7 @@ const LocationMap = () => {
                           >
                             <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg blur-md opacity-0 group-hover/social:opacity-75 transition-opacity"></div>
                             <div className="relative w-9 h-9 bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300">
-                              <FaTiktok className="w-4 h-4 text-white" />
+                              <TiktokIcon className="w-4 h-4 text-white" />
                             </div>
                           </Link>
                         </div>
