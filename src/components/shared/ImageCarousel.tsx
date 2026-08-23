@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { getImageUrl } from "@/lib/utils";
 
@@ -144,12 +145,14 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
               className="relative h-60 md:h-80 lg:h-[500px] cursor-pointer overflow-hidden rounded-2xl"
               onClick={() => openLightbox(currentIndex)}
             >
-              <img
+              <Image
                 src={getImageSrc(images[currentIndex])}
                 alt={`Property Image ${currentIndex + 1}`}
-                fetchPriority="high"
-                loading="eager"
-                className="w-full h-full object-cover"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 66vw"
+                quality={75}
+                className="object-cover"
               />
 
               {/* Fullscreen Icon */}
@@ -218,11 +221,13 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                         : "opacity-80 hover:opacity-100"
                     }`}
                   >
-                    <img
+                    <Image
                       src={getImageSrc(image)}
                       alt={`Thumbnail ${index + 1}`}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="96px"
+                      quality={60}
+                      className="object-cover"
                     />
                     {isLastVisibleWithRemaining && (
                       <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex flex-col items-center justify-center text-white p-1 rounded-xl hover:bg-black/70 transition-colors">
