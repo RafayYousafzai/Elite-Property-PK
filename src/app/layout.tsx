@@ -2,14 +2,13 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import Script from "next/script";
-import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import SessionProviderComp from "@/components/nextauth/SessionProvider";
 import { Providers } from "./providers";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
-const font = Bricolage_Grotesque({ subsets: ["latin"] });
+const font = Bricolage_Grotesque({ subsets: ["latin"], display: "swap" });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
 
@@ -51,10 +50,20 @@ export default function RootLayout({
   session: unknown;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
+        {/* Preconnect to Google Fonts and static origins */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+
+        {/* Preload critical LCP Hero background asset for mobile & desktop */}
+        <link rel="preload" as="image" href="/images/hero/hero-bg-mobile.webp" type="image/webp" media="(max-width: 768px)" />
+        <link rel="preload" as="image" href="/images/hero/hero-bg.webp" type="image/webp" media="(min-width: 769px)" />
+
         {/* Meta Pixel Code */}
-        <Script id="facebook-pixel" strategy="afterInteractive">
+        <Script id="facebook-pixel" strategy="lazyOnload">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -73,10 +82,9 @@ export default function RootLayout({
         {/* Google tag (gtag.js) - AW-17506316720 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17506316720"
-          strategy="afterInteractive"
-          async
+          strategy="lazyOnload"
         />
-        <Script id="gtag" strategy="afterInteractive">
+        <Script id="gtag" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);} 
@@ -86,23 +94,6 @@ export default function RootLayout({
           `}
         </Script>
 
-
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1763559634157665&ev=PageView&noscript=1"
-            alt=""
-          />
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1605023388022892&ev=PageView&noscript=1"
-            alt=""
-          />
-        </noscript>
         {/* Global JSON-LD Structured Data Schema */}
         <script
           type="application/ld+json"
@@ -145,18 +136,12 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={`${font.className} bg-white dark:bg-black antialiased`}>
+      <body className={`${font.className} bg-white text-slate-900 antialiased`}>
         <NextTopLoader color="#d8b648" showSpinner={false} />
         <SessionProviderComp session={session}>
-          <ThemeProvider
-            attribute="class"
-            enableSystem={true}
-            defaultTheme="light"
-          >
-            <Providers>
-              <Suspense fallback={null}>{children}</Suspense>
-            </Providers>
-          </ThemeProvider>
+          <Providers>
+            <Suspense fallback={null}>{children}</Suspense>
+          </Providers>
         </SessionProviderComp>
         <Analytics />
       </body>

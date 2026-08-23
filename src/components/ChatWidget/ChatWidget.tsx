@@ -92,23 +92,23 @@ export default function ChatWidget() {
     }
   }, [messages.length, clearAutoCloseTimer]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  // useEffect(() => {
+  //   if (typeof window === "undefined") return;
 
-    const setupTimer = window.setTimeout(() => {
-      setIsEmbedded(window.self !== window.top);
-      setBubbleText("Looking for DHA or Bahria plots?");
-      setShowBubble(true);
-      introTimerRef.current = window.setTimeout(() => {
-        hasAutoOpenedRef.current = true;
-        setIsOpen(true);
-        setShowBubble(false);
-        scheduleAutoClose();
-      }, 1800);
-    }, 0);
+  //   const setupTimer = window.setTimeout(() => {
+  //     setIsEmbedded(window.self !== window.top);
+  //     setBubbleText("Looking for DHA or Bahria plots?");
+  //     setShowBubble(true);
+  //     introTimerRef.current = window.setTimeout(() => {
+  //       hasAutoOpenedRef.current = true;
+  //       setIsOpen(true);
+  //       setShowBubble(false);
+  //       scheduleAutoClose();
+  //     }, 1800);
+  //   }, 0);
 
-    return () => window.clearTimeout(setupTimer);
-  }, [scheduleAutoClose, setIsOpen]);
+  //   return () => window.clearTimeout(setupTimer);
+  // }, [scheduleAutoClose, setIsOpen]);
 
   useEffect(() => {
     if (isOpen) {

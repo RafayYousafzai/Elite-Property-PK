@@ -121,7 +121,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                         alt={currentProperty.name}
                         width={680}
                         height={530}
-                        unoptimized={true}
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                         className="rounded-2xl w-none h-[350px] object-cover md:h-540"
                       />
                     </CarouselItem>

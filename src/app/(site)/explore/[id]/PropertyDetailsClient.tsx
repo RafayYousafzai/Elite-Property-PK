@@ -4,10 +4,14 @@ import { useEffect } from "react";
 import type { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import ImageCarousel from "@/components/shared/ImageCarousel";
-import GoogleMap from "@/components/shared/GoogleMap";
 import formatNumberShort from "@/lib/formatNumberShort";
 import { formatLocation } from "@/lib/utils";
+
+const GoogleMap = dynamic(() => import("@/components/shared/GoogleMap"), {
+  ssr: false,
+});
 
 // Extend Window interface for Meta Pixel
 declare global {

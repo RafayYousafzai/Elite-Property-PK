@@ -74,6 +74,7 @@ export default function HeroSearchBar() {
       {/* Phase Dropdown */}
       <div className="flex flex-row gap-3">
         <Select
+          aria-label="Select DHA Phase"
           placeholder="Select in islamabad DHA..."
           selectedKeys={query ? [query] : []}
           onSelectionChange={(keys) => {
@@ -81,12 +82,6 @@ export default function HeroSearchBar() {
             setQuery(selected || "");
           }}
           startContent={<MapPin className="w-5 h-5 text-slate-400" />}
-          // classNames={{
-          //   trigger:
-          //     "bg-white/95 backdrop-blur-sm border border-white/20 rounded-xl py-4 h-auto min-h-[3.5rem] data-[hover=true]:bg-white",
-          //   value: "text-slate-900",
-          //   popoverContent: "bg-white",
-          // }}
           className="flex-1"
         >
           {phases.map((phase) => (
@@ -99,6 +94,7 @@ export default function HeroSearchBar() {
         <Button
           onClick={handleSearch}
           size="lg"
+          aria-label="Search properties"
           className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 whitespace-nowrap"
         >
           <Search className="w-5 h-5 text-white" />

@@ -4,15 +4,12 @@ import type React from "react";
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useTheme } from "next-themes";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button, Drawer, DrawerBody, DrawerContent } from "@heroui/react";
 
 // Navigation configuration - edit this array to modify navigation items
 const navigationItems = [
-  // { name: "Home", href: "/" },
-  // { name: "Plots", href: "/explore?type=plots" },
   { name: "Houses", href: "/explore?type=homes" },
   { name: "Plots", href: "/explore?type=plots" },
   { name: "Apartments", href: "/explore?type=apartments" },
@@ -49,7 +46,6 @@ const Header: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -113,7 +109,7 @@ const Header: React.FC = () => {
   return (
     <>
       {/* Top Fixed Announcement Bar */}
-      <div className="fixed top-0 left-0 w-full h-11 bg-zinc-950 dark:bg-black border-b border-[#d4af37]/20 flex items-center justify-center z-[100] px-4 select-none">
+      <div className="fixed top-0 left-0 w-full h-11 bg-zinc-950 border-b border-[#d4af37]/20 flex items-center justify-center z-[100] px-4 select-none">
         <div className={`transition-all duration-500 ease-in-out flex items-center gap-1.5 justify-center text-center text-sm md:text-[15px] tracking-wide ${announcementFade ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
           <span className="text-white/95 font-semibold font-sans">{announcements[announcementIndex].text}</span>
           <span className="text-white/30 font-light mx-1">—</span>
@@ -124,71 +120,27 @@ const Header: React.FC = () => {
       <header
         className={`fixed h-20 md:h-24 py-1 z-50 w-full transition-all duration-300 lg:px-0 px-4  ${
           sticky
-            ? "top-11 bg-white dark:bg-dark shadow-md"
+            ? "top-11 bg-white shadow-md"
             : "top-12 bg-transparent "
         }  ${hidden ? "-translate-y-full" : "translate-y-0 "}`}
       >
       <nav
         className={`w-auto mx-auto max-w-8xl flex items-center justify-between py-0 pt-2 md:py-4 duration-300 ${
-          sticky ? " dark:bg-dark top-5 px-4 " : "shadow-none top-0"
+          sticky ? " top-5 px-4 " : "shadow-none top-0"
         }`}
       >
         <div className="flex justify-between items-center w-full">
           <div className="flex-shrink-0">
             <Link href="/">
-              {/* <Image
-                src={"/images/header/dark-logo.svg"}
-                alt="logo"
-                width={300}
-                height={300}
-                unoptimized={true}
-                className={`h-auto w-24 sm:w-32 md:w-40 mt-1 md:mt-2 ${
-                  isHomepage
-                    ? sticky
-                      ? "block dark:hidden"
-                      : "hidden"
-                    : sticky
-                    ? "block dark:hidden"
-                    : "block dark:hidden"
-                } `}
-              />
-              <Image
-                src={"/images/header/logo.svg"}
-                alt="logo"
-                width={600}
-                height={600}
-                unoptimized={true}
-                className={`h-auto w-24 sm:w-32 md:w-40 mt-1 md:mt-2 ${
-                  isHomepage
-                    ? sticky
-                      ? "hidden dark:block"
-                      : "block"
-                    : sticky
-                    ? "dark:block hidden"
-                    : "dark:block hidden"
-                }`}
-              /> */}
-
               <Image
                 src={"/elite-logo-brown.png"}
-                alt="logo"
+                alt="Elite Property Exchange Logo"
                 width={600}
                 height={600}
+                priority={true}
                 unoptimized={true}
-                className={`h-[60px] w-auto object-contain sm:w-32 md:w-40  `}
+                className={`h-[60px] w-auto object-contain sm:w-32 md:w-40`}
               />
-
-              {/* <h1
-                className={`text-3xl font-semibold mt-2 ${
-                  isHomepage
-                    ? sticky
-                      ? "text-dark dark:text-white"
-                      : "text-white"
-                    : "text-dark dark:text-white"
-                }`}
-              >
-                Homely
-              </h1> */}
             </Link>
           </div>
 
@@ -222,9 +174,9 @@ const Header: React.FC = () => {
                       ? "text-primary font-medium"
                       : isHomepage
                         ? sticky
-                          ? "text-dark dark:text-white hover:text-primary"
+                          ? "text-dark hover:text-primary"
                           : "text-white hover:text-primary"
-                        : "text-dark dark:text-white hover:text-primary"
+                        : "text-dark hover:text-primary"
                   }`}
                 >
                   {item.name}
@@ -234,40 +186,15 @@ const Header: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2 md:gap-6 flex-shrink-0">
-            {/* <Button
-              isIconOnly
-              className="bg-transparent hover:cursor-pointer p-1 sm:p-2"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              <Icon
-                icon={"solar:sun-bold"}
-                width={24}
-                height={24}
-                className={`sm:w-8 sm:h-8 dark:hidden block ${
-                  isHomepage
-                    ? sticky
-                      ? "text-dark"
-                      : "text-white"
-                    : "text-dark"
-                }`}
-              />
-              <Icon
-                icon={"solar:moon-bold"}
-                width={24}
-                height={24}
-                className="sm:w-8 sm:h-8 dark:block hidden text-white"
-              />
-            </Button> */}
-
             <div className={`hidden md:block`}>
               <Link
                 href="tel:+923344111778"
                 className={`text-base text-inherit flex items-center gap-2 transition-colors duration-200 ${
                   isHomepage
                     ? sticky
-                      ? "text-dark dark:text-white hover:text-primary"
+                      ? "text-dark hover:text-primary"
                       : "text-white hover:text-primary"
-                    : "text-dark dark:text-white hover:text-primary"
+                    : "text-dark hover:text-primary"
                 }`}
               >
                 <Icon icon={"ph:phone-bold"} width={24} height={24} />

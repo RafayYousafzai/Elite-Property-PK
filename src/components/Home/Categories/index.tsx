@@ -8,18 +8,11 @@ const Categories = () => {
       <div className="absolute left-0 top-0">
         <Image
           src="/images/categories/Vector.svg"
-          alt="vector"
+          alt=""
+          aria-hidden="true"
           width={800}
           height={1050}
-          className="dark:hidden w-auto h-auto max-w-full"
-          unoptimized={true}
-        />
-        <Image
-          src="/images/categories/Vector-dark.svg"
-          alt="vector"
-          width={800}
-          height={1050}
-          className="hidden dark:block w-auto h-auto max-w-full"
+          className="w-auto h-auto max-w-full"
           unoptimized={true}
         />
       </div>
@@ -61,9 +54,10 @@ const Categories = () => {
               <Link href="/explore?type=apartments">
                 <Image
                   src="/images/categories/villas.jpg"
-                  alt="apartments"
+                  alt="DHA Islamabad Apartments"
                   width={680}
                   height={386}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   className="w-full h-[350px] md:h-auto object-cover"
                 />
               </Link>
@@ -100,9 +94,10 @@ const Categories = () => {
               <Link href="/explore?type=homes">
                 <Image
                   src="/images/categories/plots.png"
-                  alt="plots"
+                  alt="DHA Islamabad Homes"
                   width={680}
                   height={386}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   className="w-full h-[350px] md:h-auto object-cover"
                 />
               </Link>
@@ -139,9 +134,10 @@ const Categories = () => {
               <Link href="/explore">
                 <Image
                   src="/images/categories/building.png"
-                  alt="explore all"
+                  alt="Explore All Properties"
                   width={680}
                   height={386}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   className="w-full h-[350px] md:h-auto object-cover"
                 />
               </Link>

@@ -11,6 +11,8 @@ const GetInTouch: React.FC = () => {
             loop
             muted
             playsInline
+            preload="none"
+            poster="/images/drone-shot-poster.webp"
             aria-label="Video background showing luxurious real estate"
           >
             <source src="/images/drone-shot.mp4" type="video/mp4" />

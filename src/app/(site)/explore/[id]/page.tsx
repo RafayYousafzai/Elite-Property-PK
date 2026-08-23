@@ -102,6 +102,9 @@ export default async function PropertyDetailsPage({ params }: PageProps) {
 
   return (
     <>
+      {mainImage && (
+        <link rel="preload" as="image" href={mainImage} fetchPriority="high" />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}

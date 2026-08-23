@@ -12,13 +12,16 @@ const Hero: React.FC = () => {
     <section className="relative min-h-screen flex items-center overflow-hidden pt-[15vh] pb-12">
       {/* Background Image & Overlays */}
       <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/hero/1 (1).jpg"
-          alt="Hero Background"
-          fill // Changed layout="fill" to the recommended `fill` prop
-          className="object-cover object-center"
-          priority={true}
-        />
+        <picture>
+          <source media="(max-width: 768px)" srcSet="/images/hero/hero-bg-mobile.webp" type="image/webp" />
+          <source media="(min-width: 769px)" srcSet="/images/hero/hero-bg.webp" type="image/webp" />
+          <img
+            src="/images/hero/hero-bg.webp"
+            alt="Elite Property Exchange DHA Islamabad Luxury Villa"
+            fetchPriority="high"
+            className="w-full h-full object-cover object-center"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
       </div>

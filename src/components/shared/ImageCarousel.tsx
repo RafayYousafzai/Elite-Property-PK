@@ -1,11 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import { Image } from "@heroui/react";
+import dynamic from "next/dynamic";
 import { Icon } from "@iconify/react";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
-import PhotoSphereViewer from "./PhotoSphereViewer";
 import { getImageUrl } from "@/lib/utils";
+
+// Dynamically import heavy 3D viewer and LightboxModal to eliminate 1.5MB and CSS from main thread
+const PhotoSphereViewer = dynamic(() => import("./PhotoSphereViewer"), {
+  ssr: false,
+});
+const LightboxModal = dynamic(() => import("./LightboxModal"), {
+  ssr: false,
+});
 
 interface PropertyImage {
   src?: string;
@@ -139,10 +144,11 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
               className="relative h-60 md:h-80 lg:h-[500px] cursor-pointer overflow-hidden rounded-2xl"
               onClick={() => openLightbox(currentIndex)}
             >
-              <Image
-                removeWrapper
+              <img
                 src={getImageSrc(images[currentIndex])}
                 alt={`Property Image ${currentIndex + 1}`}
+                fetchPriority="high"
+                loading="eager"
                 className="w-full h-full object-cover"
               />
 
@@ -212,10 +218,10 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                         : "opacity-80 hover:opacity-100"
                     }`}
                   >
-                    <Image
-                      removeWrapper
+                    <img
                       src={getImageSrc(image)}
                       alt={`Thumbnail ${index + 1}`}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                     {isLastVisibleWithRemaining && (
@@ -245,14 +251,14 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
       </div>
 
       {/* Lightbox */}
-      <Lightbox
-        open={lightboxOpen}
-        close={() => setLightboxOpen(false)}
-        slides={lightboxSlides}
-        index={lightboxIndex}
-        carousel={{ finite: false }}
-        controller={{ closeOnBackdropClick: true }}
-      />
+      {lightboxOpen && (
+        <LightboxModal
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          slides={lightboxSlides}
+          index={lightboxIndex}
+        />
+      )}
     </>
   );
 };
