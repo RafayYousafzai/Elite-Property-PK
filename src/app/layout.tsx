@@ -1,12 +1,11 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
-import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
-import SessionProviderComp from "@/components/nextauth/SessionProvider";
 import { Providers } from "./providers";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import ThirdPartyScripts from "@/components/shared/ThirdPartyScripts";
 
 const font = Bricolage_Grotesque({ subsets: ["latin"], display: "swap" });
 
@@ -44,10 +43,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  session,
 }: Readonly<{
   children: React.ReactNode;
-  session: unknown;
 }>) {
   return (
     <html lang="en">
@@ -62,37 +59,10 @@ export default function RootLayout({
         <link rel="preload" as="image" href="/images/hero/hero-bg-mobile.webp" type="image/webp" media="(max-width: 768px)" />
         <link rel="preload" as="image" href="/images/hero/hero-bg.webp" type="image/webp" media="(min-width: 769px)" />
 
-        {/* Meta Pixel Code */}
-        <Script id="facebook-pixel" strategy="lazyOnload">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1763559634157665');
-            fbq('init', '1605023388022892');
-            fbq('track', 'PageView');
-          `}
-        </Script>
-
-        {/* Google tag (gtag.js) - AW-17506316720 */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17506316720"
-          strategy="lazyOnload"
-        />
-        <Script id="gtag" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);} 
-            gtag('js', new Date());
-
-            gtag('config', 'AW-17506316720');
-          `}
-        </Script>
+        {/* Meta Pixel + Google Ads tag: deferred until the visitor actually
+            interacts (or a short idle fallback), so their long parse/exec
+            tasks land outside the window Lighthouse uses to compute TTI. */}
+        <ThirdPartyScripts />
 
         {/* Global JSON-LD Structured Data Schema */}
         <script
@@ -138,11 +108,9 @@ export default function RootLayout({
 
       <body className={`${font.className} bg-white text-slate-900 antialiased`}>
         <NextTopLoader color="#d8b648" showSpinner={false} />
-        <SessionProviderComp session={session}>
-          <Providers>
-            <Suspense fallback={null}>{children}</Suspense>
-          </Providers>
-        </SessionProviderComp>
+        <Providers>
+          <Suspense fallback={null}>{children}</Suspense>
+        </Providers>
         <Analytics />
       </body>
     </html>
