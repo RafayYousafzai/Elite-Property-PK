@@ -67,7 +67,7 @@ export const ParallaxScroll = ({
       ref={gridRef}
     >
       {!isLessColls && (
-        <div className="mb-16 flex flex-col gap-3 ">
+        <div className="mb-16 flex flex-col gap-3">
           <div className="flex gap-2.5 items-center justify-center">
             <span>
               <Icon
@@ -81,7 +81,7 @@ export const ParallaxScroll = ({
               Featured Properties
             </p>
           </div>
-          <h2 className="text-40 lg:text-52 font-medium text-black dark:text-white text-center tracking-tight leading-11 mb-2">
+          <h2 className="text-40 lg:text-52 font-medium text-black dark:text-white text-center tracking-tight leading-tight mb-2">
             Inspiring designed homes & apartments.
           </h2>
           <p className="text-xm font-normal text-black/50 dark:text-white/50 text-center">
@@ -102,9 +102,9 @@ export const ParallaxScroll = ({
               onClick={() => handleClick(property.slug)}
               style={{ y: translateFirst }}
               key={"grid-1" + idx}
-              className="group relative cursor-pointer "
+              className="group relative cursor-pointer"
             >
-              <div className="relative overflow-hidden">
+              <div className="relative overflow-hidden rounded-2xl">
                 <Image
                   src={getImageUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
@@ -113,33 +113,33 @@ export const ParallaxScroll = ({
                   unoptimized={true}
                   alt={property.name}
                 />
-                {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-2xl">
-                  <div className="absolute bottom-4 left-4 text-white ">
-                    <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                      <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
-                      <p className="text-sm "> {property.area} sqft</p>
-                    </div>
-
-                    <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
-                      {property.name}
-                    </h3>
+                {/* Full Gradient Overlay & Text Container */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white z-10">
+                  <div className="font-light tracking-tight flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-2 mb-1">
+                    <p className="text-xs text-slate-300 font-medium">
+                      {formatLocation(property.location)} • {property.area} sqft
+                    </p>
                   </div>
+
+                  <h3 className="text-lg font-bold leading-snug tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    {property.name}
+                  </h3>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
         {/* Second Part */}
-        <div className="grid gap-10 md:-mt-16 ">
+        <div className="grid gap-10 md:-mt-16">
           {secondPart.map((property, idx) => (
             <motion.div
               onClick={() => handleClick(property.slug)}
               style={{ y: isSmallScreen ? translateFirst : translateSecond }}
               key={"grid-2" + idx}
-              className="group relative cursor-pointer "
+              className="group relative cursor-pointer"
             >
-              <div className="relative overflow-hidden">
+              <div className="relative overflow-hidden rounded-2xl">
                 <Image
                   src={getImageUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
@@ -148,18 +148,18 @@ export const ParallaxScroll = ({
                   unoptimized={true}
                   alt={property.name}
                 />
-                {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-2xl">
-                  <div className="absolute bottom-4 left-4 text-white ">
-                    <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                      <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
-                      <p className="text-sm "> {property.area} sqft</p>
-                    </div>
-
-                    <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
-                      {property.name}
-                    </h3>
+                {/* Full Gradient Overlay & Text Container */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white z-10">
+                  <div className="font-light tracking-tight flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-2 mb-1">
+                    <p className="text-xs text-slate-300 font-medium">
+                      {formatLocation(property.location)} • {property.area} sqft
+                    </p>
                   </div>
+
+                  <h3 className="text-lg font-bold leading-snug tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    {property.name}
+                  </h3>
                 </div>
               </div>
             </motion.div>
@@ -172,9 +172,9 @@ export const ParallaxScroll = ({
               onClick={() => handleClick(property.slug)}
               style={{ y: translateThird }}
               key={"grid-3" + idx}
-              className="group relative cursor-pointer "
+              className="group relative cursor-pointer"
             >
-              <div className="relative overflow-hidden">
+              <div className="relative overflow-hidden rounded-2xl">
                 <Image
                   src={getImageUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
@@ -183,18 +183,18 @@ export const ParallaxScroll = ({
                   unoptimized={true}
                   alt={property.name}
                 />
-                {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-2xl">
-                  <div className="absolute bottom-4 left-4 text-white ">
-                    <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                      <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
-                      {/* <p className="text-sm "> {property.area} sqft</p> */}
-                    </div>
-
-                    <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
-                      {property.name}
-                    </h3>
+                {/* Full Gradient Overlay & Text Container */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white z-10">
+                  <div className="font-light tracking-tight flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-2 mb-1">
+                    <p className="text-xs text-slate-300 font-medium">
+                      {formatLocation(property.location)}
+                    </p>
                   </div>
+
+                  <h3 className="text-lg font-bold leading-snug tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    {property.name}
+                  </h3>
                 </div>
               </div>
             </motion.div>
@@ -202,15 +202,15 @@ export const ParallaxScroll = ({
         </div>
         {/* Fourth Part */}
         {!isLessColls && (
-          <div className="grid gap-10 md:-mt-16 ">
+          <div className="grid gap-10 md:-mt-16">
             {fourthPart.map((property, idx) => (
               <motion.div
                 onClick={() => handleClick(property.slug)}
                 style={{ y: isSmallScreen ? translateFirst : translateSecond }}
-                key={"grid-2" + idx}
-                className="group relative cursor-pointer "
+                key={"grid-4" + idx}
+                className="group relative cursor-pointer"
               >
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden rounded-2xl">
                   <Image
                     src={getImageUrl(property.images?.[0])}
                     className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
@@ -219,18 +219,18 @@ export const ParallaxScroll = ({
                     unoptimized={true}
                     alt={property.name}
                   />
-                  {/* Property Name (Always Visible) */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-2xl">
-                    <div className="absolute bottom-4 left-4 text-white ">
-                      <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
-                        <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
-                        <p className="text-sm "> {property.area} sqft</p>
-                      </div>
-
-                      <h3 className="text-xl capitalize drop-shadow-lg font-medium  tracking-tight leading-11">
-                        {property.name}
-                      </h3>
+                  {/* Full Gradient Overlay & Text Container */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5 text-white z-10">
+                    <div className="font-light tracking-tight flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-2 mb-1">
+                      <p className="text-xs text-slate-300 font-medium">
+                        {formatLocation(property.location)} • {property.area} sqft
+                      </p>
                     </div>
+
+                    <h3 className="text-lg font-bold leading-snug tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                      {property.name}
+                    </h3>
                   </div>
                 </div>
               </motion.div>
