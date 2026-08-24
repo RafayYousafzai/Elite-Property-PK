@@ -104,7 +104,9 @@ const Header: React.FC = () => {
     };
   }, [handleScroll]);
 
-  const isHomepage = pathname === "/" || pathname === "/about";
+  // Only Homepage ('/') and Property Details ('/explore/[id]') have dark hero backgrounds
+  const hasDarkHero = pathname === "/" || (pathname.startsWith("/explore/") && pathname !== "/explore");
+  const useWhiteHeader = hasDarkHero && !sticky;
 
   return (
     <>
@@ -172,9 +174,9 @@ const Header: React.FC = () => {
                   className={`text-base text-inherit flex items-center gap-2 pr-6 transition-colors duration-200 ${
                     isActive
                       ? "text-primary font-medium"
-                      : sticky
-                        ? "text-dark hover:text-primary"
-                        : "text-white hover:text-primary"
+                      : useWhiteHeader
+                        ? "text-white hover:text-primary"
+                        : "text-dark hover:text-primary"
                   }`}
                 >
                   {item.name}
@@ -188,9 +190,9 @@ const Header: React.FC = () => {
               <Link
                 href="tel:+923344111778"
                 className={`text-base text-inherit flex items-center gap-2 transition-colors duration-200 ${
-                  sticky
-                    ? "text-dark hover:text-primary"
-                    : "text-white hover:text-primary"
+                  useWhiteHeader
+                    ? "text-white hover:text-primary"
+                    : "text-dark hover:text-primary"
                 }`}
               >
                 <Icon icon={"ph:phone-bold"} width={24} height={24} />
@@ -210,7 +212,7 @@ const Header: React.FC = () => {
                   width={24}
                   height={24}
                   className={`sm:w-7 sm:h-7 ${
-                    sticky ? "text-dark" : "text-white"
+                    useWhiteHeader ? "text-white" : "text-dark"
                   }`}
                 />
               </Button>
