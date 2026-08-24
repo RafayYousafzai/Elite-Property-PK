@@ -172,11 +172,9 @@ const Header: React.FC = () => {
                   className={`text-base text-inherit flex items-center gap-2 pr-6 transition-colors duration-200 ${
                     isActive
                       ? "text-primary font-medium"
-                      : isHomepage
-                        ? sticky
-                          ? "text-dark hover:text-primary"
-                          : "text-white hover:text-primary"
-                        : "text-dark hover:text-primary"
+                      : sticky
+                        ? "text-dark hover:text-primary"
+                        : "text-white hover:text-primary"
                   }`}
                 >
                   {item.name}
@@ -190,11 +188,9 @@ const Header: React.FC = () => {
               <Link
                 href="tel:+923344111778"
                 className={`text-base text-inherit flex items-center gap-2 transition-colors duration-200 ${
-                  isHomepage
-                    ? sticky
-                      ? "text-dark hover:text-primary"
-                      : "text-white hover:text-primary"
-                    : "text-dark hover:text-primary"
+                  sticky
+                    ? "text-dark hover:text-primary"
+                    : "text-white hover:text-primary"
                 }`}
               >
                 <Icon icon={"ph:phone-bold"} width={24} height={24} />
@@ -213,12 +209,8 @@ const Header: React.FC = () => {
                   icon={"ph:list"}
                   width={24}
                   height={24}
-                  className={`sm:w-7 sm:h-7  ${
-                    isHomepage
-                      ? sticky
-                        ? "text-dark"
-                        : "text-white"
-                      : "text-dark"
+                  className={`sm:w-7 sm:h-7 ${
+                    sticky ? "text-dark" : "text-white"
                   }`}
                 />
               </Button>

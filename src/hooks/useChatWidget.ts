@@ -105,7 +105,10 @@ export function useChatWidget(options?: { initialOpen?: boolean }) {
     if (stored) {
       return stored;
     }
-    const randomPart = typeof crypto !== "undefined" ? crypto.randomUUID().substring(0, 8) : Math.random().toString(36).substring(2, 10);
+    const randomPart =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID().substring(0, 8)
+        : Math.random().toString(36).substring(2, 10);
     const newSessionId = `sess_${randomPart}`;
     const newSession: StoredSession = {
       sessionId: newSessionId,
