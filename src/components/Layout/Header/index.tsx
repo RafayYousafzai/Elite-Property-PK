@@ -10,14 +10,14 @@ import { Button, Drawer, DrawerBody, DrawerContent } from "@heroui/react";
 
 // Navigation configuration - edit this array to modify navigation items
 const navigationItems = [
-  { name: "Houses", href: "/explore?type=homes" },
-  { name: "Plots", href: "/explore?type=plots" },
-  { name: "Apartments", href: "/explore?type=apartments" },
-  { name: "About", href: "/about" },
-  { name: "Team", href: "/team" },
-  { name: "Contact", href: "/contactus" },
-  { name: "Blogs", href: "/blogs" },
-  { name: "Request a Call Back", href: "/request-callback" },
+  { name: "Houses", href: "/explore?type=homes", icon: "ph:house-line-bold" },
+  { name: "Plots", href: "/explore?type=plots", icon: "ph:map-pin-line-bold", badge: "Popular" },
+  { name: "Apartments", href: "/explore?type=apartments", icon: "ph:buildings-bold" },
+  { name: "About", href: "/about", icon: "ph:info-bold" },
+  { name: "Team", href: "/team", icon: "ph:users-three-bold" },
+  { name: "Contact", href: "/contactus", icon: "ph:envelope-simple-bold" },
+  { name: "Blogs", href: "/blogs", icon: "ph:article-bold" },
+  { name: "Request a Call Back", href: "/request-callback", icon: "ph:phone-call-bold", isCTA: true },
 ];
 
 const Header: React.FC = () => {
@@ -224,13 +224,33 @@ const Header: React.FC = () => {
               size="sm"
               placement="right"
             >
-              <DrawerContent>
+              <DrawerContent className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 max-w-[85vw] sm:max-w-xs border-l border-slate-200 dark:border-slate-800">
                 {() => (
                   <>
-                    <DrawerBody className="p-0">
-                      <nav className="flex flex-col">
+                    <DrawerBody className="p-0 flex flex-col h-full overflow-hidden">
+                      {/* Drawer Header with Logo & Close Button */}
+                      <div className="p-4 sm:p-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 shrink-0">
+                        <Image
+                          src="/elite-logo-brown.png"
+                          alt="Elite Property Exchange Logo"
+                          width={140}
+                          height={40}
+                          priority
+                          className="h-9 w-auto object-contain"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setNavbarOpen(false)}
+                          className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition border-0 cursor-pointer"
+                          aria-label="Close menu"
+                        >
+                          <Icon icon="ph:x-bold" className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {/* Scrollable Navigation Links List */}
+                      <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
                         {navigationItems.map((item, index) => {
-                          // Check if current path and params match exactly
                           let isActive = false;
                           if (item.href === pathname) {
                             isActive = true;
@@ -238,7 +258,6 @@ const Header: React.FC = () => {
                             pathname === "/explore" &&
                             item.href.startsWith("/explore")
                           ) {
-                            // For explore pages, check the type parameter more simply
                             if (
                               item.href.includes("type=plots") &&
                               typeParam === "plots"
@@ -257,31 +276,61 @@ const Header: React.FC = () => {
                               key={index}
                               onClick={() => {
                                 setNavbarOpen(false);
-                                // Small delay to ensure drawer closes first
                                 setTimeout(() => {
                                   router.push(item.href);
                                 }, 100);
                               }}
-                              className={`w-full text-left px-6 py-4 text-base transition-colors duration-200 border-b border-gray-100 dark:border-gray-800 last:border-b-0 ${
-                                isActive
-                                  ? "text-primary bg-primary/5 border-r-2 border-r-primary font-medium"
-                                  : "text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800"
+                              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm transition-all border-0 cursor-pointer ${
+                                item.isCTA
+                                  ? "bg-primary text-white font-bold hover:bg-primary/90 mt-3 shadow-xs"
+                                  : isActive
+                                    ? "text-primary font-extrabold bg-transparent"
+                                    : "text-slate-700 dark:text-slate-200 font-medium hover:text-primary bg-transparent"
                               }`}
                             >
-                              {item.name}
+                              <div className="flex items-center gap-3">
+                                <Icon
+                                  icon={item.icon}
+                                  className={`w-5 h-5 shrink-0 ${
+                                    item.isCTA
+                                      ? "text-white"
+                                      : isActive
+                                        ? "text-primary"
+                                        : "text-slate-400 dark:text-slate-500"
+                                  }`}
+                                />
+                                <span>{item.name}</span>
+                              </div>
                             </button>
                           );
                         })}
-                      </nav>
-                      <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
-                        <Link
-                          href="tel:+923344111778"
-                          onClick={() => setNavbarOpen(false)}
-                          className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-200"
-                        >
-                          <Icon icon="ph:phone-bold" width={20} height={20} />
-                          <span>+923344111778</span>
-                        </Link>
+                      </div>
+
+                      {/* Drawer Bottom Quick Reach Card (Call & WhatsApp) */}
+                      <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 space-y-2.5 shrink-0">
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          Quick Reach
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href="tel:+923344111778"
+                            onClick={() => setNavbarOpen(false)}
+                            className="flex-1 h-10 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs border-0"
+                          >
+                            <Icon icon="ph:phone-bold" className="w-4 h-4" />
+                            <span>Call Now</span>
+                          </a>
+                          <a
+                            href="https://wa.me/+923344111778"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setNavbarOpen(false)}
+                            className="flex-1 h-10 rounded-xl bg-slate-900 dark:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs border-0"
+                          >
+                            <Icon icon="ph:whatsapp-logo-fill" className="w-4 h-4 text-emerald-400" />
+                            <span>WhatsApp</span>
+                          </a>
+                        </div>
                       </div>
                     </DrawerBody>
                   </>
