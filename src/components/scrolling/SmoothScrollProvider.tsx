@@ -2,18 +2,25 @@
 
 import { ReactNode, useEffect } from "react";
 import Lenis from "@studio-freight/lenis";
+import { usePathname } from "next/navigation";
 
 export default function SmoothScrollProvider({
   children,
 }: {
   children: ReactNode;
 }) {
+  const pathname = usePathname();
+
   useEffect(() => {
-    // Initialize Lenis with lightweight, hardware-accelerated lerp settings
+    // Disable smooth scroll on /explore pages to prevent stuttering
+    if (pathname && pathname.startsWith("/explore")) {
+      return;
+    }
+
     const lenis = new Lenis({
-      lerp: 0.1, // Smooth linear interpolation (much lighter on CPU/GPU than long durations)
+      lerp: 0.1,
       smoothWheel: true,
-      wheelMultiplier: 1.0, // Match native mouse speed to prevent tracking lag
+      wheelMultiplier: 1.0,
     });
 
     let rafId: number;
@@ -27,10 +34,10 @@ export default function SmoothScrollProvider({
     return () => {
       lenis.destroy();
       if (rafId) {
-        cancelAnimationFrame(rafId); // Stop animation loop to prevent memory/CPU leaks on page transitions
+        cancelAnimationFrame(rafId);
       }
     };
-  }, []);
+  }, [pathname]);
 
   return <>{children}</>;
 }

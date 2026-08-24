@@ -6,29 +6,15 @@ import { Icon } from "@iconify/react";
 import { Image } from "@heroui/react";
 import Link from "next/link";
 import { formatLocation, getImageUrl } from "@/lib/utils";
+import { getBedsCount, getBathsCount } from "@/lib/supabase/properties";
 
-const timeAgo = (dateStr?: string) => {
-  if (!dateStr) return "Recently";
-  const date = new Date(dateStr);
-  const now = new Date();
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  if (seconds < 60) return "Just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-};
-
-const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, priority }) => {
+const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
+  item,
+}) => {
   const {
     name,
     location,
     rate,
-    beds,
-    baths,
     area,
     slug,
     images,
@@ -38,270 +24,223 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({ item, 
     area_unit,
     purpose,
     is_sold,
-    is_featured,
-    created_at,
   } = item;
 
-  // Get the main image URL using robust getImageUrl helper
   const mainImage = getImageUrl(images && images.length > 0 ? images[0] : null);
-
   const formattedPrice = formatNumberShort(Number(rate)).replace("Rs", "PKR");
+  const displayCategory = property_type
+    ? property_type.replace(/-/g, " ")
+    : property_category || "Property";
+
+  const bedNum = getBedsCount(item);
+  const bathNum = getBathsCount(item);
 
   return (
-    <div className="w-full">
-      {/* Desktop Card Layout (md and up) */}
-      <div className="hidden md:block relative rounded-2xl border border-dark/10 dark:border-white/10 group hover:shadow-3xl duration-300 dark:hover:shadow-white/20 bg-white dark:bg-slate-900/50">
-        {/* Status Badge */}
-        {is_sold ? (
-          <div className="absolute top-6 left-6 z-10 px-4 py-2 bg-red-500 text-white rounded-full text-sm font-semibold">
-            Sold
+    <div className="w-full group">
+      {/* Desktop Layout (md:flex flex-col) */}
+      <div className="hidden md:flex flex-col relative rounded-2xl bg-transparent border-0 shadow-none transition-all duration-300">
+        {/* Image Container */}
+        <div className="relative w-full h-64 sm:h-72 overflow-hidden rounded-2xl bg-slate-200 dark:bg-slate-800">
+          {/* Badges Stacked on Left of Image */}
+          <div className="absolute top-3.5 left-3.5 z-20 flex flex-col gap-1.5 items-start pointer-events-auto">
+            {is_sold ? (
+              <div className="px-3 py-1 bg-red-500 text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-none border-0">
+                Sold
+              </div>
+            ) : (
+              purpose && (
+                <div className="px-3 py-1 bg-primary text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-none border-0">
+                  For {purpose}
+                </div>
+              )
+            )}
+            {video_url && (
+              <a
+                href={video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 px-2.5 py-1 bg-red-600 text-white rounded-xl text-[11px] font-bold shadow-none border-0 hover:bg-red-700 transition"
+              >
+                <Icon icon="ph:youtube-logo-fill" className="w-3.5 h-3.5" />
+                <span>Video</span>
+              </a>
+            )}
           </div>
-        ) : (
-          purpose && (
-            <div className="absolute top-6 left-6 z-10 px-4 py-2 bg-primary text-white rounded-full text-sm font-semibold">
-              For {purpose}
-            </div>
-          )
-        )}
 
-        <div className="overflow-hidden rounded-t-2xl relative">
-          <Link href={`/explore/${slug}`}>
-            {mainImage && (
+          <Link href={`/explore/${slug}`} className="block w-full h-full">
+            {mainImage ? (
               <Image
                 removeWrapper
                 src={mainImage}
                 alt={name}
-                className="w-full h-72 object-cover rounded-t-2xl"
+                className="w-full h-64 sm:h-72 object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
               />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-slate-400">
+                No Image
+              </div>
             )}
           </Link>
-          <div className="absolute top-6 right-6 p-4 bg-white rounded-full hidden group-hover:block pointer-events-none">
-            <Icon
-              icon={"solar:arrow-right-linear"}
-              width={24}
-              height={24}
-              className="text-black"
-            />
-          </div>
         </div>
 
-        <div className="p-6">
-          <div className="flex flex-col mobile:flex-row gap-3 mobile:gap-0 justify-between mb-4">
-            <div className="flex-1">
-              <Link href={`/explore/${slug}`}>
-                <h3 className="text-xl font-medium text-black dark:text-white duration-300 group-hover:text-primary line-clamp-1">
-                  {name}
-                </h3>
-              </Link>
-              <p className="text-sm font-normal text-black/50 dark:text-white/50 flex items-center gap-1 mt-1">
-                <Icon icon={"ph:map-pin"} width={16} height={16} />
-                {formatLocation(location)}
+        {/* Details Section directly below image */}
+        <div className="pt-3.5 px-0 flex flex-col flex-1 justify-between gap-3">
+          <div className="space-y-2">
+            <Link href={`/explore/${slug}`}>
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug">
+                {name}
+              </h3>
+            </Link>
+
+            <div className="flex items-center justify-between gap-2 -mb-1">
+              <p className="text-xs font-normal text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate">
+                <Icon icon="ph:map-pin" className="w-3.5 h-3.5 text-primary shrink-0" />
+                <span className="truncate">{formatLocation(location)}</span>
               </p>
-              {property_type && (
-                <p className="text-xs text-black/60 dark:text-white/60 mt-1 capitalize">
-                  {property_type} • {property_category || "Property"}
-                </p>
-              )}
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 capitalize shrink-0">
+                {displayCategory}
+              </span>
             </div>
-            <div className="flex flex-col gap-2 items-end">
-              <button className="text-base font-semibold text-primary px-4 py-2 rounded-full bg-primary/10 whitespace-nowrap">
+
+            <div className="pt-0.5">
+              <p className="text-xl font-bold text-slate-900 dark:text-white">
                 {formattedPrice}
-              </button>
-              {video_url && (
-                <a
-                  href={video_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full transition duration-300 text-sm"
-                >
-                  <Icon icon={"ph:youtube-logo-fill"} width={16} height={16} />
-                  <span className="text-xs font-medium">Video</span>
-                </a>
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-400 pt-0.5">
+              {bedNum > 0 && (
+                <span className="flex items-center gap-1">
+                  <Icon icon="solar:bed-linear" className="w-4 h-4 text-slate-400" />
+                  {bedNum} Beds
+                </span>
+              )}
+              {bathNum > 0 && (
+                <span className="flex items-center gap-1">
+                  <Icon icon="solar:bath-linear" className="w-4 h-4 text-slate-400" />
+                  {bathNum} Baths
+                </span>
+              )}
+              {area && (
+                <span className="flex items-center gap-1">
+                  <Icon icon="lineicons:arrow-all-direction" className="w-4 h-4 text-slate-400" />
+                  {area} {area_unit || "Sq Ft"}
+                </span>
               )}
             </div>
           </div>
 
-          {/* Property Features */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {beds && (
-              <div className="flex items-center gap-2 border border-black/10 dark:border-white/20 px-3 py-2 rounded-lg">
-                <Icon
-                  icon={"solar:bed-linear"}
-                  width={18}
-                  height={18}
-                  className="text-primary"
-                />
-                <p className="text-xs text-black dark:text-white">{beds}</p>
-              </div>
-            )}
-            {baths && (
-              <div className="flex items-center gap-2 border border-black/10 dark:border-white/20 px-3 py-2 rounded-lg">
-                <Icon
-                  icon={"solar:bath-linear"}
-                  width={18}
-                  height={18}
-                  className="text-primary"
-                />
-                <p className="text-xs text-black dark:text-white">{baths}</p>
-              </div>
-            )}
-            {area && (
-              <div className="flex items-center gap-2 border border-black/10 dark:border-white/20 px-3 py-2 rounded-lg">
-                <Icon
-                  icon={"lineicons:arrow-all-direction"}
-                  width={18}
-                  height={18}
-                  className="text-primary"
-                />
-                <p className="text-xs text-black dark:text-white">
-                  {area} {area_unit || "Sq Ft"}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Desktop CTA Action Buttons */}
-          <div className="flex gap-2 pt-4 border-t border-black/5 dark:border-white/5 mt-4">
+          <div className="grid grid-cols-2 gap-2 pt-1">
             <a
               href="tel:+923344111778"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-bold transition duration-200 shadow-sm"
+              className="h-10 flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-all border-0 shadow-none"
             >
-              <Icon icon="solar:phone-calling-linear" className="w-4.5 h-4.5" />
+              <Icon icon="solar:phone-calling-linear" className="w-4 h-4 text-primary" />
               <span>Call Agent</span>
             </a>
             <a
               href={`https://wa.me/+923344111778?text=${encodeURIComponent(`Hi, I am interested in property: ${name} (Price: ${formatNumberShort(Number(rate))}).`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-black/10 dark:border-white/10 text-slate-800 dark:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5 text-xs font-bold transition duration-200 shadow-sm bg-white dark:bg-slate-900"
+              className="h-10 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 text-xs font-semibold transition-all border-0 shadow-none"
             >
-              <Icon icon="ph:whatsapp-logo-fill" className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <Icon icon="ph:whatsapp-logo-fill" className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>WhatsApp</span>
             </a>
           </div>
         </div>
       </div>
 
-      {/* Mobile Horizontal List View (less than md) - Brand Styled, Extremely Compact */}
-      <div className="block md:hidden bg-white dark:bg-slate-900 border border-dark/10 dark:border-white/10 rounded-xl overflow-hidden shadow-sm transition duration-200">
-        <div className="flex h-36 relative">
-          {/* Left Column: Image Section (38% width) */}
-          <div className="relative w-[38%] shrink-0 h-full bg-black/5 dark:bg-white/5">
-            <Link href={`/explore/${slug}`} className="block w-full h-full">
-              {mainImage && (
-                <Image
-                  removeWrapper
-                  src={mainImage}
-                  alt={name}
-                  className="w-full h-full object-cover"
-                />
-              )}
-            </Link>
-
-            {/* Badges on Image */}
-            <div className="absolute top-1.5 left-1.5 flex flex-col gap-1 z-10">
-              {is_sold ? (
-                <span className="bg-red-500 text-white font-extrabold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded">
-                  SOLD
+      {/* Mobile Horizontal Layout (Image Left, Content Right, No BG) */}
+      <div className="flex md:hidden flex-row gap-3 bg-transparent rounded-2xl p-0 overflow-hidden border-0 shadow-none items-stretch">
+        {/* Left: Image (38% width) */}
+        <div className="relative w-36 shrink-0 h-36 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800">
+          <div className="absolute top-1.5 left-1.5 z-20 flex flex-col gap-1 items-start">
+            {is_sold ? (
+              <span className="px-1.5 py-0.5 bg-red-500 text-white rounded text-[9px] font-extrabold uppercase">
+                Sold
+              </span>
+            ) : (
+              purpose && (
+                <span className="px-1.5 py-0.5 bg-primary text-white rounded text-[9px] font-extrabold uppercase">
+                  {purpose}
                 </span>
-              ) : is_featured ? (
-                <span className="bg-red-500 text-white font-extrabold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                  <Icon icon="solar:fire-bold" className="w-2.5 h-2.5" />
-                  HOT
-                </span>
-              ) : (
-                purpose && (
-                  <span className="bg-primary text-white font-extrabold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded">
-                    {purpose}
-                  </span>
-                )
-              )}
-            </div>
-
-            {/* Image Count Indicator */}
-            {images && images.length > 0 && (
-              <div className="absolute bottom-1.5 left-1.5 bg-black/60 backdrop-blur-[2px] text-white text-[9px] px-1 py-0.5 rounded font-medium flex items-center gap-1">
-                <Icon icon="solar:camera-linear" className="w-3 h-3" />
-                <span>{images.length}</span>
-              </div>
+              )
             )}
           </div>
 
-          {/* Right Column: Details Section (62% width) */}
-          <div className="flex-1 p-2.5 flex flex-col justify-between overflow-hidden">
-            {/* Top Badge & Category */}
-            <div className="flex items-center justify-between">
-              <span className="text-[9px] uppercase tracking-wider font-semibold text-black/50 dark:text-white/50 capitalize truncate max-w-[70%]">
-                {property_type.replace(/-/g, " ")}
-              </span>
-              {is_featured && (
-                <span className="bg-primary/10 text-primary text-[8px] font-extrabold px-1.5 py-0.5 rounded border border-primary/20 tracking-wider uppercase flex items-center gap-0.5">
-                  <Icon icon="solar:crown-linear" className="w-2.5 h-2.5" />
-                  TITANIUM
-                </span>
-              )}
-            </div>
+          <Link href={`/explore/${slug}`} className="block w-full h-full">
+            {mainImage && (
+              <Image
+                removeWrapper
+                src={mainImage}
+                alt={name}
+                className="w-full h-full object-cover rounded-xl"
+              />
+            )}
+          </Link>
+        </div>
 
-            {/* Price & Name */}
-            <div className="space-y-0.5">
-              <Link href={`/explore/${slug}`} className="block">
-                <h4 className="text-sm font-bold text-primary leading-tight">
-                  {formattedPrice}
-                </h4>
-                <p className="text-[11px] font-medium text-black dark:text-white line-clamp-1 hover:text-primary leading-tight mt-0.5">
-                  {name}
-                </p>
-              </Link>
-            </div>
+        {/* Right: Details (62% width) */}
+        <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+          <div className="space-y-1">
+            <Link href={`/explore/${slug}`}>
+              <h4 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                {name}
+              </h4>
+            </Link>
 
-            {/* Location */}
-            <div className="flex items-center gap-1 text-[10px] text-black/50 dark:text-white/50">
-              <Icon icon="ph:map-pin" className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">{formatLocation(location)}</span>
-            </div>
-
-            {/* Specs & Time Row */}
-            <div className="flex items-center justify-between text-[10px] text-black/70 dark:text-white/70 py-0.5 border-t border-black/5 dark:border-white/5">
-              <div className="flex items-center gap-2">
-                {beds && (
-                  <span className="flex items-center gap-0.5">
-                    <Icon icon="solar:bed-linear" className="w-3 h-3 text-primary" />
-                    {beds}
-                  </span>
-                )}
-                {baths && (
-                  <span className="flex items-center gap-0.5">
-                    <Icon icon="solar:bath-linear" className="w-3 h-3 text-primary" />
-                    {baths}
-                  </span>
-                )}
-                <span className="flex items-center gap-0.5">
-                  <Icon icon="lineicons:arrow-all-direction" className="w-3 h-3 text-primary" />
-                  {area} {area_unit || "Sq Ft"}
-                </span>
-              </div>
-              <span className="text-[8px] font-normal text-black/40 dark:text-white/40 shrink-0">
-                {timeAgo(created_at)}
+            <div className="flex items-center justify-between gap-1">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate">
+                <Icon icon="ph:map-pin" className="w-3 h-3 text-primary shrink-0" />
+                <span className="truncate">{formatLocation(location)}</span>
+              </p>
+              <span className="text-[10px] font-medium text-slate-400 capitalize shrink-0">
+                {displayCategory}
               </span>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex gap-1.5 mt-1 border-t border-black/5 dark:border-white/5 pt-1.5">
+            <p className="text-sm font-bold text-slate-900 dark:text-white pt-0.5">
+              {formattedPrice}
+            </p>
+
+            <div className="flex items-center gap-2 text-[10px] font-medium text-slate-600 dark:text-slate-400">
+              {bedNum > 0 && <span>{bedNum} Beds</span>}
+              {bathNum > 0 && <span>• {bathNum} Baths</span>}
+              {area && <span>• {area} {area_unit || "Sq Ft"}</span>}
+            </div>
+          </div>
+
+          {/* Action Buttons Section */}
+          <div className="space-y-1.5 pt-1.5">
+            {video_url && (
+              <a
+                href={video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-7 sm:h-8 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold flex items-center justify-center gap-1.5 transition border-0 shadow-none cursor-pointer"
+              >
+                <Icon icon="ph:youtube-logo-fill" className="w-3.5 h-3.5" />
+                <span>Watch Video Tour</span>
+              </a>
+            )}
+
+            <div className="grid grid-cols-2 gap-1.5">
               <a
                 href="tel:+923344111778"
-                className="flex-1 flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-[10px] font-bold transition"
+                className="h-8 flex items-center justify-center gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] font-bold border-0"
               >
-                <Icon icon="solar:phone-calling-linear" className="w-3.5 h-3.5" />
-                <span>CALL</span>
+                <Icon icon="solar:phone-calling-linear" className="w-3.5 h-3.5 text-primary" />
+                <span>Call</span>
               </a>
               <a
                 href={`https://wa.me/+923344111778?text=${encodeURIComponent(`Hi, I am interested in property: ${name} (Price: ${formatNumberShort(Number(rate))}).`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg border border-black/10 dark:border-white/10 text-slate-800 dark:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5 text-[10px] font-bold transition bg-white dark:bg-slate-900"
+                className="h-8 flex items-center justify-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold border-0"
               >
                 <Icon icon="ph:whatsapp-logo-fill" className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>WHATSAPP</span>
+                <span>Chat</span>
               </a>
             </div>
           </div>

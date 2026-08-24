@@ -12,12 +12,13 @@ import {
   SlidersHorizontal,
   AlertCircle,
   RefreshCw,
+  X,
 } from "lucide-react";
 import type { SearchFilters } from "@/types/property";
 import { Chip, Button, ButtonGroup, Input } from "@heroui/react";
 import PropertyCard from "@/components/Home/Properties/Card/Card";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useProperties } from "@/hooks/useProperties";
 import toast from "react-hot-toast";
 import { PropertyListSkeleton } from "@/components/ui/property-skeleton";
@@ -27,6 +28,7 @@ export default function SearchPageClient({
 }: {
   initialProperties: Property[];
 }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type");
   const searchParam = searchParams.get("search");
@@ -64,6 +66,7 @@ export default function SearchPageClient({
 
   // Use local state for input to avoid typing lag
   const [searchValue, setSearchValue] = useState(searchParam || "");
+  const [searchOpen, setSearchOpen] = useState(Boolean(searchParam));
 
   // Update filters when URL parameters change
   useEffect(() => {
@@ -86,6 +89,7 @@ export default function SearchPageClient({
     if (searchParam !== null) {
       updates.searchQuery = searchParam;
       setSearchValue(searchParam);
+      if (searchParam) setSearchOpen(true);
     }
 
     if (Object.keys(updates).length > 0) {
@@ -141,20 +145,6 @@ export default function SearchPageClient({
   // Apply filters whenever filters change
   useEffect(() => {
     const applyFiltersAsync = async () => {
-      // Check if we are using default filters and have pre-fetched initialProperties
-      const isDefaultFilters =
-        filters.propertyType === "all" &&
-        filters.priceRange[0] === 0 &&
-        filters.priceRange[1] === 1000000000 &&
-        filters.minArea === 0 &&
-        filters.maxArea === 500 &&
-        !filters.searchQuery;
-
-      if (isDefaultFilters && initialProperties.length > 0) {
-        // Skip API request, use server pre-fetched properties
-        return;
-      }
-
       setIsLoading(true);
       try {
         await applyFilters(filters);
@@ -167,27 +157,53 @@ export default function SearchPageClient({
     };
 
     applyFiltersAsync();
-  }, [filters, applyFilters, initialProperties]);
+  }, [filters, applyFilters]);
+
+  const updateUrlWithFilters = useCallback((newFilters: SearchFilters) => {
+    const params = new URLSearchParams();
+    if (newFilters.propertyType && newFilters.propertyType !== "all") {
+      params.set("type", newFilters.propertyType);
+    }
+    if (newFilters.searchQuery) {
+      params.set("search", newFilters.searchQuery);
+    }
+    if (newFilters.subCategory) {
+      params.set("subCategory", newFilters.subCategory);
+    }
+    if (newFilters.beds) {
+      params.set("beds", String(newFilters.beds));
+    }
+    if (newFilters.baths) {
+      params.set("baths", String(newFilters.baths));
+    }
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `/explore?${queryString}` : "/explore";
+    router.replace(newUrl, { scroll: false });
+  }, [router]);
 
   const handleClearFilters = useCallback(() => {
     setSearchValue("");
+    const defaultFilters: SearchFilters = {
+      propertyType: "all",
+      subCategory: undefined,
+      priceRange: [0, 1000000000],
+      minArea: 0,
+      maxArea: 500,
+      searchQuery: "",
+    };
     startTransition(() => {
-      setFilters({
-        propertyType: "all",
-        subCategory: undefined,
-        priceRange: [0, 1000000000],
-        minArea: 0,
-        maxArea: 500,
-        searchQuery: "",
-      });
+      setFilters(defaultFilters);
     });
-  }, []);
+    updateUrlWithFilters(defaultFilters);
+  }, [updateUrlWithFilters]);
 
   const handleFiltersChange = useCallback((newFilters: SearchFilters) => {
     startTransition(() => {
       setFilters(newFilters);
     });
-  }, []);
+    updateUrlWithFilters(newFilters);
+  }, [updateUrlWithFilters]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchValue(value);
@@ -222,7 +238,7 @@ export default function SearchPageClient({
   }
 
   return (
-    <div className="min-h-screen mt-20 md:mt-32">
+    <div className="min-h-screen mt-32 md:mt-32">
       <div className="flex">
         {/* Desktop Sidebar - Hidden on mobile */}
         <div
@@ -242,17 +258,17 @@ export default function SearchPageClient({
         {/* Main Content */}
         <div className="flex-1 min-h-screen">
           {/* Professional Header */}
-          <div className="  backdrop-blur-lg bg-white/95 dark:bg-slate-900/95 transition-all duration-200">
-            <div className="max-w-full mx-auto px-3 md:px-0 ">
+          <div className="backdrop-blur-lg bg-white/95 dark:bg-slate-900/95 transition-all duration-200">
+            <div className="max-w-full mx-auto px-3 md:px-0">
               {/* Header Content */}
-              <div className="py-6">
-                {/* Top Section - Title and Stats */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-                  <div className="">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">
+              <div className="py-4 sm:py-6">
+                {/* Header Row */}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1">
                       Premium Properties
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                       <span className="font-semibold text-primary transition-all duration-200">
                         {isLoading || isPending || dataLoading ? (
                           <span className="inline-block w-8 h-4 bg-slate-200 dark:bg-transparent rounded animate-pulse"></span>
@@ -264,95 +280,86 @@ export default function SearchPageClient({
                     </p>
                   </div>
 
-                  {/* View Mode Toggle - Desktop */}
-                  <div className="hidden sm:flex items-center gap-1 rounded-lg p-1">
-                    <Button
-                      size="sm"
-                      color={viewMode === "grid" ? "primary" : "default"}
-                      onPress={() => handleViewModeChange("grid")}
-                      className={`h-9 px-4 transition-all duration-200  `}
-                    >
-                      <Grid className="h-4 w-4 mr-2" />
-                      Grid
-                    </Button>
-                    <Button
-                      className={`h-9 px-4 transition-all duration-200  `}
-                      color={viewMode === "list" ? "primary" : "default"}
-                      size="sm"
-                      onPress={() => handleViewModeChange("list")}
-                    >
-                      <List className="h-4 w-4 mr-2" />
-                      List
-                    </Button>
-                  </div>
-                </div>
+                  {/* Header Actions: Expandable Search, Filters & View Mode Toggle */}
+                  <div className="flex items-center gap-2 flex-wrap ml-auto">
+                    {/* Collapsible / Expanding Search Bar */}
+                    {searchOpen ? (
+                      <div className="relative flex items-center gap-1.5 animate-in fade-in zoom-in-95 duration-200 w-full sm:w-72 md:w-80">
+                        <Input
+                          startContent={<Search className="h-4 w-4 text-slate-400" />}
+                          endContent={
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSearchValue("");
+                                setSearchOpen(false);
+                                startTransition(() => {
+                                  setFilters((prev) => ({ ...prev, searchQuery: "" }));
+                                });
+                              }}
+                              className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors cursor-pointer border-0"
+                              aria-label="Close search"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          }
+                          autoFocus
+                          size="sm"
+                          value={searchValue}
+                          placeholder="Search location, name, type..."
+                          onValueChange={(value) => handleSearchChange(value)}
+                          className="h-10 w-full rounded-xl"
+                        />
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setSearchOpen(true)}
+                        className="h-10 px-2.5 sm:px-3 rounded-xl bg-transparent text-slate-700 dark:text-slate-200 hover:text-primary transition-all duration-200 flex items-center gap-1.5 text-xs font-semibold cursor-pointer border-0 shadow-none"
+                        aria-label="Open search bar"
+                      >
+                        <Search className="h-4 w-4 text-primary" />
+                        <span className="hidden sm:inline">Search</span>
+                      </button>
+                    )}
 
-                {/* Search and Filters Row */}
-                <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-                  {/* Search Input */}
-                  <div className="flex-1 relative">
-                    <Input
-                      startContent={
-                        <Search className="h-5 w-5 text-slate-400" />
-                      }
-                      fullWidth
-                      size="lg"
-                      value={searchValue}
-                      placeholder="Search by location, name, or property type..."
-                      onValueChange={(value) => handleSearchChange(value)}
-                      className="h-12   "
-                    />
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 md:hidden">
                     {/* Mobile Filter Button */}
-                    <Button
-                      variant="flat"
-                      size="sm"
+                    <button
+                      type="button"
                       onClick={() => setMobileFiltersOpen(true)}
-                      className="bg-transparent text-md lg:hidden"
+                      className="lg:hidden h-10 px-2.5 rounded-xl bg-transparent text-slate-700 dark:text-slate-200 hover:text-primary transition-all duration-200 flex items-center gap-1.5 text-xs font-semibold cursor-pointer border-0 shadow-none"
                     >
-                      <SlidersHorizontal className="h-4 w-4 mr-2" />
-                      Filters
-                    </Button>
+                      <SlidersHorizontal className="h-4 w-4 text-primary" />
+                      <span>Filters</span>
+                    </button>
 
-                    {/* Desktop Sidebar Toggle */}
-                    <Button
-                      variant="flat"
-                      size="sm"
-                      onClick={() => setSidebarOpen(!sidebarOpen)}
-                      className="bg-transparent text-md hidden lg:flex"
-                    >
-                      <SlidersHorizontal className="h-4 w-4 mr-2" />
-                      {sidebarOpen ? "Hide" : "Show"} Filters
-                    </Button>
-
-                    {/* Mobile View Toggle */}
-                    <ButtonGroup className="ml-auto">
-                      <Button
-                        size="sm"
+                    {/* View Mode Toggle */}
+                    <div className="inline-flex items-center gap-1 bg-transparent border-0 shadow-none">
+                      <button
+                        type="button"
                         onClick={() => handleViewModeChange("list")}
-                        className="bg-transparent"
+                        className={`h-9 px-2.5 sm:px-3 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 cursor-pointer border-0 shadow-none ${
+                          viewMode === "list"
+                            ? "text-primary font-bold bg-transparent"
+                            : "text-slate-500 hover:text-slate-900 dark:hover:text-white bg-transparent"
+                        }`}
                       >
-                        <ListFilter
-                          className={`h-5 w-5 ${
-                            viewMode === "list" ? "text-primary" : ""
-                          }`}
-                        />
-                      </Button>
-                      <Button
-                        size="sm"
+                        <List className="h-4 w-4" />
+                        <span className="hidden sm:inline">List</span>
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => handleViewModeChange("grid")}
-                        className="bg-transparent"
+                        className={`h-9 px-2.5 sm:px-3 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 cursor-pointer border-0 shadow-none ${
+                          viewMode === "grid"
+                            ? "text-primary font-bold bg-transparent"
+                            : "text-slate-500 hover:text-slate-900 dark:hover:text-white bg-transparent"
+                        }`}
                       >
-                        <Grid
-                          className={`h-4 w-4 ${
-                            viewMode === "grid" ? "text-primary" : ""
-                          }`}
-                        />
-                      </Button>
-                    </ButtonGroup>
+                        <Grid className="h-4 w-4" />
+                        <span className="hidden sm:inline">Grid</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -453,7 +460,7 @@ export default function SearchPageClient({
                 ) : (
                   <div className="animate-in fade-in duration-300">
                     {viewMode === "list" ? (
-                      <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 px-2 pb-20">
+                      <div className="grid gap-x-6 gap-y-5 sm:gap-x-8 sm:gap-y-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 px-2 pb-20">
                         {filteredProperties
                           .slice(0, visibleCount)
                           .map((property, index) => (
@@ -503,39 +510,39 @@ export default function SearchPageClient({
           </div>
         </div>
 
-        {/* Custom Mobile Filter Overlay */}
+        {/* Custom Mobile Filter Drawer */}
         {mobileFiltersOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="fixed inset-0 z-[100] lg:hidden flex justify-end">
             {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
               onClick={() => setMobileFiltersOpen(false)}
             />
 
             {/* Filter Panel */}
-            <div className="fixed inset-y-0 left-0 w-full max-w-sm bg-white dark:bg-slate-900 shadow-xl transform transition-transform duration-300 ease-in-out flex flex-col animate-in slide-in-from-left">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
+            <div className="relative w-[88vw] max-w-xs h-full bg-white dark:bg-slate-900 shadow-2xl z-10 flex flex-col animate-in slide-in-from-right duration-300">
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
                     Filter Properties
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Refine your search results
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {filteredProperties.length} properties found
                   </p>
                 </div>
-                <Button
-                  variant="light"
-                  size="sm"
+                <button
+                  type="button"
                   onClick={() => setMobileFiltersOpen(false)}
-                  className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors duration-200 text-2xl"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer border-0"
+                  aria-label="Close filters"
                 >
-                  ✕
-                </Button>
+                  <X className="w-4 h-4" />
+                </button>
               </div>
 
-              {/* Filter Content - Scrollable */}
-              <div className="flex-1 overflow-y-auto p-4">
+              {/* Single Scrollable Content Area */}
+              <div className="flex-1 overflow-y-auto px-5 py-4">
                 <SearchSidebar
                   filters={filters}
                   onFiltersChange={handleFiltersChange}
@@ -543,26 +550,25 @@ export default function SearchPageClient({
                 />
               </div>
 
-              {/* Footer */}
-              <div className="p-4 space-y-3 flex-shrink-0  ">
-                <Button
-                  color="primary"
+              {/* Sticky Drawer Footer */}
+              <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shrink-0 space-y-2">
+                <button
+                  type="button"
                   onClick={() => setMobileFiltersOpen(false)}
-                  className="w-full transition-all duration-200"
+                  className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs transition-all border-0 shadow-none flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  Apply Filters ({filteredProperties.length} results)
-                </Button>
-                <Button
-                  color="danger"
-                  variant="light"
+                  <span>Apply Filters ({filteredProperties.length})</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => {
                     handleClearFilters();
                     setMobileFiltersOpen(false);
                   }}
-                  className="w-full transition-all duration-200"
+                  className="w-full h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-semibold bg-transparent transition-all border-0 cursor-pointer"
                 >
-                  Clear All Filters
-                </Button>
+                  Reset Filters
+                </button>
               </div>
             </div>
           </div>

@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
-import { Sparkles } from "lucide-react";
 import type { SearchFilters } from "@/types/property";
-import { Button, Chip } from "@heroui/react";
 import { propertyTypes } from "@/components/Admin/PropertyForm";
 import formatNumberShort from "@/lib/formatNumberShort";
 
@@ -43,17 +41,16 @@ export default function SearchSidebar({
     onFiltersChange({ ...filters, priceRange: newRange });
   };
 
-  const handleBedsChange = (beds: number) => {
-    onFiltersChange({
-      ...filters,
-      beds: beds === filters.beds ? undefined : beds,
-    });
+  const handlePresetPrice = (min: number, max: number) => {
+    const newRange: [number, number] = [min, max];
+    setPriceRange(newRange);
+    onFiltersChange({ ...filters, priceRange: newRange });
   };
 
-  const handleBathsChange = (baths: number) => {
+  const handlePhaseChange = (phase: string) => {
     onFiltersChange({
       ...filters,
-      baths: baths === filters.baths ? undefined : baths,
+      searchQuery: phase,
     });
   };
 
@@ -63,300 +60,273 @@ export default function SearchSidebar({
     filters.priceRange[0] > 0 || filters.priceRange[1] < 1000000000,
     filters.beds !== undefined,
     filters.baths !== undefined,
-    filters.minArea > 0 || filters.maxArea < 500,
     filters.searchQuery.length > 0,
   ].filter(Boolean).length;
 
+  const presetPrices = [
+    { label: "Any", min: 0, max: 1000000000 },
+    { label: "< 2 Crore", min: 0, max: 20000000 },
+    { label: "2 - 5 Crore", min: 20000000, max: 50000000 },
+    { label: "5 - 10 Crore", min: 50000000, max: 100000000 },
+    { label: "10 Crore+", min: 100000000, max: 1000000000 },
+  ];
+
   return (
-    <div className="w-full md:w-80 bg-sidebar/95 backdrop-blur-xl border-sidebar-border/50 h-full overflow-y-auto animate-slide-in-up">
-      <div className="py-6 md:px-6">
-        <div className="hidden md:flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div>
-              <h2 className="text-xl font-bold text-sidebar-foreground bg-primary  bg-clip-text text-transparent">
-                Filters
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                Find your perfect property
-              </p>
-            </div>
+    <div className="w-full md:w-80 bg-transparent border-0">
+      <div className="py-2 md:py-6 px-1 md:px-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              Filters
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Refine property search
+            </p>
           </div>
           {activeFiltersCount > 0 && (
-            <Button
-              variant="ghost"
-              radius="full"
-              size="sm"
+            <button
+              type="button"
               onClick={onClearFilters}
-              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-300 premium-hover"
+              className="text-xs font-semibold text-primary hover:underline cursor-pointer border-0 bg-transparent"
             >
-              Clear ({activeFiltersCount})
-            </Button>
+              Reset All ({activeFiltersCount})
+            </button>
           )}
         </div>
 
-        <div className="space-y-8">
-          {/* Property Type */}
-          <div className="animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <div className="flex items-center gap-3 mb-4 pb-2 ">
-              <h3 className="text-base font-semibold text-foreground">Type</h3>
-              <Sparkles className="h-3 w-3 text-secondary ml-auto" />
+        {/* Property Type */}
+        <div className="space-y-2.5">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Property Type
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { value: "all", label: "All" },
+              { value: "homes", label: "Homes" },
+              { value: "apartments", label: "Apartments" },
+              { value: "plots", label: "Plots" },
+              { value: "commercial", label: "Commercial" },
+            ].map((type) => (
+              <button
+                key={type.value}
+                type="button"
+                onClick={() =>
+                  handlePropertyTypeChange(
+                    type.value as
+                      | "all"
+                      | "homes"
+                      | "plots"
+                      | "apartments"
+                      | "commercial"
+                  )
+                }
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer border-0 shadow-none ${
+                  filters.propertyType === type.value
+                    ? "bg-primary text-white"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                }`}
+              >
+                {type.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sub Category */}
+        {filters.propertyType !== "all" &&
+          filters.propertyType !== "apartments" && (
+            <div className="space-y-2.5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Category
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {(filters.propertyType === "homes"
+                  ? ["House", "Farm House", "Room"]
+                  : filters.propertyType === "plots"
+                  ? propertyTypes.Plots
+                  : filters.propertyType === "commercial"
+                  ? propertyTypes.Commercial
+                  : []
+                ).map((subType) => (
+                  <button
+                    key={subType}
+                    type="button"
+                    onClick={() => handleSubCategoryChange(subType)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer border-0 shadow-none ${
+                      filters.subCategory === subType
+                        ? "bg-primary text-white"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {subType}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: "all", label: "All Properties" },
-                { value: "homes", label: "Homes" },
-                { value: "apartments", label: "Apartments" },
-                { value: "plots", label: "Plots" },
-                { value: "commercial", label: "Commercial" },
-              ].map((type) => (
-                <Chip
-                  key={type.value}
-                  variant={
-                    filters.propertyType === type.value ? "shadow" : "flat"
-                  }
-                  className={`cursor-pointer transition-all duration-300 premium-hover ${
-                    filters.propertyType === type.value
-                      ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg scale-105 border-primary/50"
-                      : "hover:bg-muted hover:scale-105 hover:shadow-md border-border/50"
+          )}
+
+        {/* DHA Phase (All + Phase 1 to Phase 7) */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Select DHA Islamabad Phase
+            </h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: "All", value: "" },
+              { label: "Phase 1", value: "Phase 1" },
+              { label: "Phase 2", value: "Phase 2" },
+              { label: "Phase 3", value: "Phase 3" },
+              { label: "Phase 4", value: "Phase 4" },
+              { label: "Phase 5", value: "Phase 5" },
+              { label: "Phase 6", value: "Phase 6" },
+              { label: "Phase 7", value: "Phase 7" },
+            ].map((phase) => {
+              const isSelected =
+                phase.value === ""
+                  ? !filters.searchQuery || filters.searchQuery === ""
+                  : filters.searchQuery === phase.value;
+              return (
+                <button
+                  key={phase.label}
+                  type="button"
+                  onClick={() => handlePhaseChange(phase.value)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer border-0 shadow-none ${
+                    isSelected
+                      ? "bg-primary text-white"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                   }`}
-                  onClick={() =>
-                    handlePropertyTypeChange(
-                      type.value as
-                        | "all"
-                        | "homes"
-                        | "plots"
-                        | "apartments"
-                        | "commercial"
-                    )
-                  }
                 >
-                  {type.label}
-                </Chip>
-              ))}
-            </div>
+                  {phase.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Price Range Slider & Preset Chips */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Price Range
+            </h3>
+            <span className="text-xs font-semibold text-primary">
+              PKR {formatNumberShort(priceRange[0])} - {formatNumberShort(priceRange[1])}
+            </span>
           </div>
 
-          {/* Sub Category - Show only when a main category is selected */}
-          {filters.propertyType !== "all" &&
-            filters.propertyType !== "apartments" && (
-              <div
-                className="animate-fade-in"
-                style={{ animationDelay: "0.15s" }}
-              >
-                <div className="flex items-center gap-3 mb-4 pb-2">
-                  <h3 className="text-base font-semibold text-foreground">
-                    Sub Category
-                  </h3>
-                  <Sparkles className="h-3 w-3 text-secondary ml-auto" />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {(filters.propertyType === "homes"
-                    ? ["House", "flat/appartment", "Farm House", "Room"]
-                    : filters.propertyType === "plots"
-                    ? propertyTypes.Plots
-                    : filters.propertyType === "commercial"
-                    ? propertyTypes.Commercial
-                    : []
-                  ).map((subType) => (
-                    <Chip
-                      key={subType}
-                      variant={
-                        filters.subCategory === subType ? "shadow" : "flat"
+          <Slider
+            value={priceRange}
+            onValueChange={handlePriceRangeChange}
+            max={1000000000}
+            min={0}
+            step={5000000}
+            className="w-full"
+          />
+
+          {/* Suggested Price Chips */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {presetPrices.map((preset) => {
+              const isPresetActive =
+                priceRange[0] === preset.min && priceRange[1] === preset.max;
+              return (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => handlePresetPrice(preset.min, preset.max)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all duration-200 cursor-pointer border-0 shadow-none ${
+                    isPresetActive
+                      ? "bg-primary text-white"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Bedrooms & Bathrooms */}
+        {filters.propertyType !== "plots" && (
+          <div className="space-y-5 pt-1">
+            {/* Bedrooms */}
+            <div className="space-y-2.5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Bedrooms
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: undefined, label: "Any" },
+                  { value: 1, label: "1" },
+                  { value: 2, label: "2" },
+                  { value: 3, label: "3" },
+                  { value: 4, label: "4+" },
+                ].map((b) => {
+                  const isSelected = filters.beds === b.value;
+                  return (
+                    <button
+                      key={b.label}
+                      type="button"
+                      onClick={() =>
+                        onFiltersChange({
+                          ...filters,
+                          beds: b.value,
+                        })
                       }
-                      className={`cursor-pointer transition-all duration-300 premium-hover ${
-                        filters.subCategory === subType
-                          ? "bg-primary text-secondary-foreground shadow-lg scale-105 border-secondary/50"
-                          : "hover:bg-muted hover:scale-105 hover:shadow-md border-border/50"
+                      className={`min-w-9 h-9 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center cursor-pointer border-0 shadow-none ${
+                        isSelected
+                          ? "bg-primary text-white"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                       }`}
-                      onClick={() => handleSubCategoryChange(subType)}
                     >
-                      {subType}
-                    </Chip>
-                  ))}
-                </div>
+                      {b.label}
+                    </button>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
-          {/* Property Type */}
-          <div className="animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <div className="flex items-center gap-3 mb-4 pb-2 ">
-              <h3 className="text-base font-semibold text-foreground">
-                Select Phase
+            {/* Bathrooms */}
+            <div className="space-y-2.5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Bathrooms
               </h3>
-              <Sparkles className="h-3 w-3 text-secondary ml-auto" />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: "Phase 1" },
-                { value: "Phase 2" },
-                { value: "Phase 3" },
-                { value: "Phase 4" },
-                { value: "Phase 5" },
-                { value: "Phase 6" },
-                { value: "Phase 7" },
-              ].map((type) => (
-                <Chip
-                  key={type.value}
-                  variant={
-                    filters.searchQuery === type.value ? "shadow" : "flat"
-                  }
-                  className={`cursor-pointer transition-all duration-300 premium-hover ${
-                    filters.searchQuery === type.value
-                      ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg scale-105 border-primary/50"
-                      : "hover:bg-muted hover:scale-105 hover:shadow-md border-border/50"
-                  }`}
-                  onClick={() =>
-                    onFiltersChange({
-                      ...filters,
-                      searchQuery: type.value as string,
-                    })
-                  }
-                >
-                  DHA {type.value}
-                </Chip>
-              ))}
-            </div>
-          </div>
-
-          {/* Price Range */}
-          <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <div className="flex items-center justify-between mb-4 pb-2 ">
-              <h3 className="text-base font-semibold text-foreground">
-                Price Range
-              </h3>
-              <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-                Rs.{formatNumberShort(priceRange[0])} - Rs.
-                {formatNumberShort(priceRange[1])}
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="relative">
-                <Slider
-                  value={priceRange}
-                  onValueChange={handlePriceRangeChange}
-                  max={1000000000}
-                  min={0}
-                  step={10000}
-                  className="w-full"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg opacity-50 pointer-events-none" />
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground font-medium">
-                  Rs.{priceRange[0].toLocaleString()}
-                </span>
-                <span className="text-muted-foreground font-medium">
-                  Rs.{priceRange[1].toLocaleString()}
-                </span>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: undefined, label: "Any" },
+                  { value: 1, label: "1" },
+                  { value: 2, label: "2" },
+                  { value: 3, label: "3" },
+                  { value: 4, label: "4+" },
+                ].map((b) => {
+                  const isSelected = filters.baths === b.value;
+                  return (
+                    <button
+                      key={b.label}
+                      type="button"
+                      onClick={() =>
+                        onFiltersChange({
+                          ...filters,
+                          baths: b.value,
+                        })
+                      }
+                      className={`min-w-9 h-9 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center cursor-pointer border-0 shadow-none ${
+                        isSelected
+                          ? "bg-primary text-white"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                      }`}
+                    >
+                      {b.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
-
-          {/* Beds & Baths (only for homes and apartments) */}
-          {filters.propertyType !== "plots" && (
-            <>
-              {/* Bedrooms */}
-              <div
-                className="animate-fade-in"
-                style={{ animationDelay: "0.3s" }}
-              >
-                <div className="flex items-center gap-3 mb-4 pb-2 ">
-                  <h3 className="text-base font-semibold text-foreground">
-                    Bedrooms
-                  </h3>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[1, 2, 3, 4, 5].map((bed) => (
-                    <Chip
-                      key={bed}
-                      variant={filters.beds === bed ? "solid" : "flat"}
-                      className={`cursor-pointer transition-all duration-300 premium-hover ${
-                        filters.beds === bed
-                          ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg scale-105 border-primary/50"
-                          : "hover:bg-muted hover:scale-105 hover:shadow-md border-border/50"
-                      }`}
-                      onClick={() => handleBedsChange(bed)}
-                    >
-                      {bed}+ bed{bed > 1 ? "s" : ""}
-                    </Chip>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bathrooms */}
-              <div
-                className="animate-fade-in"
-                style={{ animationDelay: "0.4s" }}
-              >
-                <div className="flex items-center gap-3 mb-4 pb-2 ">
-                  <h3 className="text-base font-semibold text-foreground">
-                    Bathrooms
-                  </h3>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[1, 2, 3, 4].map((bath) => (
-                    <Chip
-                      key={bath}
-                      variant={filters.baths === bath ? "solid" : "flat"}
-                      className={`cursor-pointer transition-all duration-300 premium-hover ${
-                        filters.baths === bath
-                          ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg scale-105 border-primary/50"
-                          : "hover:bg-muted hover:scale-105 hover:shadow-md border-border/50"
-                      }`}
-                      onClick={() => handleBathsChange(bath)}
-                    >
-                      {bath}+ bath{bath > 1 ? "s" : ""}
-                    </Chip>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Area Range */}
-          {/* <div className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
-            <div className="flex items-center justify-between mb-4 pb-2 ">
-              <h3 className="text-base font-semibold text-foreground">
-                Area (sq ft)
-              </h3>
-              <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-                {areaRange[0]} - {areaRange[1]} sq ft
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="relative">
-                <Slider
-                  value={areaRange}
-                  onValueChange={handleAreaRangeChange}
-                  max={500}
-                  min={0}
-                  step={10}
-                  className="w-full"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg opacity-50 pointer-events-none" />
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground font-medium">
-                  {areaRange[0]} sq ft
-                </span>
-                <span className="text-muted-foreground font-medium">
-                  {areaRange[1]} sq ft
-                </span>
-              </div>
-            </div>
-          </div> */}
-
-          {/* Apply Button */}
-          {/* {activeFiltersCount > 0 && (
-            <Button
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold animate-fade-in-up premium-hover"
-              style={{ animationDelay: "0.6s" }}
-            >
-              Apply {activeFiltersCount} Filter
-              {activeFiltersCount > 1 ? "s" : ""}
-            </Button>
-          )} */}
-        </div>
+        )}
       </div>
     </div>
   );
