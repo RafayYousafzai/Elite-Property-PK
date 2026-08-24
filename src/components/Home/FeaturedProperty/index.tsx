@@ -70,42 +70,38 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
           </p>
           {/* Navigation for multiple properties */}
           {properties.length > 1 && (
-            <div className="flex mt-3">
-              <div className="flex gap-2">
-                {properties.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentPropertyIndex(index)}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 ${
-                      currentPropertyIndex === index
-                        ? "bg-primary text-white"
-                        : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                    }`}
-                  >
-                    Property {index + 1}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar py-1">
+              {properties.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setCurrentPropertyIndex(index);
+                    setCurrent(1);
+                  }}
+                  className={`w-9 h-9 rounded-full text-xs font-bold transition-all duration-200 flex items-center justify-center shrink-0 ${
+                    currentPropertyIndex === index
+                      ? "bg-primary text-white shadow-sm scale-105"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                  aria-label={`Property ${index + 1}`}
+                >
+                  {index + 1}
+                </button>
+              ))}
             </div>
           )}
-          <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white line-clamp-2">
+          <h2 className="lg:text-40 text-30 font-semibold text-dark dark:text-white line-clamp-2 mt-2 leading-tight">
             {currentProperty.name}
           </h2>
 
-          <div className="flex items-center gap-2.5">
-            <Icon
-              icon="ph:map-pin"
-              width={28}
-              height={26}
-              className="text-dark/50 dark:text-white/50"
-            />
+          <div className="flex items-center gap-2.5 mt-1">
             <p className="text-dark/50 dark:text-white/50 text-base">
               {formatLocation(currentProperty.location)}
             </p>
           </div>
         </div>
         <div className="grid lg:grid-cols-2 gap-10">
-          <div className="relative">
+          <div className="relative overflow-hidden rounded-2xl">
             <Carousel
               setApi={setApi}
               opts={{
@@ -122,13 +118,13 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                         width={680}
                         height={530}
                         sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="rounded-2xl w-none h-[350px] object-cover md:h-540"
+                        className="rounded-2xl w-full h-[350px] object-cover md:h-[540px]"
                       />
                     </CarouselItem>
                   ))
                 ) : (
                   <CarouselItem>
-                    <div className="rounded-2xl w-full h-[350px] md:h-540 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <div className="rounded-2xl w-full h-[350px] md:h-[540px] bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                       <Icon
                         icon="ph:house-simple-fill"
                         className="text-6xl text-gray-400"
@@ -139,52 +135,48 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
               </CarouselContent>
             </Carousel>
             {count > 0 && (
-              <div className="absolute left-1/2 transform -translate-x-1/2 bg-dark/70 rounded-full py-2 px-4 bottom-6">
-                <p className="text-white text-sm font-medium">
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-md rounded-full py-1.5 px-4 z-10 pointer-events-none">
+                <p className="text-white text-xs font-semibold tracking-wide">
                   {current} / {count}
                 </p>
               </div>
             )}
           </div>
           <div className="flex flex-col gap-10">
-            <div className="md:block hidden ">
-              <p className=" text-dark/75 dark:text-white/75 text-base font-semibold gap-2">
+            <div className="md:block hidden">
+              <p className="text-dark/75 dark:text-white/75 text-base font-semibold gap-2 flex items-center">
                 <Icon
                   icon="ph:house-simple-fill"
-                  className="text-2xl text-primary "
+                  className="text-2xl text-primary"
                 />
                 Featured property
               </p>
               {/* Navigation for multiple properties */}
               {properties.length > 1 && (
-                <div className="flex mt-3">
-                  <div className="flex gap-2">
-                    {properties.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentPropertyIndex(index)}
-                        className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 ${
-                          currentPropertyIndex === index
-                            ? "bg-primary text-white"
-                            : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                        }`}
-                      >
-                        Property {index + 1}
-                      </button>
-                    ))}
-                  </div>
+                <div className="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar py-1">
+                  {properties.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setCurrentPropertyIndex(index);
+                        setCurrent(1);
+                      }}
+                      className={`w-9 h-9 rounded-full text-xs font-bold transition-all duration-200 flex items-center justify-center shrink-0 ${
+                        currentPropertyIndex === index
+                          ? "bg-primary text-white shadow-sm scale-105"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                      aria-label={`Property ${index + 1}`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
                 </div>
               )}
-              <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white line-clamp-2">
+              <h2 className="lg:text-40 text-30 font-semibold text-dark dark:text-white line-clamp-2 mt-2 leading-tight">
                 {currentProperty.name}
               </h2>
-              <div className="flex items-center gap-2.5">
-                <Icon
-                  icon="ph:map-pin"
-                  width={28}
-                  height={26}
-                  className="text-dark/50 dark:text-white/50"
-                />
+              <div className="flex items-center gap-2.5 mt-1">
                 <p className="text-dark/50 dark:text-white/50 text-base">
                   {formatLocation(currentProperty.location)}
                 </p>
