@@ -81,26 +81,27 @@ const Hero: React.FC = () => {
 
               {/* Main Call-to-Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                {query ? (
+                {query && (
                   <Button
                     onClick={handleSearch}
-                    className="h-12 bg-primary hover:bg-primary/90 text-primary-foreground px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25 flex items-center justify-center gap-2 cursor-pointer"
+                    className="lg:hidden h-12 bg-primary hover:bg-primary/90 text-primary-foreground px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-none border-0 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Search className="w-5 h-5" />
                     <span>Search Properties</span>
                   </Button>
-                ) : (
-                  <Button
-                    asChild
-                    className="h-12 bg-primary hover:bg-primary/90 text-primary-foreground px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25"
-                  >
-                    <Link href="/contactus">Book a visit</Link>
-                  </Button>
                 )}
                 <Button
                   asChild
+                  className={`h-12 bg-primary hover:bg-primary/90 text-primary-foreground px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-none border-0 ${
+                    query ? "hidden lg:flex" : "flex"
+                  }`}
+                >
+                  <Link href="/contactus">Book a visit</Link>
+                </Button>
+                <Button
+                  asChild
                   variant="outline"
-                  className="h-12 border-0 bg-white/15 backdrop-blur-md text-white cursor-pointer hover:bg-white/25 hover:text-white px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105"
+                  className="h-12 border-0 bg-white/15 backdrop-blur-md text-white cursor-pointer hover:bg-white/25 hover:text-white px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-none"
                 >
                   <Link href="/explore">View Properties</Link>
                 </Button>
