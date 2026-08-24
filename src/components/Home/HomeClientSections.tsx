@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { Property } from "@/types/property";
+import LazyMount from "@/components/shared/LazyMount";
 
 const ParallaxScroll = dynamic(
   () => import("@/components/ui/parallax-scroll").then((mod) => mod.ParallaxScroll),
@@ -68,13 +69,25 @@ interface HomeClientSectionsProps {
 }
 
 export function HomeParallaxSection({ featuredProperties }: HomeClientSectionsProps) {
-  return <ParallaxScroll items={featuredProperties} />;
+  return (
+    <LazyMount minHeight={900}>
+      <ParallaxScroll items={featuredProperties} />
+    </LazyMount>
+  );
 }
 
 export function HomeVideoSection() {
-  return <VideoShowcase videos={videoList} />;
+  return (
+    <LazyMount minHeight={600}>
+      <VideoShowcase videos={videoList} />
+    </LazyMount>
+  );
 }
 
 export function HomeLocationSection() {
-  return <LocationMap />;
+  return (
+    <LazyMount minHeight={700}>
+      <LocationMap />
+    </LazyMount>
+  );
 }
