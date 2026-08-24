@@ -99,7 +99,7 @@ const Services = () => {
           {services.map((service, index) => (
             <div
               key={index}
-              className="group relative bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 hover:border-primary/30 transition-all duration-500 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-primary/20 animate-fade-in-up"
+              className="group relative bg-white/5 backdrop-blur-lg rounded-2xl p-8 border-0 transition-all duration-500 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-primary/20 animate-fade-in-up"
               style={{ animationDelay: `${index * 150}ms` }}
             >
               {/* Card Glow Effect */}
@@ -132,18 +132,7 @@ const Services = () => {
                     </div>
                   ))}
                 </div>
-
-                {/* Learn More Button */}
-                {/* <div className="mt-6 pt-6 border-t border-white/10">
-                  <button className="flex items-center gap-2 text-primary font-semibold group-hover:gap-3 transition-all duration-300">
-                    Learn More
-                    <Icon icon="ph:arrow-right" className="text-lg" />
-                  </button>
-                </div> */}
               </div>
-
-              {/* Hover Border Effect */}
-              <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-primary/30 transition-all duration-500"></div>
             </div>
           ))}
         </div>
@@ -153,7 +142,7 @@ const Services = () => {
           className="text-center mt-16 animate-fade-in-up"
           style={{ animationDelay: "800ms" }}
         >
-          <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 max-w-4xl mx-auto">
+          <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border-0 max-w-4xl mx-auto">
             <h3 className="text-white text-3xl font-bold mb-4">
               Ready to Transform Your Property Dreams?
             </h3>

@@ -3,300 +3,159 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Property } from "@/types/property";
-import { Icon } from "@iconify/react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from "@/components/ui/carousel";
-import { Button } from "@heroui/react";
-import formatNumberShort from "@/lib/formatNumberShort";
 import { formatLocation, getImageUrl } from "@/lib/utils";
+import formatNumberShort from "@/lib/formatNumberShort";
+import { ArrowRight, ChevronLeft, ChevronRight, Bed, Bath, Maximize2 } from "lucide-react";
 
 interface FeaturedPropertyProps {
   properties: Property[];
 }
 
 const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
-  const [api, setApi] = React.useState<CarouselApi | undefined>(undefined);
-  const [current, setCurrent] = React.useState(0);
-  const [count, setCount] = React.useState(0);
-  const [currentPropertyIndex, setCurrentPropertyIndex] = React.useState(0);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    if (!api) {
-      return;
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === "left" ? -500 : 500;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
+  };
 
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
-
-  // If no properties, show fallback message
   if (!properties || properties.length === 0) {
-    return (
-      <section>
-        <div className="container max-w-8xl mx-auto px-5 2xl:px-0">
-          <div className="text-center">
-            <h2 className="lg:text-52 text-40 font-medium text-dark dark:text-white mb-4">
-              No Featured Properties Available
-            </h2>
-            <p className="text-dark/50 dark:text-white/50">
-              Check back soon for our latest featured properties!
-            </p>
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
-  // Get the current property to display
-  const currentProperty = properties[currentPropertyIndex] || properties[0];
-
   return (
-    <section>
-      <div className="container max-w-8xl mx-auto px-5 2xl:px-0">
-        <div className="md:hidden block mb-10">
-          <p className=" text-dark/75 dark:text-white/75 text-base font-semibold gap-2">
-            <Icon
-              icon="ph:house-simple-fill"
-              className="text-2xl text-primary "
-            />
-            Featured property
-          </p>
-          {/* Navigation for multiple properties */}
+    <section className="py-12 lg:py-20 overflow-hidden w-full">
+      <div className="container max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-0">
+        {/* Header Bar Aligned To Container Grid */}
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <span className="text-xs font-bold tracking-widest text-slate-400 dark:text-slate-400 uppercase block mb-2">
+              EXCLUSIVE LISTINGS
+            </span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Featured Properties
+            </h2>
+          </div>
+
+          {/* Navigation Scroll Controls */}
           {properties.length > 1 && (
-            <div className="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar py-1">
-              {properties.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setCurrentPropertyIndex(index);
-                    setCurrent(1);
-                  }}
-                  className={`w-9 h-9 rounded-full text-xs font-bold transition-all duration-200 flex items-center justify-center shrink-0 ${
-                    currentPropertyIndex === index
-                      ? "bg-primary text-white shadow-sm scale-105"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                  aria-label={`Property ${index + 1}`}
-                >
-                  {index + 1}
-                </button>
-              ))}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => scroll("left")}
+                className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white flex items-center justify-center hover:bg-primary hover:text-white transition-all cursor-pointer shadow-none border-0"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => scroll("right")}
+                className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white flex items-center justify-center hover:bg-primary hover:text-white transition-all cursor-pointer shadow-none border-0"
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
           )}
-          <h2 className="lg:text-40 text-30 font-semibold text-dark dark:text-white line-clamp-2 mt-2 leading-tight">
-            {currentProperty.name}
-          </h2>
-
-          <div className="flex items-center gap-2.5 mt-1">
-            <p className="text-dark/50 dark:text-white/50 text-base">
-              {formatLocation(currentProperty.location)}
-            </p>
-          </div>
         </div>
-        <div className="grid lg:grid-cols-2 gap-10">
-          <div className="relative overflow-hidden rounded-2xl">
-            <Carousel
-              setApi={setApi}
-              opts={{
-                loop: true,
-              }}
-            >
-              <CarouselContent>
-                {currentProperty.images && currentProperty.images.length > 0 ? (
-                  currentProperty.images.map((image, index) => (
-                    <CarouselItem key={index}>
-                      <Image
-                        src={getImageUrl(image)}
-                        alt={currentProperty.name}
-                        width={680}
-                        height={530}
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="rounded-2xl w-full h-[350px] object-cover md:h-[540px]"
-                      />
-                    </CarouselItem>
-                  ))
-                ) : (
-                  <CarouselItem>
-                    <div className="rounded-2xl w-full h-[350px] md:h-[540px] bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                      <Icon
-                        icon="ph:house-simple-fill"
-                        className="text-6xl text-gray-400"
-                      />
-                    </div>
-                  </CarouselItem>
-                )}
-              </CarouselContent>
-            </Carousel>
-            {count > 0 && (
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-md rounded-full py-1.5 px-4 z-10 pointer-events-none">
-                <p className="text-white text-xs font-semibold tracking-wide">
-                  {current} / {count}
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col gap-10">
-            <div className="md:block hidden">
-              <p className="text-dark/75 dark:text-white/75 text-base font-semibold gap-2 flex items-center">
-                <Icon
-                  icon="ph:house-simple-fill"
-                  className="text-2xl text-primary"
-                />
-                Featured property
-              </p>
-              {/* Navigation for multiple properties */}
-              {properties.length > 1 && (
-                <div className="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar py-1">
-                  {properties.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setCurrentPropertyIndex(index);
-                        setCurrent(1);
-                      }}
-                      className={`w-9 h-9 rounded-full text-xs font-bold transition-all duration-200 flex items-center justify-center shrink-0 ${
-                        currentPropertyIndex === index
-                          ? "bg-primary text-white shadow-sm scale-105"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                      }`}
-                      aria-label={`Property ${index + 1}`}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <h2 className="lg:text-40 text-30 font-semibold text-dark dark:text-white line-clamp-2 mt-2 leading-tight">
-                {currentProperty.name}
-              </h2>
-              <div className="flex items-center gap-2.5 mt-1">
-                <p className="text-dark/50 dark:text-white/50 text-base">
-                  {formatLocation(currentProperty.location)}
-                </p>
-              </div>
-            </div>
-            <p className="text-base text-dark/50 dark:text-white/50 line-clamp-3">
-              {currentProperty.description ||
-                "This property features modern amenities and spacious living areas in a prime location."}
-            </p>
-            <div className="grid grid-cols-2 gap-10">
-              {currentProperty.beds && (
-                <div className="flex items-center gap-4">
-                  <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
-                    <Image
-                      src={"/images/hero/sofa.svg"}
-                      alt="bedrooms"
-                      width={24}
-                      height={24}
-                      className="block dark:hidden"
-                      unoptimized={true}
-                    />
-                    <Image
-                      src={"/images/hero/dark-sofa.svg"}
-                      alt="bedrooms"
-                      width={24}
-                      height={24}
-                      className="hidden dark:block"
-                      unoptimized={true}
-                    />
-                  </div>
-                  <h6 className="">{currentProperty.beds} Bedrooms</h6>
-                </div>
-              )}
-              {currentProperty.baths && (
-                <div className="flex items-center gap-4">
-                  <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
-                    <Image
-                      src={"/images/hero/tube.svg"}
-                      alt="bathrooms"
-                      width={24}
-                      height={24}
-                      className="block dark:hidden"
-                      unoptimized={true}
-                    />
-                    <Image
-                      src={"/images/hero/dark-tube.svg"}
-                      alt="bathrooms"
-                      width={24}
-                      height={24}
-                      className="hidden dark:block"
-                      unoptimized={true}
-                    />
-                  </div>
-                  <h6 className="">{currentProperty.baths} Bathrooms</h6>
-                </div>
-              )}
-              <div className="flex items-center gap-4">
-                <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
-                  <Image
-                    src={"/images/hero/bar.svg"}
-                    alt="area"
-                    width={24}
-                    height={24}
-                    className="block dark:hidden"
-                    unoptimized={true}
-                  />
-                  <Image
-                    src={"/images/hero/dark-bar.svg"}
-                    alt="area"
-                    width={24}
-                    height={24}
-                    className="hidden dark:block"
-                    unoptimized={true}
-                  />
-                </div>
-                <h6 className="">
-                  {currentProperty.area} {currentProperty.area_unit || "Sq Ft"}
-                </h6>
-              </div>
-              {currentProperty.property_category && (
-                <div className="flex items-center gap-4">
-                  <div className="bg-dark/5 dark:bg-white/5 p-2.5 rounded-[6px]">
-                    <Icon
-                      icon={
-                        currentProperty.property_category === "Home"
-                          ? "ph:house-simple-fill"
-                          : currentProperty.property_category === "Plots"
-                          ? "ph:app-window-fill"
-                          : "ph:buildings-fill"
-                      }
-                      width={24}
-                      height={24}
-                      className="text-dark dark:text-white"
-                    />
-                  </div>
-                  <h6 className="">{currentProperty.property_type}</h6>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-10 items-center">
-              <Link href={`/explore/${currentProperty.slug}`}>
-                <Button
-                  className="bg-primary text-white"
-                  size="lg"
-                  radius="full"
+
+        {/* Scroll Track: Aligned to left container margin, extends to right screen edge */}
+        <div className="relative -mr-4 sm:-mr-6 lg:-mr-8 2xl:-mr-[50vw]">
+          <div
+            ref={scrollRef}
+            className="flex gap-6 sm:gap-8 overflow-x-auto no-scrollbar snap-x snap-mandatory py-2 pr-12 sm:pr-24 lg:pr-32"
+          >
+            {properties.map((property) => {
+              const mainImage = property.images?.[0]
+                ? getImageUrl(property.images[0])
+                : "/images/placeholder.jpg";
+
+              return (
+                <div
+                  key={property.id || property.slug}
+                  className="w-[90vw] sm:w-[680px] md:w-[840px] lg:w-[980px] shrink-0 snap-start"
                 >
-                  View Details
-                </Button>
-              </Link>
-              <div>
-                <h4 className="text-3xl text-dark dark:text-white font-medium">
-                  {formatNumberShort(Number(currentProperty.rate))}
-                </h4>
-                <p className="text-base text-dark/50 dark:text-white/50">
-                  {currentProperty.purpose === "Rent"
-                    ? "Per Month"
-                    : "Total Price"}
-                </p>
-              </div>
-            </div>
+                  <div className="group relative h-[450px] sm:h-[520px] lg:h-[580px] w-full overflow-hidden rounded-3xl bg-slate-900 shadow-none border-0">
+                    {/* Hero Background Image */}
+                    <Image
+                      src={mainImage}
+                      alt={property.name}
+                      fill
+                      sizes="(max-width: 768px) 85vw, 720px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      priority={false}
+                    />
+
+                    {/* Dark Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
+
+                    {/* Top Badge: Purpose */}
+                    {property.purpose && (
+                      <div className="absolute top-5 left-5 z-10">
+                        <span className="px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-white text-xs font-semibold uppercase tracking-wider border-0">
+                          {property.purpose === "Rent" ? "For Rent" : "For Sale"}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Bottom Overlaid Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 z-10 flex flex-col justify-end space-y-4">
+                      {/* Location Badge */}
+                      <div className="text-xs font-bold tracking-wider text-slate-300 uppercase">
+                        {formatLocation(property.location)}
+                      </div>
+
+                      {/* Property Title */}
+                      <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white line-clamp-1">
+                        {property.name}
+                      </h3>
+
+                      {/* Price Row & Action Button */}
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight block">
+                            {formatNumberShort(Number(property.rate))}
+                          </span>
+                        </div>
+
+                        <Link
+                          href={`/explore/${property.slug}`}
+                          className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-white/20 hover:bg-primary backdrop-blur-md text-white flex items-center justify-center transition-all duration-300 shrink-0 border-0 group/btn"
+                          aria-label={`View details for ${property.name}`}
+                        >
+                          <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
+                        </Link>
+                      </div>
+
+                      {/* Spec Bar */}
+                      <div className="pt-3 border-t border-white/20 flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium text-slate-200">
+                        {property.beds && (
+                          <div className="flex items-center gap-1.5">
+                            <Bed className="w-4 h-4 text-primary" />
+                            <span>{property.beds} Beds</span>
+                          </div>
+                        )}
+                        {property.baths && (
+                          <div className="flex items-center gap-1.5">
+                            <Bath className="w-4 h-4 text-primary" />
+                            <span>{property.baths} Baths</span>
+                          </div>
+                        )}
+                        {property.area && (
+                          <div className="flex items-center gap-1.5">
+                            <Maximize2 className="w-4 h-4 text-primary" />
+                            <span>
+                              {property.area} {property.area_unit || "Sq Ft"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

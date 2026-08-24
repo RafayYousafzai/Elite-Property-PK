@@ -107,14 +107,14 @@ export const ParallaxScroll = ({
               <div className="relative overflow-hidden">
                 <Image
                   src={getImageUrl(property.images?.[0])}
-                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   unoptimized={true}
                   alt={property.name}
                 />
                 {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-2xl">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                       <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
@@ -142,14 +142,14 @@ export const ParallaxScroll = ({
               <div className="relative overflow-hidden">
                 <Image
                   src={getImageUrl(property.images?.[0])}
-                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   unoptimized={true}
                   alt={property.name}
                 />
                 {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-2xl">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                       <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
@@ -177,14 +177,14 @@ export const ParallaxScroll = ({
               <div className="relative overflow-hidden">
                 <Image
                   src={getImageUrl(property.images?.[0])}
-                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
+                  className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
                   height="400"
                   width="400"
                   unoptimized={true}
                   alt={property.name}
                 />
                 {/* Property Name (Always Visible) */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-2xl">
                   <div className="absolute bottom-4 left-4 text-white ">
                     <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                       <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}
@@ -213,14 +213,14 @@ export const ParallaxScroll = ({
                 <div className="relative overflow-hidden">
                   <Image
                     src={getImageUrl(property.images?.[0])}
-                    className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-sm transition-transform duration-500 group-hover:scale-105"
+                    className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
                     height="400"
                     width="400"
                     unoptimized={true}
                     alt={property.name}
                   />
                   {/* Property Name (Always Visible) */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-sm">
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent rounded-2xl">
                     <div className="absolute bottom-4 left-4 text-white ">
                       <div className="font-light tracking-tight leading-11flex flex-wrap opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:translate-y-0 translate-y-full">
                         <p className="text-sm  mb-1">{formatLocation(property.location)}</p>{" "}

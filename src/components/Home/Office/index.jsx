@@ -27,7 +27,7 @@ const LocationMap = () => {
       "2nd Floor, Plaza no 19, Tipu Boulevard, Sector G DHA Phase II, Islamabad",
     phone: "+923344111778",
     email: "pk.eliteproperty@gmail.com",
-    hours: "Working Hours 9 Am to 7 Pm 7 Days A Week",
+    hours: "Mon - Sun: 9:00 AM - 7:00 PM",
   };
 
   const handleGetDirections = () => {
@@ -40,248 +40,213 @@ const LocationMap = () => {
   };
 
   return (
-    <div className="container max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-0 z-10 pb-20 relative overflow-hidden">
-      <div className="container mx-auto relative z-10">
+    <section className="relative py-20 overflow-hidden">
+      <div className="container max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-0 relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-600 to-yellow-600 text-white px-6 py-2 rounded-full text-sm font-semibold mb-6">
-            <MapPin className="w-4 h-4" />
-            Visit Our Office
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 shadow-none">
+            <MapPin className="w-3.5 h-3.5" />
+            <span>Visit Our Office</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Find Us in the Heart of
-            <span className="bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text  text-primary">
-              {" "}
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+            Find Us in the Heart of{" "}
+            <span className="text-primary">
               Islamabad
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-2xl mx-auto mt-3 font-normal">
             Visit our premium office location for personalized consultations and
             exclusive property viewings
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Map Container */}
-          <div className="relative group">
-            <div className="absolute inset-0 rounded-2xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
-            <div className="relative bg-slate-50 rounded-2xl overflow-hidden  ">
-              {/* Interactive Map Placeholder */}
-              <div className="aspect-[4/3] bg-gradient-to-br from-amber-100 to-yellow-100 relative">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3325.7026272595363!2d73.16746392552783!3d33.53511641307411!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfed8930128de7%3A0x4b866d1a81e61490!2sElite%20Property%20Exchange!5e0!3m2!1sen!2s!4v1759570688102!5m2!1sen!2s"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="rounded-2xl"
-                ></iframe>
-              </div>
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
+          {/* Map Container (7 Columns) */}
+          <div className="lg:col-span-7 rounded-2xl overflow-hidden bg-white dark:bg-slate-900/50 backdrop-blur-md flex flex-col shadow-none">
+            <div className="relative w-full h-[360px] sm:h-[440px] bg-slate-100 dark:bg-slate-800">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3325.7026272595363!2d73.16746392552783!3d33.53511641307411!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfed8930128de7%3A0x4b866d1a81e61490!2sElite%20Property%20Exchange!5e0!3m2!1sen!2s!4v1759570688102!5m2!1sen!2s"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full h-full"
+              ></iframe>
+            </div>
 
-              {/* Map Footer */}
-              <div className="p-6 bg-gradient-to-r from-amber-50 to-yellow-50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">
-                      Elite Property Real Estate
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      Premium Property Solutions
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleGetDirections}
-                    className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
-                  >
-                    <Navigation className="w-4 h-4" />
-                    Directions
-                  </button>
-                </div>
+            {/* Map Footer Bar */}
+            <div className="p-5 bg-slate-50/90 dark:bg-slate-900/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white text-base">
+                  Elite Property Exchange
+                </h4>
+                <p className="text-xs text-primary font-medium flex items-center gap-1 mt-0.5">
+                  <span>DHA Phase II • Islamabad</span>
+                </p>
               </div>
+              <button
+                onClick={handleGetDirections}
+                className="h-11 px-5 bg-primary hover:bg-primary/90 text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0 shadow-none"
+              >
+                <Navigation className="w-4 h-4" />
+                <span>Get Directions</span>
+              </button>
             </div>
           </div>
 
-          {/* Contact Information */}
-          <div className="space-y-8">
-            <div className="relative group">
-              {/* Luxury gradient background with subtle animation */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-100/50 via-yellow-50/30 to-orange-100/50 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+          {/* Contact Details Card (5 Columns) */}
+          <div className="lg:col-span-5 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 sm:p-8 space-y-6 shadow-none">
+            {/* Address */}
+            <div className="flex items-start gap-3.5">
+              <div className="text-primary shrink-0 mt-0.5">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs uppercase font-bold text-slate-400 tracking-wider mb-1">
+                  Office Address
+                </h4>
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-relaxed">
+                  {officeLocation.address}
+                </p>
+              </div>
+            </div>
 
-              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-amber-100/50">
-                <div className="grid grid-cols-1 gap-6">
-                  {/* Office Address */}
-                  <div className="flex items-center gap-4 group/item">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl blur-md opacity-50 group-hover/item:opacity-75 transition-opacity"></div>
-                      <div className="relative w-12 h-12 bg-gradient-to-br from-amber-600 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover/item:scale-110 transition-transform duration-300">
-                        <MapPin className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-1 text-sm">
-                        Office Address
-                      </h4>
-                      <p className="text-gray-600 text-sm leading-relaxed">
-                        {officeLocation.address}
-                      </p>
-                    </div>
-                  </div>
+            {/* Phone & Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 ">
+              <div className="flex items-start gap-3">
+                <div className="text-primary shrink-0 mt-0.5">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">
+                    Phone
+                  </h4>
+                  <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 mt-0.5">
+                    {officeLocation.phone}
+                  </p>
+                </div>
+              </div>
 
-                  {/* Phone & Email Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center gap-3 group/item">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl blur-md opacity-50 group-hover/item:opacity-75 transition-opacity"></div>
-                        <div className="relative w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover/item:scale-110 transition-transform duration-300">
-                          <Phone className="w-4 h-4 text-white" />
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-xs mb-0.5">
-                          Phone
-                        </h4>
-                        <p className="text-gray-600 text-sm">
-                          {officeLocation.phone}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 group/item">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl blur-md opacity-50 group-hover/item:opacity-75 transition-opacity"></div>
-                        <div className="relative w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover/item:scale-110 transition-transform duration-300">
-                          <Mail className="w-4 h-4 text-white" />
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-xs mb-0.5">
-                          Email
-                        </h4>
-                        <p className="text-gray-600 text-sm">
-                          {officeLocation.email}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Office Hours & Social Media Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center gap-3 group/item">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl blur-md opacity-50 group-hover/item:opacity-75 transition-opacity"></div>
-                        <div className="relative w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover/item:scale-110 transition-transform duration-300">
-                          <Clock className="w-4 h-4 text-white" />
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-xs mb-0.5">
-                          Hours
-                        </h4>
-                        <p className="text-gray-600 text-sm">
-                          {officeLocation.hours}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Social Media Links */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 text-xs mb-2">
-                          Follow Us
-                        </h4>
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href="https://www.facebook.com/elitepropexch/"
-                            target="_blank"
-                            className="group/social relative"
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg blur-md opacity-0 group-hover/social:opacity-75 transition-opacity"></div>
-                            <div className="relative w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300">
-                              <Facebook className="w-4 h-4 text-white" />
-                            </div>
-                          </Link>
-
-                          <Link
-                            href="https://www.instagram.com/elitepropertyexchange/"
-                            target="_blank"
-                            className="group/social relative"
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-br from-pink-600 via-purple-600 to-orange-500 rounded-lg blur-md opacity-0 group-hover/social:opacity-75 transition-opacity"></div>
-                            <div className="relative w-9 h-9 bg-gradient-to-br from-pink-600 via-purple-600 to-orange-500 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300">
-                              <Instagram className="w-4 h-4 text-white" />
-                            </div>
-                          </Link>
-
-                          <Link
-                            href="https://www.tiktok.com/@elitepropertiespk"
-                            target="_blank"
-                            className="group/social relative"
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg blur-md opacity-0 group-hover/social:opacity-75 transition-opacity"></div>
-                            <div className="relative w-9 h-9 bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300">
-                              <TiktokIcon className="w-4 h-4 text-white" />
-                            </div>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div className="flex items-start gap-3">
+                <div className="text-primary shrink-0 mt-0.5">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">
+                    Email
+                  </h4>
+                  <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 mt-0.5 truncate max-w-[140px]">
+                    {officeLocation.email}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* Hours & Social */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 ">
+              <div className="flex items-start gap-3">
+                <div className="text-primary shrink-0 mt-0.5">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">
+                    Working Hours
+                  </h4>
+                  <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 mt-0.5">
+                    {officeLocation.hours}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider mb-2">
+                  Follow Us
+                </h4>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="https://www.facebook.com/elitepropexch/"
+                    target="_blank"
+                    className="w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-none"
+                    aria-label="Facebook"
+                  >
+                    <Facebook className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href="https://www.instagram.com/elitepropertyexchange/"
+                    target="_blank"
+                    className="w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-none"
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href="https://www.tiktok.com/@elitepropertiespk"
+                    target="_blank"
+                    className="w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-none"
+                    aria-label="TikTok"
+                  >
+                    <TiktokIcon className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Buttons (Matching Height h-12) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <button
                 onClick={handleCallNow}
-                className="flex-1 cursor-pointer bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-5 text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-none"
               >
-                <div className="flex items-center justify-center gap-2">
-                  <Phone className="w-5 h-5" />
-                  Call Now
-                </div>
+                <Phone className="w-4.5 h-4.5" />
+                <span>Call Now</span>
               </button>
 
               <Link
                 href="https://wa.me/+923344111778"
                 target="_blank"
-                className=""
+                className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl px-5 text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-none"
               >
-                <button
-                  // onClick={handleGetDirections}
-                  className="flex-1 cursor-pointer text-white font-semibold py-4 px-8 rounded-xl bg-primary transition-all duration-300 transform hover:scale-101 shadow-lg"
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <Image
-                      src="/icons/whatsapp.png"
-                      alt="WhatsApp"
-                      width={20}
-                      height={20}
-                    />
-                    WhatsApp
-                  </div>
-                </button>
+                <Image
+                  src="/icons/whatsapp.png"
+                  alt="WhatsApp"
+                  width={18}
+                  height={18}
+                  className="brightness-200"
+                />
+                <span>WhatsApp</span>
               </Link>
             </div>
 
-            {/* Additional Info */}
-            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-6 border border-amber-100">
-              <h4 className="font-semibold text-gray-900 mb-2">
-                🏆 Why Visit Us?
+            {/* Why Visit Us Highlight Box */}
+            <div className="bg-primary/5 dark:bg-white/5 rounded-xl p-4 shadow-none">
+              <h4 className="font-bold text-slate-900 dark:text-white text-xs mb-2 text-primary">
+                Why Visit Our Office?
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Free property consultation</li>
-                <li>• Exclusive off-market listings</li>
-                <li>• Professional investment advice</li>
-                <li>• Complimentary market analysis</li>
-              </ul>
+              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Free Consultation
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Off-Market Listings
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Investment Advice
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Market Analysis
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

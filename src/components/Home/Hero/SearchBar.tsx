@@ -18,22 +18,49 @@ const PropertyTypeButton = ({
   onClick: () => void;
 }) => (
   <button
+    type="button"
     onClick={onClick}
-    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+    className={`flex items-center gap-1.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
       isActive
-        ? "bg-primary text-white shadow-lg shadow-primary/30"
-        : "bg-white/10 backdrop-blur-sm text-white/80 hover:bg-white/20 hover:text-white border border-white/20"
+        ? "bg-primary text-white shadow-md shadow-primary/30 font-semibold"
+        : "bg-white/10 backdrop-blur-md text-white/80 hover:bg-white/20 hover:text-white"
     }`}
   >
-    <Icon className="w-4 h-4" />
-    <span className="text-sm">{label}</span>
+    <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+    <span>{label}</span>
   </button>
 );
 
-export default function HeroSearchBar() {
-  const [selectedType, setSelectedType] = useState<string>("all");
-  const [query, setQuery] = useState<string>("");
+interface HeroSearchBarProps {
+  selectedType?: string;
+  onTypeChange?: (type: string) => void;
+  query?: string;
+  onQueryChange?: (query: string) => void;
+  onSearch?: () => void;
+}
+
+export default function HeroSearchBar({
+  selectedType: propSelectedType,
+  onTypeChange,
+  query: propQuery,
+  onQueryChange,
+  onSearch: propOnSearch,
+}: HeroSearchBarProps = {}) {
+  const [internalSelectedType, setInternalSelectedType] = useState<string>("all");
+  const [internalQuery, setInternalQuery] = useState<string>("");
   const router = useRouter();
+
+  const selectedType = propSelectedType ?? internalSelectedType;
+  const setSelectedType = (type: string) => {
+    if (onTypeChange) onTypeChange(type);
+    else setInternalSelectedType(type);
+  };
+
+  const query = propQuery ?? internalQuery;
+  const setQuery = (q: string) => {
+    if (onQueryChange) onQueryChange(q);
+    else setInternalQuery(q);
+  };
 
   const propertyTypes = [
     { value: "all", label: "All", icon: Building2 },
@@ -50,6 +77,10 @@ export default function HeroSearchBar() {
   }));
 
   const handleSearch = () => {
+    if (propOnSearch) {
+      propOnSearch();
+      return;
+    }
     const params = new URLSearchParams();
     if (selectedType !== "all") params.set("type", selectedType);
     if (query) params.set("search", query);
@@ -57,9 +88,9 @@ export default function HeroSearchBar() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-5">
       {/* Property Type Filters */}
-      <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+      <div className="flex flex-wrap gap-2 sm:gap-2.5 justify-center lg:justify-start">
         {propertyTypes.map((type) => (
           <PropertyTypeButton
             key={type.value}
@@ -72,7 +103,7 @@ export default function HeroSearchBar() {
       </div>
 
       {/* Phase Dropdown */}
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-row items-center gap-3">
         <Select
           aria-label="Select DHA Phase"
           placeholder="Select in islamabad DHA..."
@@ -83,19 +114,22 @@ export default function HeroSearchBar() {
           }}
           startContent={<MapPin className="w-5 h-5 text-slate-400" />}
           className="flex-1"
+          classNames={{
+            trigger: "h-12 rounded-xl",
+          }}
         >
           {phases.map((phase) => (
-            <SelectItem key={phase.value} value={phase.value}>
+            <SelectItem key={phase.value}>
               {phase.label}
             </SelectItem>
           ))}
         </Select>
 
+        {/* Desktop search button (hidden on mobile) */}
         <Button
           onClick={handleSearch}
-          size="lg"
           aria-label="Search properties"
-          className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 whitespace-nowrap"
+          className="hidden lg:flex h-12 w-12 aspect-square p-0 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 items-center justify-center cursor-pointer shrink-0"
         >
           <Search className="w-5 h-5 text-white" />
         </Button>
@@ -103,3 +137,4 @@ export default function HeroSearchBar() {
     </div>
   );
 }
+

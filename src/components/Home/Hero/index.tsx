@@ -1,10 +1,24 @@
-import type React from "react";
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import HeroSearchBar from "./SearchBar";
 
 const Hero: React.FC = () => {
+  const [selectedType, setSelectedType] = useState<string>("all");
+  const [query, setQuery] = useState<string>("");
+  const router = useRouter();
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (selectedType !== "all") params.set("type", selectedType);
+    if (query) params.set("search", query);
+    router.push(`/explore?${params.toString()}`);
+  };
+
   return (
     // Set min-height to avoid content being cut off on smaller screens and use flex to center content.
     // pt-[10vh] adds padding at the top to account for your navbar.
@@ -46,7 +60,7 @@ const Hero: React.FC = () => {
                     Elite
                   </span>
                 </h1>
-                <p className="text-lg sm:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-light">
+                <p className="-mt-5 text-lg sm:text-xl text-white/90 leading-snug max-w-2xl mx-auto lg:mx-0 font-light text-balance">
                   Step into a world of modern architecture and secure
                   investments. At Elite Property Exchange, every property is
                   verified and handpicked to match your lifestyle and financial
@@ -56,23 +70,37 @@ const Hero: React.FC = () => {
 
               {/* Category Buttons for mobile - Replaced with Search Bar */}
               <div className="lg:hidden">
-                <HeroSearchBar />
+                <HeroSearchBar
+                  selectedType={selectedType}
+                  onTypeChange={setSelectedType}
+                  query={query}
+                  onQueryChange={setQuery}
+                  onSearch={handleSearch}
+                />
               </div>
 
               {/* Main Call-to-Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25"
-                >
-                  <Link href="/contactus">Book a visit</Link>
-                </Button>
+                {query ? (
+                  <Button
+                    onClick={handleSearch}
+                    className="h-12 bg-primary hover:bg-primary/90 text-primary-foreground px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Search className="w-5 h-5" />
+                    <span>Search Properties</span>
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    className="h-12 bg-primary hover:bg-primary/90 text-primary-foreground px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/25"
+                  >
+                    <Link href="/contactus">Book a visit</Link>
+                  </Button>
+                )}
                 <Button
                   asChild
                   variant="outline"
-                  size="lg"
-                  className="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white cursor-pointer hover:bg-white/20 hover:text-white px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105"
+                  className="h-12 border-0 bg-white/15 backdrop-blur-md text-white cursor-pointer hover:bg-white/25 hover:text-white px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105"
                 >
                   <Link href="/explore">View Properties</Link>
                 </Button>
@@ -81,7 +109,13 @@ const Hero: React.FC = () => {
 
             {/* Right Column: Search Bar for Desktop */}
             <div className="hidden lg:flex flex-col items-center justify-center space-y-10">
-              <HeroSearchBar />
+              <HeroSearchBar
+                selectedType={selectedType}
+                onTypeChange={setSelectedType}
+                query={query}
+                onQueryChange={setQuery}
+                onSearch={handleSearch}
+              />
             </div>
           </div>
         </div>
