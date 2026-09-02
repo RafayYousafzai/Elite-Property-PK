@@ -72,7 +72,7 @@ const Footer = () => {
                 href="/contactus"
                 className="bg-white text-base font-semibold py-4 px-8 rounded-none text-pretty hover:bg-white hover:text-dark duration-300 hover:cursor-pointer"
               >
-                Get In Touch
+                Get In Touch.
               </Link>
             </div>
             <div className="md:col-span-3 sm:col-span-6 col-span-12">
