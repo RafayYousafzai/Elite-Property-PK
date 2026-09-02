@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useTransition } from "react";
+import { useState, useEffect, useCallback, useTransition, useRef } from "react";
 import SearchSidebar from "@/components/search-sidebar";
 import { Property } from "@/types/property";
 
@@ -142,10 +142,37 @@ export default function SearchPageClient({
     }
   }, [mobileFiltersOpen]);
 
-  // Apply filters whenever filters change
+  // Apply filters whenever filters change.
+  // On the very first run, `initialProperties` (server-fetched) is already
+  // sitting in `filteredProperties` via useProperties(), so we avoid
+  // re-fetching from the client (and blanking the already-rendered images
+  // behind a skeleton) unless the URL actually requested a non-default filter.
+  const isFirstRun = useRef(true);
+  const isDefaultFilters = useCallback((f: SearchFilters) => {
+    return (
+      f.propertyType === "all" &&
+      !f.subCategory &&
+      !f.searchQuery &&
+      !f.beds &&
+      !f.baths
+    );
+  }, []);
+
   useEffect(() => {
+    const firstRun = isFirstRun.current;
+    isFirstRun.current = false;
+
+    // Nothing to fetch: SSR data already matches "no filters applied".
+    if (firstRun && isDefaultFilters(filters) && initialProperties.length > 0) {
+      return;
+    }
+
     const applyFiltersAsync = async () => {
-      setIsLoading(true);
+      // Don't show the full-grid skeleton on first run — keep the already
+      // -rendered SSR cards/images visible while the filtered set loads in.
+      if (!firstRun) {
+        setIsLoading(true);
+      }
       try {
         await applyFilters(filters);
       } catch (error) {
@@ -157,7 +184,7 @@ export default function SearchPageClient({
     };
 
     applyFiltersAsync();
-  }, [filters, applyFilters]);
+  }, [filters, applyFilters, isDefaultFilters, initialProperties.length]);
 
   const updateUrlWithFilters = useCallback((newFilters: SearchFilters) => {
     const params = new URLSearchParams();

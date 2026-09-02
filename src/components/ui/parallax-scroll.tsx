@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
 import { cn, formatLocation, getImageUrl } from "@/lib/utils";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { properties } from "@/app/api/property";
 import { Property } from "@/types/property";
@@ -105,12 +104,11 @@ export const ParallaxScroll = ({
               className="group relative cursor-pointer"
             >
               <div className="relative overflow-hidden rounded-2xl">
-                <Image
+                <img
                   src={getImageUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
-                  height="400"
-                  width="400"
-                  unoptimized={true}
+                  loading="lazy"
+                  decoding="async"
                   alt={property.name}
                 />
                 {/* Full Gradient Overlay & Text Container */}
@@ -140,12 +138,11 @@ export const ParallaxScroll = ({
               className="group relative cursor-pointer"
             >
               <div className="relative overflow-hidden rounded-2xl">
-                <Image
+                <img
                   src={getImageUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
-                  height="400"
-                  width="400"
-                  unoptimized={true}
+                  loading="lazy"
+                  decoding="async"
                   alt={property.name}
                 />
                 {/* Full Gradient Overlay & Text Container */}
@@ -175,12 +172,11 @@ export const ParallaxScroll = ({
               className="group relative cursor-pointer"
             >
               <div className="relative overflow-hidden rounded-2xl">
-                <Image
+                <img
                   src={getImageUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
-                  height="400"
-                  width="400"
-                  unoptimized={true}
+                  loading="lazy"
+                  decoding="async"
                   alt={property.name}
                 />
                 {/* Full Gradient Overlay & Text Container */}
@@ -211,12 +207,11 @@ export const ParallaxScroll = ({
                 className="group relative cursor-pointer"
               >
                 <div className="relative overflow-hidden rounded-2xl">
-                  <Image
+                  <img
                     src={getImageUrl(property.images?.[0])}
                     className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
-                    height="400"
-                    width="400"
-                    unoptimized={true}
+                    loading="lazy"
+                    decoding="async"
                     alt={property.name}
                   />
                   {/* Full Gradient Overlay & Text Container */}

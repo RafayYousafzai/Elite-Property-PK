@@ -3,13 +3,13 @@
 import formatNumberShort from "@/lib/formatNumberShort";
 import { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
-import { Image } from "@heroui/react";
 import Link from "next/link";
 import { formatLocation, getImageUrl } from "@/lib/utils";
 import { getBedsCount, getBathsCount } from "@/lib/supabase/properties";
 
 const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
   item,
+  priority = false,
 }) => {
   const {
     name,
@@ -69,10 +69,11 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
 
           <Link href={`/explore/${slug}`} className="block w-full h-full">
             {mainImage ? (
-              <Image
-                removeWrapper
+              <img
                 src={mainImage}
                 alt={name}
+                loading={priority ? "eager" : "lazy"}
+                decoding="async"
                 className="w-full h-64 sm:h-72 object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
@@ -171,10 +172,11 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
 
           <Link href={`/explore/${slug}`} className="block w-full h-full">
             {mainImage && (
-              <Image
-                removeWrapper
+              <img
                 src={mainImage}
                 alt={name}
+                loading={priority ? "eager" : "lazy"}
+                decoding="async"
                 className="w-full h-full object-cover rounded-xl"
               />
             )}
