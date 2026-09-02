@@ -202,6 +202,8 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                     <img
                       src={getImageUrl(img)}
                       alt={`Thumbnail ${idx + 1}`}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                     {idx === 4 && images.length > 5 && (
