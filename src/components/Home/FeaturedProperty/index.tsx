@@ -78,13 +78,12 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                 >
                   <div className="group relative h-[450px] sm:h-[520px] lg:h-[580px] w-full overflow-hidden rounded-3xl bg-slate-900 shadow-none border-0">
                     {/* Hero Background Image */}
-                    <Image
+                    <img
                       src={mainImage}
                       alt={property.name}
-                      fill
-                      sizes="(max-width: 768px) 85vw, 720px"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      priority={false}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       onError={(e) => {
                         if (property.images?.[0]) {
                           (e.currentTarget as HTMLImageElement).src = getImageUrl(property.images[0]);
