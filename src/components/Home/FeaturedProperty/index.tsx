@@ -3,7 +3,7 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Property } from "@/types/property";
-import { formatLocation, getImageUrl } from "@/lib/utils";
+import { formatLocation, getImageUrl, getThumbnailUrl } from "@/lib/utils";
 import formatNumberShort from "@/lib/formatNumberShort";
 import { ArrowRight, ChevronLeft, ChevronRight, Bed, Bath, Maximize2 } from "lucide-react";
 
@@ -68,7 +68,7 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
           >
             {properties.map((property) => {
               const mainImage = property.images?.[0]
-                ? getImageUrl(property.images[0])
+                ? getThumbnailUrl(property.images[0])
                 : "/images/placeholder.jpg";
 
               return (
@@ -85,6 +85,11 @@ const FeaturedProperty: React.FC<FeaturedPropertyProps> = ({ properties }) => {
                       sizes="(max-width: 768px) 85vw, 720px"
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       priority={false}
+                      onError={(e) => {
+                        if (property.images?.[0]) {
+                          (e.currentTarget as HTMLImageElement).src = getImageUrl(property.images[0]);
+                        }
+                      }}
                     />
 
                     {/* Dark Gradient Overlay */}

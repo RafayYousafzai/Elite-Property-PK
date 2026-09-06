@@ -6,7 +6,7 @@ import { Icon } from "@iconify/react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import formatNumberShort from "@/lib/formatNumberShort";
-import { formatLocation, getImageUrl } from "@/lib/utils";
+import { formatLocation, getImageUrl, getThumbnailUrl } from "@/lib/utils";
 import { getBedsCount, getBathsCount } from "@/lib/supabase/properties";
 
 const PhotoSphereViewer = dynamic(() => import("@/components/shared/PhotoSphereViewer"), {
@@ -200,11 +200,14 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                     className="relative w-16 h-12 sm:w-24 sm:h-16 rounded-lg sm:rounded-xl overflow-hidden shrink-0 border border-white/30 hover:border-primary transition-all cursor-pointer opacity-90 hover:opacity-100"
                   >
                     <img
-                      src={getImageUrl(img)}
+                      src={getThumbnailUrl(img)}
                       alt={`Thumbnail ${idx + 1}`}
                       loading="lazy"
                       decoding="async"
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = getImageUrl(img);
+                      }}
                     />
                     {idx === 4 && images.length > 5 && (
                       <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold z-10">

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 
-import { cn, formatLocation, getImageUrl } from "@/lib/utils";
+import { cn, formatLocation, getImageUrl, getThumbnailUrl } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { properties } from "@/app/api/property";
 import { Property } from "@/types/property";
@@ -105,11 +105,14 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden rounded-2xl">
                 <img
-                  src={getImageUrl(property.images?.[0])}
+                  src={getThumbnailUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                   decoding="async"
                   alt={property.name}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = getImageUrl(property.images?.[0]);
+                  }}
                 />
                 {/* Full Gradient Overlay & Text Container */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl pointer-events-none" />
@@ -139,11 +142,14 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden rounded-2xl">
                 <img
-                  src={getImageUrl(property.images?.[0])}
+                  src={getThumbnailUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                   decoding="async"
                   alt={property.name}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = getImageUrl(property.images?.[0]);
+                  }}
                 />
                 {/* Full Gradient Overlay & Text Container */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl pointer-events-none" />
@@ -173,11 +179,14 @@ export const ParallaxScroll = ({
             >
               <div className="relative overflow-hidden rounded-2xl">
                 <img
-                  src={getImageUrl(property.images?.[0])}
+                  src={getThumbnailUrl(property.images?.[0])}
                   className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                   decoding="async"
                   alt={property.name}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = getImageUrl(property.images?.[0]);
+                  }}
                 />
                 {/* Full Gradient Overlay & Text Container */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl pointer-events-none" />
@@ -208,11 +217,14 @@ export const ParallaxScroll = ({
               >
                 <div className="relative overflow-hidden rounded-2xl">
                   <img
-                    src={getImageUrl(property.images?.[0])}
+                    src={getThumbnailUrl(property.images?.[0])}
                     className="h-[350px] md:h-[30rem] w-full object-cover object-center rounded-2xl transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                     decoding="async"
                     alt={property.name}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = getImageUrl(property.images?.[0]);
+                    }}
                   />
                   {/* Full Gradient Overlay & Text Container */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl pointer-events-none" />

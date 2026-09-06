@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
-import { getImageUrl } from "@/lib/utils";
+import { getImageUrl, getThumbnailUrl } from "@/lib/utils";
 
 // Dynamically import heavy 3D viewer and LightboxModal to eliminate 1.5MB and CSS from main thread
 const PhotoSphereViewer = dynamic(() => import("./PhotoSphereViewer"), {
@@ -97,9 +97,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
               <div className="relative">
                 {photoSphere && (
                   <PhotoSphereViewer
-                    src={[
-                      "https://eqwshdwdmvfqbeuqknkn.supabase.co/storage/v1/object/public/property-images/properties/42vrk13aqma-1759564251566.jpg",
-                    ]}
+                    src="https://eqwshdwdmvfqbeuqknkn.supabase.co/storage/v1/object/public/property-images/properties/42vrk13aqma-1759564251566.jpg"
                     height="460px"
                     className="shadow-lg"
                   />
@@ -222,12 +220,15 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
                     }`}
                   >
                     <Image
-                      src={getImageSrc(image)}
+                      src={getThumbnailUrl(image)}
                       alt={`Thumbnail ${index + 1}`}
                       fill
                       sizes="96px"
                       quality={60}
                       className="object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = getImageUrl(image);
+                      }}
                     />
                     {isLastVisibleWithRemaining && (
                       <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex flex-col items-center justify-center text-white p-1 rounded-xl hover:bg-black/70 transition-colors">
