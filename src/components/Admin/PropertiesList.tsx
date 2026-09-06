@@ -18,7 +18,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import formatNumberShort from "@/lib/formatNumberShort";
-import { getImageUrl } from "@/lib/utils";
+import { getImageUrl, getThumbnailUrl } from "@/lib/utils";
 
 interface Property {
   id?: string;
@@ -288,7 +288,7 @@ export default function PropertiesList({
                       <div className="relative group">
                         <Image
                           className="h-20 w-20 lg:h-24 lg:w-24 rounded-xl object-cover ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-500 transition-all duration-200"
-                          src={getImageUrl(property.images?.[0])}
+                          src={getThumbnailUrl(property.images?.[0])}
                           alt={property.name}
                           width={96}
                           height={96}
