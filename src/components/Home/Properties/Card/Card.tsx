@@ -4,7 +4,7 @@ import formatNumberShort from "@/lib/formatNumberShort";
 import { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
-import { formatLocation, getImageUrl } from "@/lib/utils";
+import { formatLocation, getImageUrl, getThumbnailUrl } from "@/lib/utils";
 import { getBedsCount, getBathsCount } from "@/lib/supabase/properties";
 
 const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
@@ -26,7 +26,9 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
     is_sold,
   } = item;
 
-  const mainImage = getImageUrl(images && images.length > 0 ? images[0] : null);
+  const rawFirstImage = images && images.length > 0 ? images[0] : null;
+  const mainImage = getThumbnailUrl(rawFirstImage);
+  const fullFallbackImage = getImageUrl(rawFirstImage);
   const formattedPrice = formatNumberShort(Number(rate)).replace("Rs", "PKR");
   const displayCategory = property_type
     ? property_type.replace(/-/g, " ")
@@ -74,6 +76,11 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
                 alt={name}
                 loading={priority ? "eager" : "lazy"}
                 decoding="async"
+                onError={(e) => {
+                  if (e.currentTarget.src !== fullFallbackImage) {
+                    e.currentTarget.src = fullFallbackImage;
+                  }
+                }}
                 className="w-full h-64 sm:h-72 object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
@@ -177,6 +184,11 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
                 alt={name}
                 loading={priority ? "eager" : "lazy"}
                 decoding="async"
+                onError={(e) => {
+                  if (e.currentTarget.src !== fullFallbackImage) {
+                    e.currentTarget.src = fullFallbackImage;
+                  }
+                }}
                 className="w-full h-full object-cover rounded-xl"
               />
             )}

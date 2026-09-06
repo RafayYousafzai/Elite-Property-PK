@@ -1,4 +1,5 @@
 import { uploadToR2 } from "@/lib/r2";
+import sharp from "sharp";
 
 export async function POST(req: Request) {
   try {
@@ -18,6 +19,7 @@ export async function POST(req: Request) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
+      // Upload main original file
       const { publicUrl, key } = await uploadToR2(
         buffer,
         fileName,
@@ -25,7 +27,42 @@ export async function POST(req: Request) {
         folder
       );
 
-      return Response.json({ publicUrl, key });
+      let thumbPublicUrl = "";
+      let thumbKey = "";
+
+      // Generate & upload WebP thumbnail (<40KB) for image uploads
+      if (file.type.startsWith("image/")) {
+        try {
+          let thumbnailBuffer = await sharp(buffer)
+            .resize({ width: 600, withoutEnlargement: true })
+            .webp({ quality: 75, effort: 6 })
+            .toBuffer();
+
+          // Enforce strict < 40 KB file size limit
+          if (thumbnailBuffer.length > 40 * 1024) {
+            thumbnailBuffer = await sharp(buffer)
+              .resize({ width: 500, withoutEnlargement: true })
+              .webp({ quality: 65, effort: 6 })
+              .toBuffer();
+          }
+
+          const thumbFileName = fileName.replace(/\.[^.]+$/, ".webp");
+          const thumbFolder = `thumbnails/${folder}`;
+
+          const thumbRes = await uploadToR2(
+            thumbnailBuffer,
+            thumbFileName,
+            "image/webp",
+            thumbFolder
+          );
+          thumbPublicUrl = thumbRes.publicUrl;
+          thumbKey = thumbRes.key;
+        } catch (thumbErr) {
+          console.error("Error generating WebP thumbnail:", thumbErr);
+        }
+      }
+
+      return Response.json({ publicUrl, key, thumbPublicUrl, thumbKey });
     } else {
       const body = await req.json();
       const { fileName, fileType = "image/jpeg", folder = "uploads" } = body;

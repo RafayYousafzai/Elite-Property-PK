@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Bed, Bath, Maximize, Eye } from "lucide-react";
 import { Image } from "@heroui/react";
 import { Property } from "@/types/property";
-import { formatLocation, getImageUrl } from "@/lib/utils";
+import { formatLocation, getImageUrl, getThumbnailUrl } from "@/lib/utils";
 
 interface PropertyCardProps {
   property: Property;
@@ -21,7 +21,7 @@ export default function PropertyCard({ property, type }: PropertyCardProps) {
       <div className="relative overflow-hidden">
         <Image
           removeWrapper
-          src={getImageUrl(property.images?.[0])}
+          src={getThumbnailUrl(property.images?.[0])}
           alt={property.name}
           className="w-full h-48 object-cover"
         />

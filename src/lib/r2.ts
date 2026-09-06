@@ -62,7 +62,21 @@ export async function deleteFromR2(key: string): Promise<boolean> {
 }
 
 export async function deleteMultipleFromR2(keys: string[]): Promise<boolean> {
-  const validKeys = keys.map(extractImagePath).filter(Boolean);
+  const allKeys: string[] = [];
+
+  keys.forEach((key) => {
+    const cleanKey = extractImagePath(key);
+    if (cleanKey) {
+      allKeys.push(cleanKey);
+      // Also delete corresponding WebP thumbnail if main image
+      if (!cleanKey.startsWith("thumbnails/")) {
+        const thumbKey = `thumbnails/${cleanKey}`.replace(/\.[^.]+$/, ".webp");
+        allKeys.push(thumbKey);
+      }
+    }
+  });
+
+  const validKeys = Array.from(new Set(allKeys));
   if (validKeys.length === 0) return true;
 
   try {

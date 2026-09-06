@@ -58,3 +58,37 @@ export function extractImagePath(urlOrPath: string): string {
   }
   return clean;
 }
+
+export function getThumbnailUrl(
+  image: any,
+  fallback = "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=70&w=400&auto=format&fit=crop"
+): string {
+  if (!image) return fallback;
+
+  const rawPath = extractImagePath(typeof image === "string" ? image : image?.src || image?.url || image?.path || "");
+  if (!rawPath) {
+    return getImageUrl(image, fallback);
+  }
+
+  // External non-R2 URLs or data URLs fallback to standard getImageUrl
+  if (
+    typeof image === "string" &&
+    (image.startsWith("data:") ||
+      (image.startsWith("http") && !image.includes("rafaykhan.website") && !image.includes(".r2.dev")))
+  ) {
+    return getImageUrl(image, fallback);
+  }
+
+  // Map "properties/abc.jpg" -> "thumbnails/properties/abc.webp"
+  let thumbPath = rawPath;
+  if (!thumbPath.startsWith("thumbnails/")) {
+    thumbPath = `thumbnails/${thumbPath}`;
+  }
+  thumbPath = thumbPath.replace(/\.[^.]+$/, ".webp");
+
+  const domain = PROPERTY_IMAGE_DOMAIN.endsWith("/")
+    ? PROPERTY_IMAGE_DOMAIN
+    : PROPERTY_IMAGE_DOMAIN + "/";
+
+  return `${domain}${thumbPath}`;
+}
