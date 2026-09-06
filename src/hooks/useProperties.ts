@@ -5,6 +5,7 @@ import { Property, SearchFilters } from "@/types/property";
 import {
   getFilteredProperties,
   getPropertiesClient,
+  transformDatabaseProperty,
 } from "@/lib/supabase/properties";
 import { createClient } from "@/utils/supabase/client";
 
@@ -115,21 +116,7 @@ export function useProperty(slug: string) {
 
         if (error) throw error;
 
-        setProperty({
-          id: data.id,
-          name: data.name,
-          slug: data.slug,
-          location: data.location,
-          rate: data.rate,
-          area: data.area,
-          beds: data.beds,
-          baths: data.baths,
-          photo_sphere: data.photo_sphere,
-          property_type: data.property_type,
-          images: data.images || [],
-          created_at: data.created_at,
-          updated_at: data.updated_at,
-        });
+        setProperty(transformDatabaseProperty(data));
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to fetch property"

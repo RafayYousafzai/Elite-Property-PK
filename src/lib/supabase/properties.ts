@@ -1,11 +1,26 @@
 import { createClient as createBrowserClient } from "@/utils/supabase/client";
 import { DatabaseProperty, Property, SearchFilters } from "@/types/property";
 import { propertyTypes } from "@/components/Admin/PropertyForm";
+import { extractImagePath, getImageUrl } from "@/lib/utils";
 
 // Transform database property to app property
 export const transformDatabaseProperty = (
   dbProperty: DatabaseProperty
 ): Property => {
+  // Use image_paths as the primary image source, fallback to images
+  const rawImagePaths =
+    dbProperty.image_paths && Array.isArray(dbProperty.image_paths) && dbProperty.image_paths.length > 0
+      ? dbProperty.image_paths
+      : dbProperty.images && Array.isArray(dbProperty.images)
+      ? dbProperty.images
+      : [];
+
+  const imagePathsArray: string[] = rawImagePaths
+    .map((img: any) => extractImagePath(typeof img === "string" ? img : img?.src || img?.url || img?.path || ""))
+    .filter((item: string) => Boolean(item));
+
+  const fullImagesArray: string[] = imagePathsArray.map((path) => getImageUrl(path));
+
   return {
     id: dbProperty.id,
     name: dbProperty.name,
@@ -17,7 +32,8 @@ export const transformDatabaseProperty = (
     baths: dbProperty.baths,
     photo_sphere: dbProperty.photo_sphere,
     property_type: dbProperty.property_type,
-    images: dbProperty.images || [],
+    images: fullImagesArray,
+    image_paths: imagePathsArray,
     description: dbProperty.description,
     is_featured: dbProperty.is_featured,
     created_at: dbProperty.created_at,
@@ -76,7 +92,7 @@ export function getBedsCount(property: Property): number {
   if (typeof property.beds === "number" && !isNaN(property.beds) && property.beds > 0) {
     return property.beds;
   }
-  if (property.beds !== null && property.beds !== undefined && property.beds !== "") {
+  if (property.beds !== null && property.beds !== undefined && (property.beds as any) !== "") {
     const parsed = parseNumericCount(property.beds);
     if (parsed > 0) return parsed;
   }
@@ -101,7 +117,7 @@ export function getBathsCount(property: Property): number {
   if (typeof property.baths === "number" && !isNaN(property.baths) && property.baths > 0) {
     return property.baths;
   }
-  if (property.baths !== null && property.baths !== undefined && property.baths !== "") {
+  if (property.baths !== null && property.baths !== undefined && (property.baths as any) !== "") {
     const parsed = parseNumericCount(property.baths);
     if (parsed > 0) return parsed;
   }

@@ -1,15 +1,18 @@
 export type Property = {
-  id: string;
+  id?: string;
   name: string;
   slug: string;
   location: string;
   rate: string;
-  images: PropertyImage[];
+  images: (PropertyImage | string)[];
+  image_paths?: string[];
   area: number;
   beds?: number | null;
   baths?: number | null;
   photo_sphere?: string | null;
-  property_type: string; // Accept any property type
+  photoSphere?: string | null;
+  property_type?: string; // Accept any property type
+  propertyType?: string;
   description?: string | null;
   is_featured?: boolean;
   created_at?: string;
@@ -44,7 +47,8 @@ export type DatabaseProperty = {
   baths: number | null;
   photo_sphere: string | null;
   property_type: string; // Accept any property type
-  images: PropertyImage[];
+  images?: (PropertyImage | string)[] | null;
+  image_paths?: string[] | null;
   description: string | null;
   is_featured: boolean;
   created_at: string;

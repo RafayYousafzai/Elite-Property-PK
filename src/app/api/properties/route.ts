@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { extractImagePath, getImageUrl } from "@/lib/utils";
 
 export async function GET() {
   const supabase = await createClient(cookies());
@@ -29,6 +30,14 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
+    if (body.images && Array.isArray(body.images)) {
+      body.images = body.images.map((img: any) => getImageUrl(img));
+    }
+    if (!body.image_paths && body.images) {
+      body.image_paths = body.images.map((img: any) => extractImagePath(img));
+    } else if (body.image_paths && Array.isArray(body.image_paths)) {
+      body.image_paths = body.image_paths.map((img: any) => extractImagePath(img));
+    }
 
     const { data, error } = await supabase
       .from("properties")

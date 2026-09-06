@@ -3,6 +3,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { extractImagePath } from "@/lib/utils";
+import { deleteMultipleFromR2 } from "@/lib/r2";
 
 // Updated schema interface
 export interface PropertyData {
@@ -15,6 +17,7 @@ export interface PropertyData {
   photo_sphere?: string | null;
   property_type: string; // Accept any property type string
   images: string[];
+  image_paths?: string[];
   description?: string | null;
   is_featured: boolean;
   featured_image_index?: number; // Index 0 = first image is cover
@@ -66,8 +69,13 @@ export async function createProperty(propertyData: PropertyData) {
     const uniqueSlug =
       baseSlug + "-" + Math.random().toString(36).substring(2, 8);
 
+    const cleanImagePaths = (propertyData.image_paths || propertyData.images || []).map(extractImagePath);
+    const fullUrlImages = propertyData.images || [];
+
     const dataToInsert = {
       ...propertyData,
+      images: fullUrlImages,
+      image_paths: cleanImagePaths,
       slug: uniqueSlug,
     };
 
@@ -129,8 +137,13 @@ export async function updateProperty(id: string, propertyData: PropertyData) {
       updatedSlug = baseSlug + "-" + Math.random().toString(36).substring(2, 8);
     }
 
+    const cleanImagePaths = (propertyData.image_paths || propertyData.images || []).map(extractImagePath);
+    const fullUrlImages = propertyData.images || [];
+
     const dataToUpdate = {
       ...propertyData,
+      images: fullUrlImages,
+      image_paths: cleanImagePaths,
       ...(updatedSlug ? { slug: updatedSlug } : {}),
     };
 
@@ -187,12 +200,36 @@ export async function deleteProperty(id: string) {
       };
     }
 
-    // Fetch property slug before deleting to revalidate its cache
+    // Fetch property details before deleting to clean up its R2 images and revalidate cache
     const { data: propToDelete } = await supabase
       .from("properties")
-      .select("slug")
+      .select("slug, images, image_paths, photo_sphere")
       .eq("id", id)
       .single();
+
+    if (propToDelete) {
+      const keysToDelete: string[] = [];
+
+      const rawPaths =
+        propToDelete.image_paths && Array.isArray(propToDelete.image_paths) && propToDelete.image_paths.length > 0
+          ? propToDelete.image_paths
+          : Array.isArray(propToDelete.images)
+          ? propToDelete.images
+          : [];
+
+      rawPaths.forEach((img: any) => {
+        const path = typeof img === "string" ? img : img?.src || img?.url || img?.path;
+        if (path) keysToDelete.push(path);
+      });
+
+      if (propToDelete.photo_sphere) {
+        keysToDelete.push(propToDelete.photo_sphere);
+      }
+
+      if (keysToDelete.length > 0) {
+        await deleteMultipleFromR2(keysToDelete);
+      }
+    }
 
     const { error } = await supabase.from("properties").delete().eq("id", id);
 

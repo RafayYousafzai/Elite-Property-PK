@@ -1,4 +1,5 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { extractImagePath } from "./utils";
 
 const cleanEnv = (val?: string) => (val || "").replace(/^["']|["']$/g, "").trim();
 
@@ -42,4 +43,41 @@ export async function uploadToR2(
   const publicUrl = `${R2_PUBLIC_URL}/${key}`;
 
   return { key, publicUrl };
+}
+
+export async function deleteFromR2(key: string): Promise<boolean> {
+  try {
+    const cleanKey = extractImagePath(key);
+    if (!cleanKey) return false;
+    const command = new DeleteObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: cleanKey,
+    });
+    await r2Client.send(command);
+    return true;
+  } catch (err) {
+    console.error("Failed to delete object from R2:", key, err);
+    return false;
+  }
+}
+
+export async function deleteMultipleFromR2(keys: string[]): Promise<boolean> {
+  const validKeys = keys.map(extractImagePath).filter(Boolean);
+  if (validKeys.length === 0) return true;
+
+  try {
+    const command = new DeleteObjectsCommand({
+      Bucket: R2_BUCKET_NAME,
+      Delete: {
+        Objects: validKeys.map((k) => ({ Key: k })),
+        Quiet: true,
+      },
+    });
+    await r2Client.send(command);
+    return true;
+  } catch (err) {
+    console.error("Failed to delete objects from R2:", keys, err);
+    await Promise.allSettled(validKeys.map((k) => deleteFromR2(k)));
+    return false;
+  }
 }

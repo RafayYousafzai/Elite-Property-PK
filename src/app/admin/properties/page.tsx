@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import PropertiesList from "@/components/Admin/PropertiesList";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { transformDatabaseProperty } from "@/lib/supabase/properties";
 
 const propertyTypes = {
   Home: [
@@ -119,7 +120,9 @@ export default async function PropertiesPage({
         {/* Properties List */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <PropertiesList
-            initialProperties={properties || []}
+            initialProperties={(properties || []).map((p: any) =>
+              transformDatabaseProperty(p)
+            )}
             initialCategory={category}
             currentPage={page}
             totalPages={totalPages}

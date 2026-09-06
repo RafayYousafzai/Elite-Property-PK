@@ -13,6 +13,8 @@ export function formatLocation(loc: string | null | undefined): string {
   return formatted;
 }
 
+export const PROPERTY_IMAGE_DOMAIN = "https://elitepropertyimages.rafaykhan.website/";
+
 export function getImageUrl(
   image: any,
   fallback = "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=70&w=400&auto=format&fit=crop"
@@ -33,5 +35,26 @@ export function getImageUrl(
     url = url.replace("http://", "https://");
   }
 
+  // Prepend domain if relative path
+  if (!url.startsWith("https://") && !url.startsWith("data:")) {
+    const domain = PROPERTY_IMAGE_DOMAIN.endsWith("/")
+      ? PROPERTY_IMAGE_DOMAIN
+      : PROPERTY_IMAGE_DOMAIN + "/";
+    const cleanPath = url.startsWith("/") ? url.slice(1) : url;
+    url = domain + cleanPath;
+  }
+
   return url;
+}
+
+export function extractImagePath(urlOrPath: string): string {
+  if (!urlOrPath || typeof urlOrPath !== "string") return "";
+  let clean = urlOrPath.trim();
+  if (clean.startsWith("http://") || clean.startsWith("https://")) {
+    clean = clean.replace(/^https?:\/\/[^\/]+\//, "");
+  }
+  if (clean.startsWith("/")) {
+    clean = clean.slice(1);
+  }
+  return clean;
 }

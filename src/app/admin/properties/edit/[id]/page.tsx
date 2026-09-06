@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { updateProperty } from "../../actions";
+import { extractImagePath } from "@/lib/utils";
 
 // Force dynamic rendering for admin pages
 export const dynamic = "force-dynamic";
@@ -35,8 +36,13 @@ export default function EditPropertyPage() {
         if (error) {
           setError(error.message);
         } else if (data) {
-          // Images should be passed as string URLs for existing images
-          const images = Array.isArray(data.images) ? data.images : [];
+          // Prefer image_paths from DB over legacy images
+          const images =
+            Array.isArray(data.image_paths) && data.image_paths.length > 0
+              ? data.image_paths
+              : Array.isArray(data.images)
+              ? data.images
+              : [];
 
           setInitialData({
             title: data.name || "",
@@ -113,6 +119,7 @@ export default function EditPropertyPage() {
         photo_sphere: photo_sphere || null,
         property_type: (formData.propertyType || "plot").toLowerCase(),
         images: uploadedImages,
+        image_paths: uploadedImages.map(extractImagePath),
         description: formData.description || null,
         is_featured: false,
 

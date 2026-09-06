@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { createProperty } from "../actions";
+import { extractImagePath } from "@/lib/utils";
 
 // Force dynamic rendering for admin pages
 export const dynamic = "force-dynamic";
@@ -47,6 +48,7 @@ export default function CreatePropertyPage() {
         photo_sphere: photo_sphere || null,
         property_type: (formData.propertyType || "plot").toLowerCase(),
         images: uploadedImages,
+        image_paths: uploadedImages.map(extractImagePath),
         description: formData.description || null,
         is_featured: false,
 

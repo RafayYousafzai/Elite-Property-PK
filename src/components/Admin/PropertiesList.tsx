@@ -21,17 +21,18 @@ import formatNumberShort from "@/lib/formatNumberShort";
 import { getImageUrl } from "@/lib/utils";
 
 interface Property {
-  id: string;
+  id?: string;
   name: string;
   location: string;
-  property_type: string;
+  property_type?: string;
   rate: string;
   area: number;
-  beds?: number;
-  baths?: number;
+  beds?: number | null;
+  baths?: number | null;
   images?: (string | { src: string })[];
-  description?: string;
-  is_featured: boolean;
+  image_paths?: string[];
+  description?: string | null;
+  is_featured?: boolean;
 }
 
 interface PropertiesListProps {
@@ -328,12 +329,12 @@ export default function PropertiesList({
                     <div className="flex flex-wrap items-center gap-3 text-sm">
                       <span
                         className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getPropertyTypeColor(
-                          property.property_type
+                          property.property_type || ""
                         )}`}
                       >
-                        {getPropertyTypeIcon(property.property_type)}
+                        {getPropertyTypeIcon(property.property_type || "")}
                         <span className="ml-1 capitalize">
-                          {property.property_type}
+                          {property.property_type || ""}
                         </span>
                       </span>
 
@@ -361,10 +362,10 @@ export default function PropertiesList({
                 {/* Actions */}
                 <div className="flex items-center space-x-3 lg:flex-shrink-0">
                   <StarButton
-                    propertyId={property.id}
-                    isFeatured={property.is_featured}
+                    propertyId={property.id || ""}
+                    isFeatured={Boolean(property.is_featured)}
                     onStatusChange={(isFeatured) =>
-                      handleFeaturedChange(property.id, isFeatured)
+                      handleFeaturedChange(property.id || "", isFeatured)
                     }
                   />
 
@@ -377,8 +378,8 @@ export default function PropertiesList({
                   </Link>
 
                   <DeletePropertyButton
-                    propertyId={property.id}
-                    onDelete={() => handleDeleteProperty(property.id)}
+                    propertyId={property.id || ""}
+                    onDelete={() => handleDeleteProperty(property.id || "")}
                   />
                 </div>
               </div>

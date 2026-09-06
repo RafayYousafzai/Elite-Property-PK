@@ -675,7 +675,7 @@ export default function PropertyForm({
                 </div>
                 <Input
                   type="text"
-                  label={`Price (${formatNumberShort(formData.price)}) *`}
+                  label={`Price (${formatNumberShort(Number(formData.price) || 0)}) *`}
                   placeholder="Enter price"
                   value={formData.price}
                   onValueChange={(value) =>
