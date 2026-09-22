@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import type { Property } from "@/types/property";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
@@ -38,13 +39,20 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
 
   const images = property.images && property.images.length > 0 ? property.images : [];
   const heroImage = getImageUrl(images[0]);
+  const heroThumb = getThumbnailUrl(images[0]);
   const formattedPrice = formatNumberShort(Number(property.rate)).replace("Rs", "PKR");
   const bedNum = getBedsCount(property);
   const bathNum = getBathsCount(property);
 
   const lightboxSlides = images.map((img) => ({
     src: getImageUrl(img),
+    thumb: getThumbnailUrl(img),
   }));
+
+  // Fetch the hero image at high priority instead of waiting for CSS to discover it
+  if (images.length > 0) {
+    ReactDOM.preload(heroImage, { as: "image", fetchPriority: "high" });
+  }
 
   // Send ViewContent event when property loads
   useEffect(() => {
@@ -75,7 +83,11 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
       <div className="w-full max-w-full overflow-x-hidden bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
         {/* Fullscreen Hero Background Section */}
         <section className="!py-0 relative w-full min-h-[100dvh] overflow-hidden flex flex-col justify-end">
-          {/* Background Image */}
+          {/* Background Image (tiny WebP thumbnail paints first, full image layers over it) */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105 blur-sm"
+            style={{ backgroundImage: `url(${heroThumb})` }}
+          />
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
             style={{ backgroundImage: `url(${heroImage})` }}
@@ -202,7 +214,8 @@ export default function PropertyDetailsClient({ property }: PropertyDetailsClien
                     <img
                       src={getThumbnailUrl(img)}
                       alt={`Thumbnail ${idx + 1}`}
-                      loading="lazy"
+                      loading="eager"
+                      fetchPriority="low"
                       decoding="async"
                       className="w-full h-full object-cover"
                       onError={(e) => {
