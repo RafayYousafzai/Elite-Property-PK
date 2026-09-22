@@ -2,6 +2,7 @@ import type { Message } from "./types";
 import { Avatar, Button, Surface, Skeleton } from "./heroui-shims";
 import { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { TextShimmer } from "./motion-primitives/text-shimmer";
+import { getThumbnailUrl } from "@/lib/utils";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -135,6 +136,66 @@ function getFileParts(msg: Message) {
   );
 }
 
+type PropertySuggestion = {
+  name: string;
+  price: string;
+  location: string;
+  size: string;
+  beds?: number;
+  baths?: number;
+  url: string;
+  img?: string;
+};
+
+/** Pulls listing cards out of a completed `suggestProperties` tool call. */
+function getPropertySuggestions(msg: Message): PropertySuggestion[] {
+  const parts = (msg.parts ?? []) as Array<Record<string, any>>;
+  return parts.flatMap((part) =>
+    part?.type === "tool-suggestProperties" &&
+    Array.isArray(part?.output?.matches)
+      ? (part.output.matches as PropertySuggestion[])
+      : [],
+  );
+}
+
+function PropertyCards({ items }: { items: PropertySuggestion[] }) {
+  return (
+    <div className="flex gap-2 overflow-x-auto pb-1 pl-10 pr-1 no-scrollbar">
+      {items.map((item) => (
+        <a
+          key={item.url}
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 w-44 rounded-2xl overflow-hidden bg-white border border-black/10 hover:border-[#d4af37] transition-colors shadow-sm"
+        >
+          {item.img && (
+            <img
+              src={getThumbnailUrl(item.img)}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="w-full h-24 object-cover"
+            />
+          )}
+          <div className="p-2.5">
+            <p className="text-[12px] font-semibold text-gray-900 leading-tight line-clamp-2">
+              {item.name}
+            </p>
+            <p className="text-[12px] font-bold text-[#b8952f] mt-1">
+              {item.price}
+            </p>
+            <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">
+              {item.location} &middot; {item.size}
+              {item.beds ? ` · ${item.beds} beds` : ""}
+            </p>
+          </div>
+        </a>
+      ))}
+    </div>
+  );
+}
+
 function getOptionButtonsForText(text: string): string[] | null {
   if (!text) return null;
   const lower = text.toLowerCase();
@@ -158,6 +219,10 @@ function getOptionButtonsForText(text: string): string[] | null {
     lower.includes("living")
   ) {
     return ["Personal Use", "Investment"];
+  }
+
+  if (lower.includes("bedroom") || lower.includes("beds")) {
+    return ["3 Beds", "4 Beds", "5+ Beds"];
   }
 
   if (
@@ -399,8 +464,10 @@ export function ChatMessages({
               const textContent = getTextContent(msg);
               const fileParts = getFileParts(msg);
               const isLastMsg = msgIdx === messages.length - 1;
+              const suggestions = isAssistant ? getPropertySuggestions(msg) : [];
 
-              if (isAssistant && !textContent.trim()) return null;
+              if (isAssistant && !textContent.trim() && suggestions.length === 0)
+                return null;
 
               return (
                 <div
@@ -419,6 +486,7 @@ export function ChatMessages({
                         !isAssistant ? "items-end ml-auto" : "items-start"
                       }`}
                     >
+                      {textContent.trim() && (
                       <Surface
                         className={`py-2.5 px-3.5 text-[13px] leading-relaxed transition-opacity duration-200 ${
                           !isAssistant
@@ -442,8 +510,15 @@ export function ChatMessages({
                           {parseMessageContent(textContent)}
                         </p>
                       </Surface>
+                      )}
                     </div>
                   </div>
+
+                  {suggestions.length > 0 && (
+                    <div className="w-full pt-2">
+                      <PropertyCards items={suggestions} />
+                    </div>
+                  )}
 
                   {/* Render contextual option buttons stacked vertically on the right side */}
                   {isAssistant && isLastMsg && activeOptions && (

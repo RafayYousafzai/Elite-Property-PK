@@ -5,6 +5,9 @@ import { getAgentTools } from "@/lib/agent/tools";
 
 export const runtime = "edge";
 
+const MODEL_ID = "gemini-3.5-flash-lite";
+const MAX_HISTORY_MESSAGES = 14;
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -16,7 +19,11 @@ export async function POST(req: Request) {
       });
     }
 
-    const { messages = [], sessionId = "anonymous" } = body;
+    const { messages: allMessages = [], sessionId = "anonymous" } = body;
+
+    // Only the tail of the conversation matters for this intake flow; sending
+    // the whole transcript on every turn is the biggest avoidable token cost.
+    const messages = allMessages.slice(-MAX_HISTORY_MESSAGES);
 
     const apiKey = (
       process.env.GEMINI_API_KEY ||
@@ -98,12 +105,20 @@ export async function POST(req: Request) {
 
     const modelMessages = await convertToModelMessages(messagesWithUrls);
 
-    // Strictly model gemini-3.1-flash-lite as requested
-    const model = google("gemini-3.1-flash-lite");
+    const model = google(MODEL_ID);
 
     const result = streamText({
       model,
-      stopWhen: stepCountIs(10),
+      // Replies are one short sentence; tool calls need a little more headroom
+      maxOutputTokens: 400,
+      temperature: 0.4,
+      providerOptions: {
+        // Scripted intake flow, so reasoning tokens are pure cost. Note that
+        // 3.x-lite rejects thinkingBudget (400 INVALID_ARGUMENT) and expects
+        // thinkingLevel instead.
+        google: { thinkingConfig: { thinkingLevel: "minimal" } },
+      },
+      stopWhen: stepCountIs(5),
       system: ELITE_SYSTEM_PROMPT,
       messages: modelMessages,
       tools: getAgentTools(sessionId),

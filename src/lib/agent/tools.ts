@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { after } from "next/server";
+import { findProperties } from "./properties";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -123,6 +124,37 @@ export const getAgentTools = (sessionId: string) => ({
       } catch (err) {
         console.warn("after() fallback to blocking saveLead:", err);
         return saveLead(sessionId, data);
+      }
+    },
+  }),
+
+  suggestProperties: tool({
+    description:
+      "Finds live Elite Property listings matching the visitor's stated preferences. Call this as soon as you know at least the property type and budget. The widget renders the results as cards, so do NOT repeat the listing details in your reply.",
+    inputSchema: z.object({
+      category: z
+        .enum(["house", "plot", "any"])
+        .optional()
+        .describe("house = built home/villa/apartment, plot = land"),
+      minBudget: z.number().optional().describe("Minimum price in PKR (1 crore = 10000000)"),
+      maxBudget: z.number().optional().describe("Maximum price in PKR (1 crore = 10000000)"),
+      phase: z.number().optional().describe("DHA phase number 1-9, if the visitor named one"),
+      minBeds: z.number().optional().describe("Minimum bedrooms, for houses only"),
+    }),
+    execute: async (filters) => {
+      try {
+        const { matches, relaxed, total } = await findProperties(filters);
+        if (matches.length === 0) {
+          return { matches: [], note: "No live listings match. Offer a callback instead." };
+        }
+        return {
+          matches,
+          total,
+          ...(relaxed ? { note: "Closest available, not an exact filter match." } : null),
+        };
+      } catch (err) {
+        console.error("suggestProperties failed:", err);
+        return { matches: [], note: "Search unavailable. Offer a callback instead." };
       }
     },
   }),
