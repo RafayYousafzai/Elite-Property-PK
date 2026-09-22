@@ -3,7 +3,10 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { ELITE_SYSTEM_PROMPT } from "@/lib/agent/prompt";
 import { getAgentTools } from "@/lib/agent/tools";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
+
+// Suppress AI SDK internal warning log in dev/edge environments
+(globalThis as any).AI_SDK_LOG_WARNINGS = false;
 
 const MODEL_ID = "gemini-3.5-flash-lite";
 const MAX_HISTORY_MESSAGES = 14;
@@ -48,8 +51,25 @@ export async function POST(req: Request) {
       apiKey,
     });
 
-    const mergedMessages: any[] = [];
+    // 1. Deduplicate consecutive identical user messages (prevents rapid double-submits)
+    const dedupedMessages: any[] = [];
     for (const msg of messages) {
+      const prev = dedupedMessages[dedupedMessages.length - 1];
+      if (
+        prev &&
+        prev.role === "user" &&
+        msg.role === "user" &&
+        (msg.content === prev.content ||
+          (msg.parts && prev.parts && JSON.stringify(msg.parts) === JSON.stringify(prev.parts)))
+      ) {
+        continue;
+      }
+      dedupedMessages.push(msg);
+    }
+
+    // 2. Merge consecutive assistant messages
+    const mergedMessages: any[] = [];
+    for (const msg of dedupedMessages) {
       if (
         mergedMessages.length > 0 &&
         msg.role === "assistant" &&
@@ -76,20 +96,23 @@ export async function POST(req: Request) {
 
     const finalMessages = sanitizedMessages.length > 0 ? sanitizedMessages : mergedMessages;
 
+    // 3. Ensure parts array is properly formed for convertToModelMessages
     const messagesWithUrls = finalMessages.map((msg) => {
-      if (msg.role === "user" && msg.parts) {
-        const fileParts = msg.parts.filter((p: any) => p.type === "file" && p.url);
+      const parts = msg.parts ? [...msg.parts] : [{ type: "text", text: msg.content || "" }];
+      const updatedMsg = { ...msg, parts };
+
+      if (msg.role === "user") {
+        const fileParts = parts.filter((p: any) => p.type === "file" && p.url);
         if (fileParts.length > 0) {
-          const updatedMsg = { ...msg, parts: [...msg.parts] };
           const urlList = fileParts.map((p: any) => `[Uploaded File URL: ${p.url}]`).join("\n");
-          const textPartIndex = updatedMsg.parts.findIndex((p: any) => p.type === "text");
+          const textPartIndex = parts.findIndex((p: any) => p.type === "text");
           if (textPartIndex !== -1) {
-            updatedMsg.parts[textPartIndex] = {
-              ...updatedMsg.parts[textPartIndex],
-              text: `${updatedMsg.parts[textPartIndex].text}\n\n${urlList}`,
+            parts[textPartIndex] = {
+              ...parts[textPartIndex],
+              text: `${parts[textPartIndex].text}\n\n${urlList}`,
             };
           } else {
-            updatedMsg.parts.push({
+            parts.push({
               type: "text",
               text: urlList,
             });
@@ -97,13 +120,55 @@ export async function POST(req: Request) {
           if (updatedMsg.content) {
             updatedMsg.content = `${updatedMsg.content}\n\n${urlList}`;
           }
-          return updatedMsg;
         }
       }
-      return msg;
+      return updatedMsg;
     });
 
-    const modelMessages = await convertToModelMessages(messagesWithUrls);
+    const rawModelMessages = await convertToModelMessages(messagesWithUrls);
+
+    // 4. Sanitize model messages to prevent AI_MissingToolResultsError:
+    // Gather all toolCallIds that have tool-results in the conversation
+    const resolvedToolCallIds = new Set<string>();
+    for (const message of rawModelMessages) {
+      if (message.role === "tool" && Array.isArray(message.content)) {
+        for (const part of message.content) {
+          if (part.type === "tool-result" && part.toolCallId) {
+            resolvedToolCallIds.add(part.toolCallId);
+          }
+        }
+      }
+    }
+
+    // Filter out unresolved tool-calls from assistant messages
+    const cleanModelMessages: typeof rawModelMessages = [];
+    for (const message of rawModelMessages) {
+      if (message.role === "assistant" && Array.isArray(message.content)) {
+        const validContent = message.content.filter((part: any) => {
+          if (part.type === "tool-call") {
+            return resolvedToolCallIds.has(part.toolCallId) || Boolean(part.providerExecuted);
+          }
+          return true;
+        });
+        if (validContent.length > 0) {
+          cleanModelMessages.push({ ...message, content: validContent });
+        }
+      } else if (message.role === "tool" && Array.isArray(message.content)) {
+        if (message.content.length > 0) {
+          cleanModelMessages.push(message);
+        }
+      } else {
+        cleanModelMessages.push(message);
+      }
+    }
+
+    while (
+      cleanModelMessages.length > 0 &&
+      cleanModelMessages[0].role !== "user" &&
+      cleanModelMessages[0].role !== "system"
+    ) {
+      cleanModelMessages.shift();
+    }
 
     const model = google(MODEL_ID);
 
@@ -120,7 +185,7 @@ export async function POST(req: Request) {
       },
       stopWhen: stepCountIs(5),
       system: ELITE_SYSTEM_PROMPT,
-      messages: modelMessages,
+      messages: cleanModelMessages,
       tools: getAgentTools(sessionId),
       onError: ({ error }) => {
         console.error("=== GEMINI STREAM ERROR ===", error);

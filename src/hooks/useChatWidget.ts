@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 const uploadFileToSupabase = async (fileObj: File, sessionId: string) => {
   try {
@@ -169,48 +169,62 @@ export function useChatWidget(options?: { initialOpen?: boolean }) {
 
   const isReady = (status === "ready" || status === "error") && !isUploading;
   const isProcessing = status === "submitted" || status === "streaming" || isUploading;
+  const isSendingRef = useRef(false);
 
   const uploadAndSend = useCallback(
     async (text: string, selectedFile?: File | null) => {
-      let finalMessageText = text.trim();
-      let uploadedUrl: string | null = null;
-
-      if (selectedFile) {
-        const MAX_FILE_SIZE = 5 * 1024 * 1024;
-        if (selectedFile.size > MAX_FILE_SIZE) {
-          alert("File size exceeds 5MB limit. Please upload a smaller file.");
-          setInput("");
-          return;
-        }
-        setIsUploading(true);
-        uploadedUrl = await uploadFileToSupabase(selectedFile, sessionId);
-        setIsUploading(false);
-
-        if (!uploadedUrl) {
-          finalMessageText += "\n[System Notification: Document upload failed.]";
-        }
+      if (isSendingRef.current || isProcessing) {
+        return;
       }
 
-      if (uploadedUrl && selectedFile) {
-        const filePart = {
-          type: "file" as const,
-          mediaType: selectedFile.type || "image/*",
-          filename: selectedFile.name,
-          url: uploadedUrl,
-        };
-
-        await sendMessage(
-          finalMessageText
-            ? { text: finalMessageText, files: [filePart] }
-            : { files: [filePart] }
-        );
-      } else if (finalMessageText) {
-        await sendMessage({ text: finalMessageText });
+      const trimmedText = text.trim();
+      if (!trimmedText && !selectedFile) {
+        return;
       }
 
+      isSendingRef.current = true;
       setInput("");
+
+      try {
+        let finalMessageText = trimmedText;
+        let uploadedUrl: string | null = null;
+
+        if (selectedFile) {
+          const MAX_FILE_SIZE = 5 * 1024 * 1024;
+          if (selectedFile.size > MAX_FILE_SIZE) {
+            alert("File size exceeds 5MB limit. Please upload a smaller file.");
+            return;
+          }
+          setIsUploading(true);
+          uploadedUrl = await uploadFileToSupabase(selectedFile, sessionId);
+          setIsUploading(false);
+
+          if (!uploadedUrl) {
+            finalMessageText += "\n[System Notification: Document upload failed.]";
+          }
+        }
+
+        if (uploadedUrl && selectedFile) {
+          const filePart = {
+            type: "file" as const,
+            mediaType: selectedFile.type || "image/*",
+            filename: selectedFile.name,
+            url: uploadedUrl,
+          };
+
+          await sendMessage(
+            finalMessageText
+              ? { text: finalMessageText, files: [filePart] }
+              : { files: [filePart] }
+          );
+        } else if (finalMessageText) {
+          await sendMessage({ text: finalMessageText });
+        }
+      } finally {
+        isSendingRef.current = false;
+      }
     },
-    [sendMessage, sessionId]
+    [sendMessage, sessionId, isProcessing]
   );
 
   const handleSubmit = useCallback(

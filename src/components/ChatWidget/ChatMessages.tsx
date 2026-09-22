@@ -422,6 +422,7 @@ export function ChatMessages({
                 <Button
                   key={opt}
                   size="sm"
+                  isDisabled={isLoading}
                   onClick={() => onQuickPromptSelect(opt)}
                   className="bg-[#d4af37] text-white font-semibold text-[13px] rounded-full px-3.5 py-1.5 h-8 min-w-0 transition hover:scale-105 shadow-sm"
                 >
@@ -527,6 +528,7 @@ export function ChatMessages({
                         <Button
                           key={opt}
                           size="sm"
+                          isDisabled={isLoading}
                           onClick={() => onQuickPromptSelect(opt)}
                           className="bg-[#d4af37] text-white font-semibold text-[13px] rounded-2xl px-4 py-2 h-auto min-h-[32px] min-w-0 transition hover:scale-105 shadow-sm text-right whitespace-normal"
                         >

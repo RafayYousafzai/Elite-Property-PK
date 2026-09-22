@@ -302,6 +302,7 @@ export default function ChatWidget({
   const onSend = (e?: FormEvent) => {
     handleUserInteraction();
     if (e && e.preventDefault) e.preventDefault();
+    if (isProcessing) return;
     if (!input.trim() && !image) return;
 
     if (image) {
@@ -382,6 +383,7 @@ export default function ChatWidget({
               quickPrompts={quickPrompts}
               onQuickPromptSelect={(prompt) => {
                 handleUserInteraction();
+                if (isProcessing) return;
                 let message = "";
 
                 if (prompt === "Looking to Buy") {
