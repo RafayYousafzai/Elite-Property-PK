@@ -206,12 +206,46 @@ export default function ChatWidget({
     };
   }, []);
 
+  // Keyboard-aware sizing: on phones the on-screen keyboard shrinks the visual
+  // viewport but not the layout viewport, which would push the composer (and
+  // the header/close button) out of reach.
+  const [viewport, setViewport] = useState<{ inset: number; height: number }>({
+    inset: 0,
+    height: 0,
+  });
+
+  useEffect(() => {
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    if (!vv || !isOpen) {
+      setViewport({ inset: 0, height: 0 });
+      return;
+    }
+
+    const update = () => {
+      const inset = Math.max(
+        0,
+        Math.round(window.innerHeight - vv.height - vv.offsetTop),
+      );
+      setViewport({ inset, height: Math.round(vv.height) });
+    };
+
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, [isOpen]);
+
+  const keyboardOpen = viewport.inset > 120;
+
   const [image, setImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const avatarSrc = avatar_url;
   const quickPrompts = [
@@ -219,12 +253,6 @@ export default function ChatWidget({
     "Investment Options",
     "Request Callback",
   ];
-
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages, isProcessing]);
 
   useEffect(() => {
     return () => {
@@ -298,19 +326,37 @@ export default function ChatWidget({
       className={
         isEmbedded
           ? "w-full h-full flex items-end justify-end p-0"
-          : `fixed bottom-6 z-50 ${
-              isOpen
-                ? "left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0"
-                : "right-6"
-            }`
+          : isOpen
+            ? // Open: full-width sheet on phones (above the fixed site header bars),
+              // floating panel from sm up
+              "fixed inset-x-2 bottom-2 z-[110] sm:inset-x-auto sm:right-6 sm:bottom-6"
+            : "fixed bottom-6 right-6 z-50"
+      }
+      style={
+        isEmbedded
+          ? undefined
+          : {
+              paddingBottom: "env(safe-area-inset-bottom, 0px)",
+              // Lift the panel above the on-screen keyboard when it is open
+              ...(isOpen && keyboardOpen
+                ? { bottom: `${viewport.inset + 8}px` }
+                : null),
+            }
       }
     >
       {isOpen && (
         <Card
           onClick={handleUserInteraction}
-          className={`w-[95vw] max-w-105 sm:w-110 md:w-115 ${
-            isMessageEmpty ? "h-56" : "h-160"
+          className={`w-full sm:w-110 md:w-115 ${
+            isMessageEmpty
+              ? "h-auto max-h-[75dvh]"
+              : "h-[75dvh] sm:h-160 max-h-[calc(100dvh-5rem)] sm:max-h-[calc(100dvh-4rem)]"
           } p-0 rounded-3xl shadow-2xl/10`}
+          style={
+            keyboardOpen && viewport.height
+              ? { maxHeight: `${viewport.height - 16}px` }
+              : undefined
+          }
         >
           <ChatHeader
             title="Elite Property PK"
@@ -321,7 +367,9 @@ export default function ChatWidget({
           />
 
           <ScrollShadow
-            className="flex-1 px-0 scrollbar-hide"
+            className={`flex-1 min-h-0 px-0 scrollbar-hide ${
+              isMessageEmpty ? "" : "overflow-hidden"
+            }`}
             style={{
               scrollbarWidth: "thin",
               scrollbarColor: "#ccc transparent",
@@ -354,8 +402,6 @@ export default function ChatWidget({
               avatarSrc={avatarSrc}
               uploadingImage={uploadingImage}
             />
-
-            <div ref={messagesEndRef} />
           </ScrollShadow>
 
           <ChatComposer

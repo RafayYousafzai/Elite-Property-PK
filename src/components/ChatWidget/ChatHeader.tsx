@@ -21,7 +21,7 @@ export function ChatHeader({
     "https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=256&auto=format&fit=crop";
 
   return (
-    <header className="relative flex items-center justify-between px-4 pt-3 shrink-0 bg-white">
+    <header className="relative z-10 flex items-center justify-between gap-2 px-4 py-3 shrink-0 bg-white border-b border-black/5">
       <div className="flex items-center gap-3">
         <div className="flex flex-col ml-2">
           <Text.Heading className="font-semibold text-[16px] leading-tight text-black/80">
@@ -37,11 +37,12 @@ export function ChatHeader({
         <Button
           isIconOnly
           onClick={onMinimize}
-          className="p-2 hover:bg-white/10 rounded-lg transition-all duration-200 group"
-          aria-label="Minimize"
+          // 44px target so the close control is comfortably tappable on phones
+          className="h-11 w-11 min-w-11 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 active:bg-black/15 transition-colors duration-200 group"
+          aria-label="Close chat"
           variant="ghost"
         >
-          <X size={18} className="text-black/80 group-hover:text-black" />
+          <X size={20} className="text-black/70 group-hover:text-black" />
         </Button>
       </div>
     </header>
