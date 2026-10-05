@@ -1,574 +1,319 @@
-import type { Message } from "./types";
-import { Avatar, Button, Surface, Skeleton } from "./heroui-shims";
-import { useMemo, useRef, useState, useEffect, useCallback } from "react";
-import { TextShimmer } from "./motion-primitives/text-shimmer";
-import { getThumbnailUrl } from "@/lib/utils";
+import { Fragment, type ReactNode, useEffect, useRef } from "react";
+import Link from "next/link";
+import type { UIMessage } from "ai";
+import { ArrowUpRight, RotateCcw } from "lucide-react";
+import { getThumbnailUrl, getImageUrl, toSameOrigin } from "@/lib/utils";
+import { AssistantAvatar } from "./AssistantAvatar";
 
-interface ChatMessagesProps {
-  messages: Message[];
-  isLoading: boolean;
-  isEmptyConversationState: boolean;
-  quickPrompts: readonly string[];
-  onQuickPromptSelect: (prompt: string) => void;
-  avatarSrc: string;
-  uploadingImage?: string | null;
-}
-
-function parseMessageContent(content: string): (string | React.ReactElement)[] {
-  const parts: (string | React.ReactElement)[] = [];
-  let lastIndex = 0;
-  let key = 0;
-
-  const combinedPattern =
-    /(\*\*\*(.*?)\*\*\*)|(\*\*(.*?)\*\*)|(\*(.*?)\*)|(`(.*?)`)|(https?:\/\/[^\s]+)/g;
-
-  let match;
-  while ((match = combinedPattern.exec(content)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(
-        <span key={`text-${key++}`}>
-          {content.substring(lastIndex, match.index)}
-        </span>,
-      );
-    }
-
-    if (match[1]) {
-      parts.push(
-        <strong
-          key={`bolditalic-${key++}`}
-          className="font-bold italic text-gray-900"
-        >
-          {match[2]}
-        </strong>,
-      );
-    } else if (match[3]) {
-      parts.push(
-        <strong key={`bold-${key++}`} className="font-bold text-gray-950">
-          {match[4]}
-        </strong>,
-      );
-    } else if (match[5]) {
-      parts.push(
-        <em key={`italic-${key++}`} className="italic text-gray-700">
-          {match[6]}
-        </em>,
-      );
-    } else if (match[7]) {
-      parts.push(
-        <code
-          key={`code-${key++}`}
-          className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-red-600 font-mono text-xs"
-        >
-          {match[8]}
-        </code>,
-      );
-    } else if (match[9]) {
-      const url = match[9];
-      const propertyMatch = url.match(/\/explore\/([^\/]+)$/);
-      const displayText = propertyMatch
-        ? propertyMatch[1]
-            .split("-")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
-            .substring(0, 35) + (propertyMatch[1].length > 35 ? "..." : "")
-        : "View Property";
-
-      parts.push(
-        <a
-          key={`link-${key++}`}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-amber-600 hover:text-amber-700 underline underline-offset-2 font-semibold inline-flex items-center gap-1 break-words"
-        >
-          {displayText}
-          <svg
-            className="w-3 h-3 inline-block flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            />
-          </svg>
-        </a>,
-      );
-    }
-
-    lastIndex = match.index + match[0].length;
-  }
-
-  if (lastIndex < content.length) {
-    parts.push(
-      <span key={`text-${key++}`}>{content.substring(lastIndex)}</span>,
-    );
-  }
-
-  return parts.length > 0 ? parts : [content];
-}
-
-function getTextContent(msg: Message): string {
-  if (msg.parts) {
-    return msg.parts
-      .filter((p) => p.type === "text")
-      .map((p) => (p as any).text)
-      .join("");
-  }
-  return (msg as any).content || "";
-}
-
-function getFileParts(msg: Message) {
-  return (
-    msg.parts?.filter(
-      (
-        part,
-      ): part is {
-        type: "file";
-        mediaType: string;
-        filename?: string;
-        url: string;
-      } => part.type === "file",
-    ) ?? []
-  );
-}
-
-type PropertySuggestion = {
+type ListingCard = {
   name: string;
   price: string;
   location: string;
   size: string;
   beds?: number;
-  baths?: number;
   url: string;
   img?: string;
+  sold?: boolean;
 };
 
-/** Pulls listing cards out of a completed `suggestProperties` tool call. */
-function getPropertySuggestions(msg: Message): PropertySuggestion[] {
-  const parts = (msg.parts ?? []) as Array<Record<string, any>>;
-  return parts.flatMap((part) =>
-    part?.type === "tool-suggestProperties" &&
-    Array.isArray(part?.output?.matches)
-      ? (part.output.matches as PropertySuggestion[])
-      : [],
+const QUICK_REPLIES = /\[\[([^\]]*)\]\]?\s*$/;
+
+/** Visible text of an assistant message, minus the trailing quick-reply line. */
+export function splitQuickReplies(text: string): { body: string; options: string[] } {
+  const start = text.indexOf("[[");
+  if (start === -1) return { body: text, options: [] };
+  const match = text.slice(start).match(QUICK_REPLIES);
+  const options = match?.[0].endsWith("]]")
+    ? match[1].split("|").map((o) => o.trim()).filter(Boolean).slice(0, 4)
+    : [];
+  return { body: text.slice(0, start).trimEnd(), options };
+}
+
+export const textOf = (msg: UIMessage) =>
+  msg.parts
+    .filter((p): p is { type: "text"; text: string } => p.type === "text")
+    .map((p) => p.text)
+    .join("");
+
+function listingCardsOf(msg: UIMessage): ListingCard[] {
+  const cards: ListingCard[] = [];
+  for (const part of msg.parts as Array<Record<string, any>>) {
+    if (part.state !== "output-available" || !part.output) continue;
+    if (part.type === "tool-searchListings" && Array.isArray(part.output.matches)) {
+      cards.push(...part.output.matches);
+    } else if (part.type === "tool-getListingDetails") {
+      if (Array.isArray(part.output.candidates)) cards.push(...part.output.candidates);
+      else if (part.output.url) cards.push(part.output);
+    }
+  }
+  // A listing can come back from more than one tool call in the same reply
+  return cards.filter((c, i) => cards.findIndex((x) => x.url === c.url) === i);
+}
+
+// ---------------------------------------------------------------- rich text
+
+function renderInline(text: string, keyBase: string): ReactNode[] {
+  const out: ReactNode[] = [];
+  const pattern = /\*\*(.+?)\*\*|\*(.+?)\*|\[([^\]]+)\]\(([^)\s]+)\)|(https?:\/\/[^\s)]+|\/(?:explore|contactus|request-callback|team|about|blogs)[^\s),.]*)/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let i = 0;
+  while ((m = pattern.exec(text))) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    const key = `${keyBase}-${i++}`;
+    if (m[1]) out.push(<strong key={key} className="font-semibold text-[#1a1714]">{m[1]}</strong>);
+    else if (m[2]) out.push(<em key={key}>{m[2]}</em>);
+    else {
+      const label = m[3] ?? (m[5].startsWith("/") ? m[5] : "link");
+      const href = m[4] ?? m[5];
+      out.push(
+        href.startsWith("/") ? (
+          <Link key={key} href={href} className="font-medium text-[#9a7a1e] underline underline-offset-2">
+            {label}
+          </Link>
+        ) : (
+          <a key={key} href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-[#9a7a1e] underline underline-offset-2">
+            {label}
+          </a>
+        ),
+      );
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+function RichText({ text }: { text: string }) {
+  const lines = text.split("\n");
+  const blocks: ReactNode[] = [];
+  let list: string[] = [];
+
+  const flushList = () => {
+    if (list.length === 0) return;
+    blocks.push(
+      <ul key={`ul-${blocks.length}`} className="my-1 space-y-1 pl-4">
+        {list.map((item, i) => (
+          <li key={i} className="list-disc marker:text-[#9a7a1e]">
+            {renderInline(item, `li-${blocks.length}-${i}`)}
+          </li>
+        ))}
+      </ul>,
+    );
+    list = [];
+  };
+
+  lines.forEach((line, i) => {
+    const bullet = line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
+    if (bullet) {
+      list.push(bullet[1]);
+      return;
+    }
+    flushList();
+    if (line.trim()) blocks.push(<p key={`p-${i}`}>{renderInline(line, `p-${i}`)}</p>);
+  });
+  flushList();
+
+  return <div className="space-y-1.5">{blocks}</div>;
+}
+
+// ---------------------------------------------------------------- pieces
+
+function ListingCards({ cards }: { cards: ListingCard[] }) {
+  return (
+    <div className="-mx-4 flex snap-x gap-2.5 overflow-x-auto px-4 pb-1 pl-14 [scrollbar-width:none]">
+      {cards.map((card) => {
+        const thumb = card.img ? getThumbnailUrl(card.img) : null;
+        return (
+          <Link
+            key={card.url}
+            href={card.url}
+            className="group w-48 shrink-0 snap-start overflow-hidden rounded-xl border border-stone-200 bg-white transition-colors hover:border-[#9a7a1e]"
+          >
+            <span className="relative block aspect-[4/3] bg-stone-200">
+              {thumb && (
+                <img
+                  src={toSameOrigin(thumb)}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    const fallback = getImageUrl(card.img);
+                    if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
+                  }}
+                  className="h-full w-full object-cover"
+                />
+              )}
+              {card.sold && (
+                <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white">
+                  Sold
+                </span>
+              )}
+            </span>
+            <span className="block p-3">
+              <span className="line-clamp-2 text-[12.5px] font-medium leading-snug text-[#1a1714] group-hover:text-[#9a7a1e]">
+                {card.name}
+              </span>
+              <span className="mt-1.5 block text-[13px] font-semibold text-[#1a1714]">{card.price}</span>
+              <span className="mt-0.5 block truncate text-[11px] text-stone-500">
+                {card.location} · {card.size}
+                {card.beds ? ` · ${card.beds} beds` : ""}
+              </span>
+            </span>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
 
-function PropertyCards({ items }: { items: PropertySuggestion[] }) {
+function TypingIndicator({ searching }: { searching: boolean }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 pl-10 pr-1 no-scrollbar">
-      {items.map((item) => (
-        <a
-          key={item.url}
-          href={item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0 w-44 rounded-2xl overflow-hidden bg-white border border-black/10 hover:border-[#d4af37] transition-colors shadow-sm"
-        >
-          {item.img && (
-            <img
-              src={getThumbnailUrl(item.img)}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              className="w-full h-24 object-cover"
+    <div className="flex items-end gap-2.5">
+      <AssistantAvatar size={32} />
+      <div className="flex items-center gap-2 rounded-2xl rounded-bl-md bg-white px-4 py-3 text-[12px] text-stone-500 ring-1 ring-stone-200">
+        <span className="flex gap-1">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#9a7a1e]"
+              style={{ animationDelay: `${i * 0.15}s` }}
             />
-          )}
-          <div className="p-2.5">
-            <p className="text-[12px] font-semibold text-gray-900 leading-tight line-clamp-2">
-              {item.name}
-            </p>
-            <p className="text-[12px] font-bold text-[#b8952f] mt-1">
-              {item.price}
-            </p>
-            <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">
-              {item.location} &middot; {item.size}
-              {item.beds ? ` · ${item.beds} beds` : ""}
-            </p>
-          </div>
-        </a>
+          ))}
+        </span>
+        {searching && <span>Checking listings…</span>}
+      </div>
+    </div>
+  );
+}
+
+export function QuickReplies({
+  options,
+  onSelect,
+  disabled,
+}: {
+  options: string[];
+  onSelect: (text: string) => void;
+  disabled?: boolean;
+}) {
+  if (options.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-2 pl-[42px]">
+      {options.map((opt) => (
+        <button
+          key={opt}
+          type="button"
+          disabled={disabled}
+          onClick={() => onSelect(opt)}
+          className="h-9 cursor-pointer rounded-full border border-[#9a7a1e]/35 bg-white px-3.5 text-[12.5px] font-medium text-[#7a5c0f] transition-colors hover:border-[#9a7a1e] hover:bg-[#faf8f3] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {opt}
+        </button>
       ))}
     </div>
   );
 }
 
-function getOptionButtonsForText(text: string): string[] | null {
-  if (!text) return null;
-  const lower = text.toLowerCase();
-
-  // Do NOT show option buttons when asking for contact info, phone, or name
-  if (
-    lower.includes("whatsapp") ||
-    lower.includes("phone") ||
-    lower.includes("number") ||
-    lower.includes("contact") ||
-    lower.includes("name") ||
-    lower.includes("reach")
-  ) {
-    return null;
-  }
-
-  if (
-    lower.includes("purpose") ||
-    lower.includes("personal use") ||
-    lower.includes("investment") ||
-    lower.includes("living")
-  ) {
-    return ["Personal Use", "Investment"];
-  }
-
-  if (lower.includes("bedroom") || lower.includes("beds")) {
-    return ["3 Beds", "4 Beds", "5+ Beds"];
-  }
-
-  if (
-    lower.includes("budget") ||
-    lower.includes("crore") ||
-    lower.includes("cr") ||
-    lower.includes("range") ||
-    lower.includes("cost")
-  ) {
-    return ["Under 2 Crore", "2 - 4 Crore", "4 - 6 Crore", "Above 6 Crore"];
-  }
-
-  if (
-    lower.includes("looking for") ||
-    lower.includes("category") ||
-    lower.includes("property type") ||
-    lower.includes("guidance") ||
-    lower.includes("plot") ||
-    lower.includes("house")
-  ) {
-    return ["Plot", "House", "Either", "Guide Me"];
-  }
-
-  return null;
-}
-
-function ThinkingIndicator({ isToolActive }: { isToolActive: boolean }) {
-  return (
-    <div className="flex items-center justify-center min-h-[24px] min-w-[40px] px-1">
-      {isToolActive ? (
-        <span className="text-[12px] text-gray-500 font-medium animate-pulse select-none">
-          Thinking...
-        </span>
-      ) : (
-        <div className="flex gap-1.5 items-center justify-center h-4">
-          <div className="w-2 h-2 rounded-full bg-[#d4af37] animate-bounce [animation-delay:-0.3s]" />
-          <div className="w-2 h-2 rounded-full bg-[#d4af37] animate-bounce [animation-delay:-0.15s]" />
-          <div className="w-2 h-2 rounded-full bg-[#d4af37] animate-bounce" />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ScrollToBottomButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="absolute bottom-4 right-4 z-10 w-8 h-8 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-500 hover:text-gray-800 hover:shadow-lg hover:scale-105 transition-all duration-200 ease-out animate-in fade-in slide-in-from-bottom-2"
-      aria-label="Scroll to bottom"
-    >
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2.5}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
-  );
-}
-
-function MessageImage({
-  url,
-  filename,
-  msgId,
-  index,
-}: {
-  url: string;
-  filename?: string;
-  msgId: string;
-  index: number;
-}) {
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const img = new window.Image();
-    img.onload = () => setLoaded(true);
-    img.src = url;
-  }, [url]);
-
-  if (!loaded) {
-    return <Skeleton className="rounded-2xl w-48 h-36 mb-2" />;
-  }
-
-  return (
-    <img
-      key={`${msgId}-file-${index}`}
-      src={url}
-      alt={filename || "Attachment"}
-      className="max-w-full rounded-2xl mb-2 animate-[fadeScaleIn_0.3s_ease-out]"
-    />
-  );
-}
+// ---------------------------------------------------------------- list
 
 export function ChatMessages({
   messages,
-  isLoading,
-  isEmptyConversationState,
-  onQuickPromptSelect,
-  avatarSrc,
-  uploadingImage,
-}: ChatMessagesProps) {
-  const isMessageEmpty = messages.length === 0;
-
-  const scrollRef = useRef<HTMLDivElement>(null);
+  status,
+  error,
+  onRetry,
+  onQuickReply,
+  emptyState,
+}: {
+  messages: UIMessage[];
+  status: string;
+  error: Error | undefined;
+  onRetry: () => void;
+  onQuickReply: (text: string) => void;
+  emptyState: ReactNode;
+}) {
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [showScrollButton, setShowScrollButton] = useState(false);
-  const isAtBottomRef = useRef(true);
-
-  const lastMessage = messages[messages.length - 1];
-  const lastAssistantHasText =
-    lastMessage?.role === "assistant"
-      ? getTextContent(lastMessage).trim() !== ""
-      : false;
-  const showLoadingBubble = isLoading && !lastAssistantHasText;
-  const currentAssistantMsg =
-    messages[messages.length - 1]?.role === "assistant"
-      ? messages[messages.length - 1]
-      : null;
-  const isToolActive =
-    currentAssistantMsg?.parts?.some((p) => p.type.startsWith("tool-")) ??
-    false;
-
-  const activeOptions = useMemo(() => {
-    if (isLoading) return null;
-    if (isMessageEmpty) return ["Plot", "House", "Investment", "Guide Me"];
-    if (lastMessage?.role === "assistant") {
-      const text = getTextContent(lastMessage);
-      return getOptionButtonsForText(text);
-    }
-    return null;
-  }, [messages, isLoading, isMessageEmpty, lastMessage]);
-
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
-    bottomRef.current?.scrollIntoView({ behavior, block: "end" });
-  }, []);
-
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    const atBottom = distanceFromBottom < 60;
-    isAtBottomRef.current = atBottom;
-    setShowScrollButton(!atBottom);
-  }, []);
+  const isBusy = status === "submitted" || status === "streaming";
 
   useEffect(() => {
-    if (isAtBottomRef.current) {
-      scrollToBottom(isLoading ? "instant" : "smooth");
-    }
-  }, [messages, isLoading, showLoadingBubble, scrollToBottom]);
+    bottomRef.current?.scrollIntoView({ block: "end", behavior: isBusy ? "auto" : "smooth" });
+  }, [messages, isBusy, error]);
 
-  const AiAvatar = useMemo(
-    () => (
-      <div className="relative shrink-0 w-8 h-8">
-        <img
-          src={avatarSrc}
-          alt="AI Avatar"
-          className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-xs"
-        />
-        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#22c55e] border-2 border-white rounded-full z-20" />
-      </div>
-    ),
-    [avatarSrc],
-  );
-
-  const WelcomeMessage = useMemo(
-    () => (
-      <div className="flex items-end gap-2 w-full mt-1.5">
-        <div className="mb-1">{AiAvatar}</div>
-        <Surface
-          className="p-2.5 text-[13px] leading-snug max-w-[80%] bg-slate-100 text-gray-800 rounded-2xl shadow-xs"
-          variant="default"
-        >
-          <p className="whitespace-pre-wrap">
-            Hi! 👋 Looking to buy or invest in property?
-          </p>
-        </Surface>
-      </div>
-    ),
-    [AiAvatar],
-  );
+  const last = messages[messages.length - 1];
+  const lastText = last?.role === "assistant" ? splitQuickReplies(textOf(last)).body : "";
+  const lastHasCards = last?.role === "assistant" && listingCardsOf(last).length > 0;
+  const searching =
+    last?.role === "assistant" &&
+    (last.parts as Array<Record<string, any>>).some(
+      (p) => p.type?.startsWith("tool-") && p.state !== "output-available" && p.type !== "tool-saveContactDetails",
+    );
+  const showTyping = isBusy && (last?.role === "user" || (!lastText.trim() && !lastHasCards) || searching);
 
   return (
-    <div
-      className={`flex flex-col h-full ${isEmptyConversationState ? "pt-2 pb-2" : "py-0"}`}
-    >
-      {isMessageEmpty ? (
-        <div className="flex flex-col flex-1 pl-2 pr-4 pb-1">
-          {WelcomeMessage}
-          {activeOptions && (
-            <div className="flex flex-row flex-wrap justify-start gap-1.5 pt-2.5 pl-10">
-              {activeOptions.map((opt) => (
-                <Button
-                  key={opt}
-                  size="sm"
-                  isDisabled={isLoading}
-                  onClick={() => onQuickPromptSelect(opt)}
-                  className="bg-[#d4af37] text-white font-semibold text-[13px] rounded-full px-3.5 py-1.5 h-8 min-w-0 transition hover:scale-105 shadow-sm"
-                >
-                  {opt}
-                </Button>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="relative flex flex-col h-full">
-          <div
-            ref={scrollRef}
-            onScroll={handleScroll}
-            className="flex flex-col gap-3 pl-2 pr-4 pb-2 overflow-y-auto flex-1 scroll-smooth"
-            style={{ scrollbarWidth: "none" }}
-          >
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full overflow-hidden shadow-sm relative border-2 border-[#d4af37]">
-                <img
-                  src={avatarSrc}
-                  alt="Elite Property PK"
-                  className="w-full h-full object-cover rounded-full"
-                />
+    <div className="flex flex-col gap-4 px-4 py-5">
+      {messages.length === 0 && emptyState}
+
+      {messages.map((msg, index) => {
+        const isLast = index === messages.length - 1;
+
+        if (msg.role === "user") {
+          return (
+            <div key={msg.id} className="flex justify-end">
+              <div className="max-w-[82%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-[#1a1714] px-4 py-2.5 text-[13.5px] leading-relaxed text-white">
+                {textOf(msg)}
               </div>
-              <span className="text-black text-[12px] font-semibold mt-1">
-                Ali{" "}
-              </span>
             </div>
+          );
+        }
 
-            <Surface className="border-amber-100 flex min-w-[300px] flex-col gap-2 rounded-2xl border p-3 text-gray-400 text-[11px] leading-relaxed m-2 text-center">
-              By using the chat feature, you agree to our terms and acknowledge
-              our privacy policy.
-            </Surface>
+        const { body, options } = splitQuickReplies(textOf(msg));
+        const cards = listingCardsOf(msg);
+        if (!body.trim() && cards.length === 0) return null;
 
-            {WelcomeMessage}
-
-            {messages.map((msg, msgIdx) => {
-              const isAssistant = msg.role === "assistant";
-              const textContent = getTextContent(msg);
-              const fileParts = getFileParts(msg);
-              const isLastMsg = msgIdx === messages.length - 1;
-              const suggestions = isAssistant ? getPropertySuggestions(msg) : [];
-
-              if (isAssistant && !textContent.trim() && suggestions.length === 0)
-                return null;
-
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col w-full ${!isAssistant ? "items-end" : "items-start"}`}
-                >
-                  <div
-                    className={`flex w-full ${!isAssistant ? "justify-end" : "justify-start gap-2"}`}
-                  >
-                    {isAssistant && (
-                      <div className="mt-auto mb-1">{AiAvatar}</div>
-                    )}
-
-                    <div
-                      className={`flex flex-col gap-1 max-w-[80%] ${
-                        !isAssistant ? "items-end ml-auto" : "items-start"
-                      }`}
-                    >
-                      {textContent.trim() && (
-                      <Surface
-                        className={`py-2.5 px-3.5 text-[13px] leading-relaxed transition-opacity duration-200 ${
-                          !isAssistant
-                            ? "bg-[#d4af37] text-white font-medium rounded-2xl"
-                            : "bg-slate-100 text-gray-800 rounded-2xl"
-                        }`}
-                        variant="default"
-                      >
-                        {fileParts.map((part, index) =>
-                          part.mediaType?.startsWith("image/") ? (
-                            <MessageImage
-                              key={`${msg.id}-file-${index}`}
-                              url={part.url}
-                              filename={part.filename}
-                              msgId={msg.id}
-                              index={index}
-                            />
-                          ) : null,
-                        )}
-                        <p className="whitespace-pre-wrap">
-                          {parseMessageContent(textContent)}
-                        </p>
-                      </Surface>
-                      )}
-                    </div>
-                  </div>
-
-                  {suggestions.length > 0 && (
-                    <div className="w-full pt-2">
-                      <PropertyCards items={suggestions} />
-                    </div>
-                  )}
-
-                  {/* Render contextual option buttons stacked vertically on the right side */}
-                  {isAssistant && isLastMsg && activeOptions && (
-                    <div className="flex flex-col items-end gap-1.5 pt-2 ml-auto max-w-[80%]">
-                      {activeOptions.map((opt) => (
-                        <Button
-                          key={opt}
-                          size="sm"
-                          isDisabled={isLoading}
-                          onClick={() => onQuickPromptSelect(opt)}
-                          className="bg-[#d4af37] text-white font-semibold text-[13px] rounded-2xl px-4 py-2 h-auto min-h-[32px] min-w-0 transition hover:scale-105 shadow-sm text-right whitespace-normal"
-                        >
-                          {opt}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {uploadingImage && (
-              <div className="flex w-full justify-end">
-                <div className="max-w-[80%] ml-auto">
-                  <Skeleton className="rounded-2xl w-48 h-36" />
+        return (
+          <Fragment key={msg.id}>
+            {body.trim() && (
+              <div className="flex items-end gap-2.5">
+                <AssistantAvatar size={32} />
+                <div className="max-w-[82%] break-words rounded-2xl rounded-bl-md bg-white px-4 py-2.5 text-[13.5px] leading-relaxed text-stone-700 ring-1 ring-stone-200">
+                  <RichText text={body} />
                 </div>
               </div>
             )}
-
-            {showLoadingBubble && (
-              <div className="flex gap-2 w-full mt-2">
-                <div className="mt-auto mb-1">{AiAvatar}</div>
-                <Surface
-                  className="px-3.5 py-2.5 bg-slate-100 rounded-2xl"
-                  variant="default"
-                >
-                  <ThinkingIndicator isToolActive={isToolActive} />
-                </Surface>
-              </div>
+            {cards.length > 0 && <ListingCards cards={cards} />}
+            {isLast && !isBusy && !error && (
+              <QuickReplies options={options} onSelect={onQuickReply} />
             )}
+          </Fragment>
+        );
+      })}
 
-            <div ref={bottomRef} className="h-1 shrink-0" />
+      {showTyping && <TypingIndicator searching={Boolean(searching)} />}
+
+      {error && !isBusy && (
+        <div className="flex items-end gap-2.5">
+          <AssistantAvatar size={32} />
+          <div className="max-w-[82%] rounded-2xl rounded-bl-md bg-red-50 px-4 py-3 text-[13px] text-red-700 ring-1 ring-red-200">
+            <p>{/429|too many/i.test(error.message) ? "You're sending messages quickly — please wait a moment." : "Sorry, I couldn't reply just now."}</p>
+            <button
+              type="button"
+              onClick={onRetry}
+              className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-semibold underline-offset-2 hover:underline"
+            >
+              <RotateCcw size={13} /> Try again
+            </button>
           </div>
-
-          {showScrollButton && (
-            <ScrollToBottomButton onClick={() => scrollToBottom("smooth")} />
-          )}
         </div>
       )}
+
+      <div ref={bottomRef} />
     </div>
+  );
+}
+
+export function ViewListingsLink() {
+  return (
+    <Link href="/explore" className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#9a7a1e]">
+      Browse all listings <ArrowUpRight size={13} />
+    </Link>
   );
 }

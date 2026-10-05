@@ -1,203 +1,82 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { after } from "next/server";
-import { findProperties } from "./properties";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-async function saveLead(sessionId: string, data: Record<string, any>) {
-  const clean = Object.fromEntries(
-    Object.entries(data).filter(([_, v]) => v !== undefined && v !== null && v.toString().trim() !== "")
-  );
-
-  if (Object.keys(clean).length === 0) return "Nothing to save.";
-
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-    console.warn("Supabase credentials missing, skipped saving lead progress.");
-    return "Supabase credentials not configured.";
-  }
-
-  const cleanUrl = SUPABASE_URL.endsWith("/") ? SUPABASE_URL.slice(0, -1) : SUPABASE_URL;
-
-  // 1. Fetch existing lead details for this session to prevent upsert field overrides
-  let existingData: Record<string, any> = {};
-  try {
-    const fetchRes = await fetch(`${cleanUrl}/rest/v1/elite_chatbot_leads?session_id=eq.${sessionId}`, {
-      method: "GET",
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
-    });
-    if (fetchRes.ok) {
-      const rows = await fetchRes.json();
-      if (rows && rows.length > 0) {
-        existingData = rows[0];
-      }
-    }
-  } catch (err) {
-    console.warn("Failed to fetch existing lead record for merging:", err);
-  }
-
-  // 2. Merge existing database values with the new incoming updates
-  const merged = {
-    ...existingData,
-    ...clean,
-  };
-
-  const leadPayload = {
-    session_id: sessionId,
-    full_name: merged.full_name || merged.name || null,
-    phone_number: merged.phone_number || merged.phone || null,
-    budget_range: merged.budget_range || null,
-    purpose: merged.purpose || null,
-    looking_for: merged.looking_for || merged.product_of_interest || null,
-    is_complete: Boolean(merged.is_complete),
-    updated_at: new Date().toISOString(),
-  };
-
-  // 3. Try upserting to 'elite_chatbot_leads' table
-  let res = await fetch(`${cleanUrl}/rest/v1/elite_chatbot_leads?on_conflict=session_id`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      Prefer: "resolution=merge-duplicates,return=representation",
-    },
-    body: JSON.stringify(leadPayload),
-  });
-
-  // 4. Fallback to 'leads' table (using default fallbacks only here to satisfy NOT NULL constraints if table lacks them)
-  if (!res.ok) {
-    const errText = await res.text();
-    console.warn("Primary elite_chatbot_leads save failed, attempting fallback to leads table:", errText);
-
-    res = await fetch(`${cleanUrl}/rest/v1/leads`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        Prefer: "return=minimal",
-      },
-      body: JSON.stringify({
-        full_name: leadPayload.full_name || "Chatbot Visitor",
-        phone_number: leadPayload.phone_number || "Pending",
-        budget_range: leadPayload.budget_range || "Pending",
-        purpose: leadPayload.purpose || "Pending",
-        looking_for: leadPayload.looking_for || "Pending",
-      }),
-    });
-
-    if (!res.ok) {
-      const fallbackErr = await res.text();
-      console.error("Fallback leads insert error:", fallbackErr);
-      return "Failed to save lead: " + fallbackErr;
-    }
-  }
-
-  return "Progress saved successfully.";
-}
+import { findListing, searchListings } from "./properties";
+import { saveLead } from "./leads";
 
 export const getAgentTools = (sessionId: string) => ({
-  updateLeadProgress: tool({
+  searchListings: tool({
     description:
-      "Updates the database with client real estate inquiry & lead details. Call this IMMEDIATELY the moment the user provides a Phone Number, Full Name, Looking For location/type, Budget Range, or Purpose. Pass is_complete as true when all intake details are collected.",
+      "Search live Elite Property listings. Results are shown to the visitor as cards automatically. Use whenever the visitor describes what they want or asks what's available.",
     inputSchema: z.object({
-      full_name: z.string().optional().describe("The user's full name"),
-      phone_number: z.string().optional().describe("The user's phone or WhatsApp number"),
-      looking_for: z.string().optional().describe("Property type, plot size, sector, or location of interest"),
-      budget_range: z.string().optional().describe("Budget or price range specified by user"),
-      purpose: z.string().optional().describe("Purpose of inquiry: Buying, Selling, Renting, Investment, or Consultation"),
-      is_complete: z.boolean().optional().describe("Set to true once all key intake details are collected"),
-    }),
-    execute: async (data) => {
-      try {
-        after(() => {
-          saveLead(sessionId, data).catch((err) => {
-            console.error("Background saveLead error:", err);
-          });
-        });
-        return "Progress saved successfully.";
-      } catch (err) {
-        console.warn("after() fallback to blocking saveLead:", err);
-        return saveLead(sessionId, data);
-      }
-    },
-  }),
-
-  suggestProperties: tool({
-    description:
-      "Finds live Elite Property listings matching the visitor's stated preferences. Call this as soon as you know at least the property type and budget. The widget renders the results as cards, so do NOT repeat the listing details in your reply.",
-    inputSchema: z.object({
-      category: z
-        .enum(["house", "plot", "any"])
+      kind: z
+        .enum(["house", "apartment", "plot", "commercial", "any"])
         .optional()
-        .describe("house = built home/villa/apartment, plot = land"),
-      minBudget: z.number().optional().describe("Minimum price in PKR (1 crore = 10000000)"),
-      maxBudget: z.number().optional().describe("Maximum price in PKR (1 crore = 10000000)"),
-      phase: z.number().optional().describe("DHA phase number 1-9, if the visitor named one"),
-      minBeds: z.number().optional().describe("Minimum bedrooms, for houses only"),
+        .describe("house = home/villa, apartment = flat/penthouse, plot = land, commercial = shop/office/commercial plot"),
+      phase: z.number().int().min(1).max(9).optional().describe("DHA phase number, if named"),
+      minPrice: z.number().optional().describe("Minimum price in PKR (1 crore = 10000000)"),
+      maxPrice: z.number().optional().describe("Maximum price in PKR (1 crore = 10000000)"),
+      minSizeMarla: z.number().optional().describe("Minimum size in marla (1 kanal = 20 marla). For an exact size like '10 marla' set min and max to 10."),
+      maxSizeMarla: z.number().optional().describe("Maximum size in marla"),
+      minBeds: z.number().int().optional().describe("Minimum bedrooms (houses/apartments only, only if the visitor asked)"),
+      keywords: z.string().optional().describe("Specific features to look for, e.g. 'basement', 'corner', 'solar', 'furnished'"),
+      sort: z.enum(["best", "price_low", "price_high", "newest"]).optional(),
     }),
     execute: async (filters) => {
       try {
-        const { matches, relaxed, total } = await findProperties(filters);
+        const { matches, exactCount, relaxed } = await searchListings(filters);
         if (matches.length === 0) {
-          return { matches: [], note: "No live listings match. Offer a callback instead." };
+          return { matches: [], note: "No listings of this kind are available right now. Offer to have an advisor find off-market options." };
         }
         return {
           matches,
-          total,
-          ...(relaxed ? { note: "Closest available, not an exact filter match." } : null),
+          exactMatches: exactCount,
+          ...(relaxed.length ? { relaxedFilters: relaxed, note: "Not exact matches — tell the visitor which filters were relaxed." } : null),
         };
       } catch (err) {
-        console.error("suggestProperties failed:", err);
-        return { matches: [], note: "Search unavailable. Offer a callback instead." };
+        console.error("searchListings failed:", err);
+        return { matches: [], note: "Search is temporarily unavailable. Offer a call from an advisor instead." };
       }
     },
   }),
 
-  getCompanyInfoTool: tool({
+  getListingDetails: tool({
     description:
-      "Retrieves verified details about Elite Property PK's key locations (DHA, Bahria Town, Gulberg, CDA sectors), property categories, investment advice, and client consultation process.",
+      "Look up full, current details of one specific listing (price, availability, size, bedrooms, features, installments, description). Use whenever the visitor asks about a particular property.",
     inputSchema: z.object({
-      topic: z
+      query: z
         .string()
-        .describe("The topic to query (e.g. 'locations', 'properties', 'services', 'investment', 'process')."),
+        .describe("The listing's URL slug if known, otherwise how the visitor described it, e.g. '2.5 kanal villa phase 5'"),
     }),
-    execute: async ({ topic }) => {
-      console.log(`>>> getCompanyInfoTool TRIGGERED for topic: "${topic}"`);
+    execute: async ({ query }) => {
+      try {
+        const result = await findListing(query);
+        if ("candidates" in result) {
+          return { candidates: result.candidates, note: "Several listings fit; show these and ask which one they mean." };
+        }
+        if ("notFound" in result) return { notFound: true, note: "No listing matches that description." };
+        return result.listing;
+      } catch (err) {
+        console.error("getListingDetails failed:", err);
+        return { error: "Listing lookup is temporarily unavailable." };
+      }
+    },
+  }),
 
-      const companyDetails = {
-        company: "Elite Property PK",
-        tagline: "Your Trusted Real Estate Partner in Pakistan",
-        website: "https://eliteproperty.pk",
-        contact_phone: "+92-300-0511111",
-        locations: [
-          "DHA Islamabad & Rawalpindi (Phases 1 to 9, DHA Valley, DHA Homes, Phase 2 Extension)",
-          "Bahria Town Islamabad & Rawalpindi (Phases 1-8, Enclave, Garden City)",
-          "Gulberg Greens & Gulberg Residencia Islamabad",
-          "CDA Sectors (B-17 Multi Gardens, F-11, E-11, G-13, Park View City)",
-        ],
-        property_types: [
-          "Residential Plots (5 Marla, 10 Marla, 1 Kanal, 2 Kanal)",
-          "Commercial Plots & Plazas (4 Marla, 8 Marla, Commercial Files)",
-          "Luxury Houses & Designer Villas",
-          "Modern Apartments & Penthouses",
-        ],
-        services: [
-          "Property Buying & Selling Assistance",
-          "High-ROI Commercial Investment Advisory",
-          "Portfolio Management & Plot Assessments",
-          "Free Site Visits & Layout Map Delivery on WhatsApp",
-        ],
-        process:
-          "Clients share their phone/WhatsApp number, target area, and budget. Our senior location specialists prepare curated listings, plot maps, and current price trends, and connect directly on WhatsApp within 15 minutes.",
-      };
-
-      return JSON.stringify(companyDetails, null, 2);
+  saveContactDetails: tool({
+    description:
+      "Save the visitor's contact details so an advisor can follow up. Call as soon as they share their name or phone/WhatsApp number.",
+    inputSchema: z.object({
+      full_name: z.string().optional(),
+      phone_number: z.string().optional().describe("Phone or WhatsApp number exactly as given"),
+      looking_for: z.string().optional().describe("Short summary of what they want, e.g. '10 marla house, DHA Phase 2'"),
+      budget_range: z.string().optional(),
+      purpose: z.string().optional().describe("Buying, selling, renting or investment"),
+    }),
+    execute: async (data) => {
+      // Saving happens after the response so it never slows the reply down
+      after(() => saveLead(sessionId, data).catch((err) => console.error("saveLead failed:", err)));
+      return { saved: true };
     },
   }),
 });

@@ -1,110 +1,89 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { AVATAR_URL } from "./avatar";
+import { usePathname } from "next/navigation";
+import { ASSISTANT_NAME } from "@/lib/agent/brand";
+import { AssistantAvatar } from "./AssistantAvatar";
 
-// The full chat panel pulls in @ai-sdk/react, ai, zod and @dnd-kit (~250KB
-// of JS that Lighthouse flags as 85-99% unused on load). None of that
-// should be fetched or executed until the visitor actually opens the chat.
-const ChatWidget = dynamic(() => import("./ChatWidget"), { ssr: false });
+// The chat panel pulls in @ai-sdk/react and ai. None of that is fetched until
+// the visitor shows intent (hover/touch on the launcher) or opens the chat.
+const loadPanel = () => import("./ChatWidget");
+const ChatWidget = dynamic(loadPanel, { ssr: false });
 
-const avatar_url = AVATAR_URL;
-
-const BUBBLE_MESSAGES = [
-  "Looking for DHA or Bahria plots?",
-  "Need help with property buying?",
-  "Interested in high-ROI investments?",
-  "Request a callback from Elite Property!",
+const BUBBLES = [
+  "Looking for a home in DHA?",
+  "Plots under 3 crore? Ask me",
+  "Ask me about any listing",
 ];
 
-function SobaanAvatar() {
-  return (
-    <div className="relative shrink-0 w-16 h-16 sm:w-18 sm:h-18">
-      <div className="w-full h-full rounded-full bg-[#d4af37] p-0.5 shadow-[0_10px_24px_rgba(212,175,55,0.35)] overflow-hidden flex items-center justify-center">
-        <img
-          src={avatar_url}
-          alt="Elite Property Assistant"
-          className="w-full h-full object-cover rounded-full"
-        />
-      </div>
-      <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#22c55e] border-2 border-white rounded-full z-20" />
-    </div>
-  );
-}
-
 export default function ChatLauncher() {
+  const pathname = usePathname();
   const [activated, setActivated] = useState(false);
-  const [showBubble, setShowBubble] = useState(false);
-  const [bubbleText, setBubbleText] = useState(BUBBLE_MESSAGES[0]);
-  const bubbleTimerRef = useRef<number | null>(null);
-  const bubbleHideTimerRef = useRef<number | null>(null);
+  const [open, setOpen] = useState(false);
+  const [bubble, setBubble] = useState<string | null>(null);
 
-  const pickRandomBubbleMessage = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * BUBBLE_MESSAGES.length);
-    return BUBBLE_MESSAGES[randomIndex];
-  }, []);
+  const onListing = /^\/explore\/[^/]+/.test(pathname);
 
+  // Occasional hint bubble until the visitor has opened the chat once
   useEffect(() => {
     if (activated) return;
-
-    const scheduleNextBubble = () => {
-      const delay = 30000 + Math.floor(Math.random() * 30000);
-      bubbleTimerRef.current = window.setTimeout(() => {
-        setBubbleText(pickRandomBubbleMessage());
-        setShowBubble(true);
-
-        if (bubbleHideTimerRef.current) {
-          window.clearTimeout(bubbleHideTimerRef.current);
-        }
-        const hideDelay = 3000 + Math.floor(Math.random() * 2000);
-        bubbleHideTimerRef.current = window.setTimeout(() => {
-          setShowBubble(false);
-        }, hideDelay);
-
-        scheduleNextBubble();
-      }, delay);
+    let hideTimer: number;
+    const show = (text: string) => {
+      setBubble(text);
+      hideTimer = window.setTimeout(() => setBubble(null), 5000);
     };
-
-    scheduleNextBubble();
-
+    const first = window.setTimeout(
+      () => show(onListing ? "Questions about this property? Ask me" : BUBBLES[0]),
+      onListing ? 8000 : 20000,
+    );
+    const repeat = window.setInterval(
+      () => show(BUBBLES[Math.floor(Math.random() * BUBBLES.length)]),
+      45000,
+    );
     return () => {
-      if (bubbleTimerRef.current) window.clearTimeout(bubbleTimerRef.current);
-      if (bubbleHideTimerRef.current)
-        window.clearTimeout(bubbleHideTimerRef.current);
+      window.clearTimeout(first);
+      window.clearTimeout(hideTimer);
+      window.clearInterval(repeat);
     };
-  }, [activated, pickRandomBubbleMessage]);
+  }, [activated, onListing]);
 
-  if (activated) {
-    return <ChatWidget defaultOpen />;
-  }
+  const openChat = useCallback(() => {
+    setActivated(true);
+    setOpen(true);
+    setBubble(null);
+  }, []);
+  const closeChat = useCallback(() => setOpen(false), []);
 
   return (
-    <div className="chat-launcher-dock fixed bottom-6 right-6 z-50">
-      <div className="relative">
-        <div
-          className={`absolute right-full top-1/2 z-10 mr-4 -translate-y-1/2 transition-all duration-500 ease-out ${
-            showBubble
-              ? "translate-x-0 opacity-100"
-              : "translate-x-2 opacity-0"
-          }`}
-          aria-hidden="true"
-        >
-          <div className="relative rounded-[22px] bg-white p-3 ring-1 ring-black/5">
-            <p className="whitespace-nowrap text-small leading-none text-[#222]">
-              {bubbleText}
+    <>
+      {activated && <ChatWidget open={open} onClose={closeChat} />}
+
+      {!open && (
+        <div className="chat-launcher-dock fixed bottom-6 right-6 z-50">
+          <div
+            className={`pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 transition-all duration-500 ${
+              bubble ? "translate-x-0 opacity-100" : "translate-x-2 opacity-0"
+            }`}
+            aria-hidden
+          >
+            <p className="whitespace-nowrap rounded-full border border-stone-200 bg-white px-4 py-2.5 text-[13px] text-[#1a1714] shadow-lg shadow-stone-900/10">
+              {bubble}
             </p>
           </div>
+          <button
+            type="button"
+            onClick={openChat}
+            onPointerEnter={loadPanel}
+            onTouchStart={loadPanel}
+            onFocus={loadPanel}
+            aria-label={`Chat with ${ASSISTANT_NAME}, our property assistant`}
+            className="flex cursor-pointer rounded-full transition-transform duration-200 hover:scale-105 active:scale-95"
+          >
+            <AssistantAvatar size={60} online />
+          </button>
         </div>
-
-        <button
-          onClick={() => setActivated(true)}
-          className="group h-16 w-16 sm:h-18 sm:w-18 rounded-full cursor-pointer focus:outline-none flex items-center justify-center transition-transform hover:scale-105 active:scale-95 bg-transparent border-none p-0 outline-none"
-          aria-label="Open Elite Property PK chat"
-        >
-          <SobaanAvatar />
-        </button>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
