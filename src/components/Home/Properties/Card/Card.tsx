@@ -2,9 +2,9 @@
 
 import formatNumberShort from "@/lib/formatNumberShort";
 import { Property } from "@/types/property";
-import { Icon } from "@iconify/react";
+import { Bath, BedDouble, MapPin, MessageCircle, Move, PhoneCall, Youtube } from "lucide-react";
 import Link from "next/link";
-import { formatLocation, getImageUrl, getThumbnailUrl } from "@/lib/utils";
+import { formatLocation, getImageUrl, getThumbnailUrl, toSameOrigin } from "@/lib/utils";
 import { getBedsCount, getBathsCount } from "@/lib/supabase/properties";
 
 const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
@@ -29,6 +29,14 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
   const rawFirstImage = images && images.length > 0 ? images[0] : null;
   const mainImage = getThumbnailUrl(rawFirstImage);
   const fullFallbackImage = getImageUrl(rawFirstImage);
+  // Thumbnail from this site's domain (/media rewrite), then R2 directly
+  const imageFallbacks = [mainImage, fullFallbackImage];
+  const retryImage = (img: HTMLImageElement) => {
+    const attempt = Number(img.dataset.attempt || 0);
+    if (attempt >= imageFallbacks.length) return;
+    img.dataset.attempt = String(attempt + 1);
+    img.src = imageFallbacks[attempt];
+  };
   const formattedPrice = formatNumberShort(Number(rate)).replace("Rs", "PKR");
   const displayCategory = property_type
     ? property_type.replace(/-/g, " ")
@@ -63,7 +71,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 px-2.5 py-1 bg-red-600 text-white rounded-xl text-[11px] font-bold shadow-none border-0 hover:bg-red-700 transition"
               >
-                <Icon icon="ph:youtube-logo-fill" className="w-3.5 h-3.5" />
+                <Youtube className="w-3.5 h-3.5" />
                 <span>Video</span>
               </a>
             )}
@@ -72,15 +80,15 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
           <Link href={`/explore/${slug}`} className="block w-full h-full">
             {mainImage ? (
               <img
-                src={mainImage}
+                src={toSameOrigin(mainImage)}
                 alt={name}
                 loading={priority ? "eager" : "lazy"}
+                fetchPriority={priority ? "high" : undefined}
                 decoding="async"
-                onError={(e) => {
-                  if (e.currentTarget.src !== fullFallbackImage) {
-                    e.currentTarget.src = fullFallbackImage;
-                  }
+                ref={(el) => {
+                  if (el && el.complete && el.naturalWidth === 0) retryImage(el);
                 }}
+                onError={(e) => retryImage(e.currentTarget)}
                 className="w-full h-64 sm:h-72 object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
@@ -102,7 +110,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
 
             <div className="flex items-center justify-between gap-2 -mb-1">
               <p className="text-xs font-normal text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate">
-                <Icon icon="ph:map-pin" className="w-3.5 h-3.5 text-primary shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span className="truncate">{formatLocation(location)}</span>
               </p>
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 capitalize shrink-0">
@@ -119,19 +127,19 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
             <div className="flex items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-400 pt-0.5">
               {bedNum > 0 && (
                 <span className="flex items-center gap-1">
-                  <Icon icon="solar:bed-linear" className="w-4 h-4 text-slate-400" />
+                  <BedDouble className="w-4 h-4 text-slate-400" />
                   {bedNum} Beds
                 </span>
               )}
               {bathNum > 0 && (
                 <span className="flex items-center gap-1">
-                  <Icon icon="solar:bath-linear" className="w-4 h-4 text-slate-400" />
+                  <Bath className="w-4 h-4 text-slate-400" />
                   {bathNum} Baths
                 </span>
               )}
               {area && (
                 <span className="flex items-center gap-1">
-                  <Icon icon="lineicons:arrow-all-direction" className="w-4 h-4 text-slate-400" />
+                  <Move className="w-4 h-4 text-slate-400" />
                   {area} {area_unit || "Sq Ft"}
                 </span>
               )}
@@ -143,7 +151,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
               href="tel:+923344111778"
               className="h-10 flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-all border-0 shadow-none"
             >
-              <Icon icon="solar:phone-calling-linear" className="w-4 h-4 text-primary" />
+              <PhoneCall className="w-4 h-4 text-primary" />
               <span>Call Agent</span>
             </a>
             <a
@@ -152,7 +160,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
               rel="noopener noreferrer"
               className="h-10 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 text-xs font-semibold transition-all border-0 shadow-none"
             >
-              <Icon icon="ph:whatsapp-logo-fill" className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>WhatsApp</span>
             </a>
           </div>
@@ -180,15 +188,15 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
           <Link href={`/explore/${slug}`} className="block w-full h-full">
             {mainImage && (
               <img
-                src={mainImage}
+                src={toSameOrigin(mainImage)}
                 alt={name}
                 loading={priority ? "eager" : "lazy"}
+                fetchPriority={priority ? "high" : undefined}
                 decoding="async"
-                onError={(e) => {
-                  if (e.currentTarget.src !== fullFallbackImage) {
-                    e.currentTarget.src = fullFallbackImage;
-                  }
+                ref={(el) => {
+                  if (el && el.complete && el.naturalWidth === 0) retryImage(el);
                 }}
+                onError={(e) => retryImage(e.currentTarget)}
                 className="w-full h-full object-cover rounded-xl"
               />
             )}
@@ -206,7 +214,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
 
             <div className="flex items-center justify-between gap-1">
               <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate">
-                <Icon icon="ph:map-pin" className="w-3 h-3 text-primary shrink-0" />
+                <MapPin className="w-3 h-3 text-primary shrink-0" />
                 <span className="truncate">{formatLocation(location)}</span>
               </p>
               <span className="text-[10px] font-medium text-slate-400 capitalize shrink-0">
@@ -234,7 +242,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
                 rel="noopener noreferrer"
                 className="w-full h-7 sm:h-8 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold flex items-center justify-center gap-1.5 transition border-0 shadow-none cursor-pointer"
               >
-                <Icon icon="ph:youtube-logo-fill" className="w-3.5 h-3.5" />
+                <Youtube className="w-3.5 h-3.5" />
                 <span>Watch Video Tour</span>
               </a>
             )}
@@ -244,7 +252,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
                 href="tel:+923344111778"
                 className="h-8 flex items-center justify-center gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] font-bold border-0"
               >
-                <Icon icon="solar:phone-calling-linear" className="w-3.5 h-3.5 text-primary" />
+                <PhoneCall className="w-3.5 h-3.5 text-primary" />
                 <span>Call</span>
               </a>
               <a
@@ -253,7 +261,7 @@ const PropertyCard: React.FC<{ item: Property; priority?: boolean }> = ({
                 rel="noopener noreferrer"
                 className="h-8 flex items-center justify-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold border-0"
               >
-                <Icon icon="ph:whatsapp-logo-fill" className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Chat</span>
               </a>
             </div>

@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { Icon } from "@iconify/react";
+import { ArrowRight, ArrowUpRight, Facebook, Instagram, Linkedin, Mail, Phone, Twitter, X } from "lucide-react";
 import { TeamMember } from "@/types/team";
 
 const SOCIALS = [
-  { key: "linkedin", icon: "ph:linkedin-logo", label: "LinkedIn" },
-  { key: "instagram", icon: "ph:instagram-logo", label: "Instagram" },
-  { key: "facebook", icon: "ph:facebook-logo", label: "Facebook" },
-  { key: "twitter", icon: "ph:x-logo", label: "X" },
+  { key: "linkedin", icon: Linkedin, label: "LinkedIn" },
+  { key: "instagram", icon: Instagram, label: "Instagram" },
+  { key: "facebook", icon: Facebook, label: "Facebook" },
+  { key: "twitter", icon: Twitter, label: "X" },
 ] as const;
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -31,7 +31,7 @@ function SocialLinks({ member, size = "sm" }: { member: TeamMember; size?: "sm" 
           onClick={(e) => e.stopPropagation()}
           className={`${box} flex items-center justify-center rounded-full border border-stone-300 text-stone-600 transition-colors hover:border-[#9a7a1e] hover:text-[#9a7a1e]`}
         >
-          <Icon icon={s.icon} width={size === "lg" ? 20 : 16} />
+          <s.icon size={size === "lg" ? 20 : 16} strokeWidth={1.5} />
         </a>
       ))}
     </div>
@@ -93,9 +93,8 @@ function Spotlight({ member, onOpen }: { member: TeamMember; onOpen: () => void 
             className="group inline-flex cursor-pointer items-center gap-3 text-sm font-semibold uppercase tracking-[0.15em] text-[#9a7a1e]"
           >
             Full Profile
-            <Icon
-              icon="ph:arrow-right"
-              width={18}
+            <ArrowRight
+              size={18}
               className="transition-transform group-hover:translate-x-1"
             />
           </button>
@@ -151,9 +150,8 @@ function MemberCard({
             <span className="text-xs uppercase tracking-[0.2em] text-white/75">
               {member.role}
             </span>
-            <Icon
-              icon="ph:arrow-up-right"
-              width={20}
+            <ArrowUpRight
+              size={20}
               className="shrink-0 text-primary opacity-0 transition-all duration-500 group-hover:opacity-100"
             />
           </span>
@@ -194,7 +192,7 @@ function ProfileModal({ member, onClose }: { member: TeamMember; onClose: () => 
           aria-label="Close profile"
           className="absolute right-4 top-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/90 text-[#1a1714] shadow-sm backdrop-blur-sm transition-colors hover:text-[#9a7a1e]"
         >
-          <Icon icon="ph:x" width={20} />
+          <X size={20} />
         </button>
 
         <div className="relative aspect-[4/5] md:aspect-auto md:min-h-[560px]">
@@ -245,7 +243,7 @@ function ProfileModal({ member, onClose }: { member: TeamMember; onClose: () => 
                   href={`tel:${member.phone.replace(/\s+/g, "")}`}
                   className="flex items-center gap-4 text-stone-700 transition-colors hover:text-[#9a7a1e]"
                 >
-                  <Icon icon="ph:phone" width={18} className="text-[#9a7a1e]" />
+                  <Phone size={18} strokeWidth={1.5} className="text-[#9a7a1e]" />
                   {member.phone}
                 </a>
               )}
@@ -254,7 +252,7 @@ function ProfileModal({ member, onClose }: { member: TeamMember; onClose: () => 
                   href={`mailto:${member.email}`}
                   className="flex items-center gap-4 break-all text-stone-700 transition-colors hover:text-[#9a7a1e]"
                 >
-                  <Icon icon="ph:envelope-simple" width={18} className="text-[#9a7a1e]" />
+                  <Mail size={18} strokeWidth={1.5} className="text-[#9a7a1e]" />
                   {member.email}
                 </a>
               )}

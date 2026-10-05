@@ -24,6 +24,7 @@ import {
 import PropertyCard from "@/components/Home/Properties/Card/Card";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 import { useSearchParams, useRouter } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { useProperties } from "@/hooks/useProperties";
 import { filterProperties, parsePropertyRate } from "@/lib/supabase/properties";
 import formatNumberShort from "@/lib/formatNumberShort";
@@ -68,13 +69,26 @@ const defaultFilters = (): SearchFilters => ({
   searchQuery: "",
 });
 
+const NO_PARAMS = new URLSearchParams();
+
+/**
+ * Reads the URL filters. useSearchParams forces client-only rendering up to the
+ * nearest Suspense boundary, so the page wraps this in its own boundary whose
+ * fallback is the same listing UI without URL filters — the server still
+ * renders the full grid.
+ */
+export function SearchPageWithParams({ initialProperties }: { initialProperties: Property[] }) {
+  return <SearchPageClient initialProperties={initialProperties} searchParams={useSearchParams()} />;
+}
+
 export default function SearchPageClient({
   initialProperties,
+  searchParams = NO_PARAMS,
 }: {
   initialProperties: Property[];
+  searchParams?: ReadonlyURLSearchParams | URLSearchParams;
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const typeParam = searchParams.get("type");
   const searchParam = searchParams.get("search");
 

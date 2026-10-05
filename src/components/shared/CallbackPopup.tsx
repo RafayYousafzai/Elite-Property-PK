@@ -1,33 +1,68 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
+import { PhoneCall, X } from "lucide-react";
+
+const DISMISSED_KEY = "elite_callback_popup_dismissed";
+const SHOW_AFTER_MS = 25000;
+const SHOW_AFTER_SCROLL = 0.6;
+
+// Pages that already are a contact form
+const EXCLUDED = ["/contactus", "/request-callback"];
 
 export default function CallbackPopup() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Appear only once the visitor is clearly engaged (time on site or deep
+  // scroll), never during first paint where it would hide the page content.
+  useEffect(() => {
+    if (EXCLUDED.includes(pathname)) return;
+    try {
+      if (sessionStorage.getItem(DISMISSED_KEY)) return;
+    } catch {
+      return;
+    }
+
+    const show = () => setIsOpen(true);
+    const timer = window.setTimeout(show, SHOW_AFTER_MS);
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (max > 0 && window.scrollY / max > SHOW_AFTER_SCROLL) show();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [pathname]);
 
   useEffect(() => {
-    // Check if user has already dismissed or completed the callback request
-    const isDismissed = sessionStorage.getItem("elite_callback_popup_dismissed");
-    if (isDismissed) return;
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && handleClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
-    // Show popup after 5 seconds delay
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const remember = () => {
+    try {
+      sessionStorage.setItem(DISMISSED_KEY, "true");
+    } catch {
+      // storage blocked — the popup simply may show again
+    }
+  };
 
   const handleClose = () => {
-    sessionStorage.setItem("elite_callback_popup_dismissed", "true");
+    remember();
     setIsOpen(false);
   };
 
   const handleRedirect = () => {
-    sessionStorage.setItem("elite_callback_popup_dismissed", "true");
+    remember();
     setIsOpen(false);
     router.push("/request-callback");
   };
@@ -35,69 +70,63 @@ export default function CallbackPopup() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-      
-      {/* Clickable Backdrop to close */}
+    <div className="fixed inset-0 z-[150] flex items-end justify-center bg-stone-900/40 p-0 backdrop-blur-sm animate-in fade-in duration-300 sm:items-center sm:p-4">
       <div className="absolute inset-0" onClick={handleClose} />
 
-      {/* Premium Centered Card with Background Image & Sharp Corners */}
-      <div 
-        className="relative w-full max-w-lg min-h-[400px] border border-zinc-800 shadow-2xl flex flex-col justify-between overflow-hidden rounded-none bg-cover bg-center animate-in zoom-in-95 duration-350"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000')`
-        }}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="callback-popup-title"
+        className="relative w-full max-w-md overflow-hidden bg-[#faf8f3] text-[#1a1714] shadow-2xl animate-in slide-in-from-bottom-4 duration-300 sm:rounded-sm"
       >
-        {/* Dark Overlay Tint for High-Contrast Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/75 to-black/40 z-10" />
-
-        {/* Close Button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 z-30 text-white/70 hover:text-white p-1.5 border border-white/20 hover:border-white/50 rounded-none bg-black/40 transition duration-150"
-          aria-label="Close popup"
-        >
-          <XMarkIcon className="h-5 w-5 stroke-[2.5]" />
-        </button>
-
-        {/* Card Content Wrapper */}
-        <div className="relative z-20 flex-1 flex flex-col justify-between p-8 sm:p-10 text-white">
-          
-          {/* Header text */}
-          <div className="space-y-3 mt-4">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#f97316]">
-              Elite Property Exchange
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white uppercase">
-              Consult With Our <br />Executive Partners
-            </h2>
-            <div className="w-12 h-1 bg-[#f97316]" />
-          </div>
-
-          {/* Description & Action buttons stacked closely */}
-          <div className="space-y-6 mt-6">
-            <p className="text-sm text-zinc-300 font-medium leading-relaxed max-w-md">
-              Looking to buy, sell, or invest in DHA Islamabad? Request a callback today and our expert consultants will connect with you shortly.
-            </p>
-
-            <div className="flex flex-col gap-2.5">
-              <button
-                onClick={handleRedirect}
-                className="w-full py-3 bg-[#f97316] hover:bg-[#ea580c] text-white font-extrabold text-xs uppercase tracking-widest rounded-none shadow-md transition duration-200"
-              >
-                Request Call Back
-              </button>
-              
-              <button
-                onClick={handleClose}
-                className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white/90 hover:text-white font-bold text-xs uppercase tracking-widest rounded-none border border-white/15 transition duration-150"
-              >
-                No Thanks, Just Browsing
-              </button>
-            </div>
-          </div>
-
+        <div className="relative aspect-[16/9] bg-stone-200">
+          <Image
+            src="/images/hero/modern-apartment-building-with-numerous-windows-and-balconies_49091535.jpeg"
+            alt=""
+            fill
+            sizes="448px"
+            className="object-cover"
+          />
+          <span className="pointer-events-none absolute inset-3 border border-white/60" />
+          <button
+            onClick={handleClose}
+            className="absolute right-4 top-4 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/90 text-stone-600 backdrop-blur-sm transition-colors hover:text-[#1a1714]"
+            aria-label="Close popup"
+          >
+            <X size={18} />
+          </button>
         </div>
 
+        <div className="p-7 sm:p-8">
+          <p className="text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
+            Elite Property Exchange
+          </p>
+          <h2
+            id="callback-popup-title"
+            className="mt-3 font-[family-name:var(--font-display)] text-3xl font-medium leading-tight"
+          >
+            Speak with an <em className="text-[#9a7a1e]">advisor</em>
+          </h2>
+          <p className="mt-3 leading-relaxed text-stone-600">
+            Looking to buy, sell or invest in DHA Islamabad? Request a call
+            back and one of our consultants will reach out shortly.
+          </p>
+
+          <div className="mt-7 flex flex-col gap-2.5">
+            <button
+              onClick={handleRedirect}
+              className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#1a1714] text-xs font-semibold uppercase tracking-[0.15em] text-white transition-colors hover:bg-[#9a7a1e]"
+            >
+              <PhoneCall size={15} /> Request a call back
+            </button>
+            <button
+              onClick={handleClose}
+              className="h-11 cursor-pointer text-xs font-semibold uppercase tracking-[0.15em] text-stone-500 transition-colors hover:text-[#1a1714]"
+            >
+              No thanks, just browsing
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

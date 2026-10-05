@@ -50,16 +50,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Preconnect to Google Fonts and static origins */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-
-        {/* Preload critical LCP Hero background asset for mobile & desktop */}
-        <link rel="preload" as="image" href="/images/hero/hero-bg-mobile.webp" type="image/webp" media="(max-width: 768px)" />
-        <link rel="preload" as="image" href="/images/hero/hero-bg.webp" type="image/webp" media="(min-width: 769px)" />
-
         {/* Meta Pixel + Google Ads tag: deferred until the visitor actually
             interacts (or a short idle fallback), so their long parse/exec
             tasks land outside the window Lighthouse uses to compute TTI. */}

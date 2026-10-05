@@ -2,15 +2,13 @@ import { Metadata } from "next";
 import { ArrowUpRight, Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { display } from "@/lib/fonts";
 import CallbackForm from "@/components/shared/CallbackForm";
+import MapEmbed from "@/components/shared/MapEmbed";
 
 export const metadata: Metadata = {
   title: "Contact Us | Elite Property Exchange",
   description: "Get in touch with Elite Property Exchange. Contact our expert real estate agents for consultations, bookings, or inquiries in DHA Islamabad.",
   keywords: ["contact elite property", "dha islamabad real estate office", "real estate agent contact islamabad"],
 };
-
-const MAP_EMBED =
-  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3325.7026272595363!2d73.16746392552783!3d33.53511641307411!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfed8930128de7%3A0x4b866d1a81e61490!2sElite%20Property%20Exchange!5e0!3m2!1sen!2s!4v1759570688102!5m2!1sen!2s";
 
 const channels = [
   {
@@ -114,15 +112,7 @@ export default function ContactUs() {
                 Open Monday – Sunday, 9:00 AM – 7:00 PM
               </p>
 
-              <div className="relative mt-10 aspect-[4/3] overflow-hidden rounded-sm border border-stone-200 bg-stone-100">
-                <iframe
-                  src={MAP_EMBED}
-                  title="Elite Property Exchange office on Google Maps"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="absolute inset-0 h-full w-full border-0 grayscale-[30%]"
-                />
-              </div>
+              <MapEmbed className="mt-10 aspect-[4/3]" />
             </div>
           </div>
         </div>

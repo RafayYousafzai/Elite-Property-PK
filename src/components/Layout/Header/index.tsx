@@ -2,7 +2,7 @@
 import type React from "react";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
@@ -42,6 +42,16 @@ const announcements = [
   { text: "High-Demand DHA Properties", highlight: "Inquire Today." },
 ];
 
+// Reads ?type= for the active nav link. useSearchParams makes a statically
+// rendered page fall back to client-only rendering up to the nearest Suspense
+// boundary, so it lives in this tiny component behind its own boundary instead
+// of in Header — otherwise every page's HTML would ship empty.
+function TypeParamSync({ onChange }: { onChange: (type: string | null) => void }) {
+  const type = useSearchParams().get("type");
+  useEffect(() => onChange(type), [type, onChange]);
+  return null;
+}
+
 const Header: React.FC = () => {
   const [sticky, setSticky] = useState(false);
   const [navbarOpen, setNavbarOpen] = useState(false);
@@ -60,8 +70,7 @@ const Header: React.FC = () => {
   }, []);
 
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const typeParam = searchParams.get("type");
+  const [typeParam, setTypeParam] = useState<string | null>(null);
 
   const [hidden, setHidden] = useState(false);
   const lastScrollY = useRef(0);
@@ -129,6 +138,10 @@ const Header: React.FC = () => {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <TypeParamSync onChange={setTypeParam} />
+      </Suspense>
+
       {/* Top Fixed Announcement Bar */}
       <div className="fixed top-0 left-0 z-[100] flex h-11 w-full select-none items-center justify-center border-b border-stone-200 bg-[#faf8f3] px-4">
         <div

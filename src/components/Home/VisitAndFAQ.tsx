@@ -1,3 +1,4 @@
+import MapEmbed from "@/components/shared/MapEmbed";
 import { Clock, MapPin, MessageCircle, Navigation, Phone, Plus } from "lucide-react";
 
 const faqs = [
@@ -29,7 +30,6 @@ const office = {
   tel: "+923344111778",
   hours: "Monday – Sunday, 9:00 AM – 7:00 PM",
   directions: "https://www.google.com/maps/dir/?api=1&destination=33.535113,73.170038",
-  map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3325.7026272595363!2d73.16746392552783!3d33.53511641307411!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfed8930128de7%3A0x4b866d1a81e61490!2sElite%20Property%20Exchange!5e0!3m2!1sen!2s!4v1759570688102!5m2!1sen!2s",
 };
 
 const VisitAndFAQ = () => {
@@ -76,15 +76,7 @@ const VisitAndFAQ = () => {
               Meet us in <em className="text-[#9a7a1e]">person</em>
             </h2>
 
-            <div className="relative mt-12 aspect-[4/3] overflow-hidden rounded-sm border border-stone-200 bg-stone-100">
-              <iframe
-                src={office.map}
-                title="Elite Property Exchange office on Google Maps"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="absolute inset-0 h-full w-full border-0 grayscale-[30%]"
-              />
-            </div>
+            <MapEmbed className="mt-12 aspect-[4/3]" />
 
             <ul className="mt-8 space-y-4 text-stone-700">
               <li className="flex gap-4">
