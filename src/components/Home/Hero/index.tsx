@@ -106,6 +106,16 @@ const Hero: React.FC = () => {
                   <Link href="/explore">View Properties</Link>
                 </Button>
               </div>
+
+              {/* Trust line */}
+              <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-medium uppercase tracking-[0.2em] text-white/75 lg:justify-start">
+                {["Verified listings", "DHA Phases 1–7", "Overseas support"].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="h-1 w-1 rounded-full bg-primary" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {/* Right Column: Search Bar for Desktop */}

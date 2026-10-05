@@ -1,24 +1,23 @@
-import FeaturedProperty from "@/components/Home/FeaturedProperty";
 import Hero from "@/components/Home/Hero";
-import Categories from "@/components/Home/Categories";
+import FeaturedEditorial from "@/components/Home/FeaturedEditorial";
+import BrowseListings from "@/components/Home/BrowseListings";
+import VideoTours from "@/components/Home/VideoTours";
+import ClientStories from "@/components/Home/ClientStories";
+import VisitAndFAQ from "@/components/Home/VisitAndFAQ";
+import WhyChooseUs from "@/components/About/WhyChooseUs";
+import Team from "@/components/About/Team";
 import BlogSmall from "@/components/shared/Blog/BlogSmallServer";
-import GetInTouch from "@/components/Home/GetInTouch";
-import FAQ from "@/components/Home/FAQs";
-import Services from "@/components/Home/Services";
-import TestimonialsServer from "@/components/Home/Testimonial/TestimonialsServer";
-import {
-  HomeParallaxSection,
-  HomeVideoSection,
-  HomeLocationSection,
-} from "@/components/Home/HomeClientSections";
 import {
   getFeaturedProperties,
+  getProperties,
 } from "@/lib/supabase/properties-server";
+import { getTeamMembersServer } from "@/lib/supabase/team-server";
+import { display } from "@/lib/fonts";
 import { Metadata } from "next";
 
-// Cache the homepage statically for 24 hours (86400 seconds) as a fallback.
-// The cache is automatically revalidated on-demand whenever a change is made from the admin panel.
-export const revalidate = 86400;
+// Statically rendered; refreshed in the background every 10 minutes so new
+// listings, testimonials and team changes from the admin panel show up quickly.
+export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: "Elite Property Exchange | Buy, Sell & Rent in DHA Islamabad",
@@ -29,8 +28,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  // Fetch properties from Supabase
-  const featuredProperties = await getFeaturedProperties();
+  const [featuredProperties, allProperties, team] = await Promise.all([
+    getFeaturedProperties(),
+    getProperties(),
+    getTeamMembersServer(),
+  ]);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
   const agentSchema = {
@@ -40,7 +42,7 @@ export default async function Home() {
     "image": `${siteUrl}/elite-logo-brown.png`,
     "@id": `${siteUrl}/#realestateagent`,
     "url": siteUrl,
-    "telephone": "+92-300-0511111",
+    "telephone": "+92-334-4111778",
     "priceRange": "$$$",
     "address": {
       "@type": "PostalAddress",
@@ -62,38 +64,29 @@ export default async function Home() {
         "Wednesday",
         "Thursday",
         "Friday",
-        "Saturday"
+        "Saturday",
+        "Sunday"
       ],
       "opens": "09:00",
-      "closes": "18:00"
+      "closes": "19:00"
     }
   };
 
   return (
-    <main>
+    <main className={`${display.variable} bg-[#faf8f3] text-[#1a1714]`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(agentSchema) }}
       />
       <Hero />
-      <Categories />
-      <HomeParallaxSection featuredProperties={featuredProperties} />
-      <Services />
-
-      <HomeVideoSection />
-
-      <FeaturedProperty properties={featuredProperties} />
-      <HomeLocationSection />
+      <FeaturedEditorial properties={featuredProperties} />
+      <BrowseListings properties={allProperties} />
+      <VideoTours />
+      <ClientStories />
+      <WhyChooseUs />
+      <Team members={team.slice(0, 3)} />
       <BlogSmall />
-      <FAQ />
-      <GetInTouch />
-      <br />
-      <br />
-      <br />
-      <TestimonialsServer />
-      <br />
-      <br />
-      <br />
+      <VisitAndFAQ />
     </main>
   );
 }
