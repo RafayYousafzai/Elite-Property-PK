@@ -7,14 +7,14 @@ import { ChatHeader } from "./ChatHeader";
 import { ChatMessages } from "./ChatMessages";
 import { ChatComposer } from "./ChatComposer";
 import Image from "next/image";
+import { AVATAR_URL } from "./avatar";
 
 type MessageWithParts = {
   role?: string;
   parts?: Array<{ type?: string }>;
 };
 
-const avatar_url =
-  "https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=256&auto=format&fit=crop";
+const avatar_url = AVATAR_URL;
 
 const BUBBLE_MESSAGES = [
   "Looking for DHA or Bahria plots?",
@@ -331,7 +331,7 @@ export default function ChatWidget({
             ? // Open: full-width sheet on phones (above the fixed site header bars),
               // floating panel from sm up
               "fixed inset-x-2 bottom-2 z-[110] sm:inset-x-auto sm:right-6 sm:bottom-6"
-            : "fixed bottom-6 right-6 z-50"
+            : "chat-launcher-dock fixed bottom-6 right-6 z-50"
       }
       style={
         isEmbedded

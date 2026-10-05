@@ -4,6 +4,27 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
 import { getImageUrl } from "@/lib/utils";
+import type { Property } from "@/types/property";
+
+const phaseOf = (p: Property) =>
+  `${p.phase || ""} ${p.location || ""} ${p.name}`.toLowerCase().match(/phase\s*(\d)/)?.[1];
+
+// Up to three available listings of the same type, preferring the same DHA phase
+function getRelatedProperties(property: Property, all: Property[]): Property[] {
+  const phase = phaseOf(property);
+  return all
+    .filter((p) => p.slug !== property.slug && !p.is_sold)
+    .map((p) => ({
+      p,
+      score:
+        (p.property_type === property.property_type ? 2 : 0) +
+        (phase && phaseOf(p) === phase ? 1 : 0),
+    }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map(({ p }) => p);
+}
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -60,11 +81,16 @@ export async function generateStaticParams() {
 
 export default async function PropertyDetailsPage({ params }: PageProps) {
   const data = await params;
-  const property = await getPropertyBySlugServer(data.id);
+  const [property, allProperties] = await Promise.all([
+    getPropertyBySlugServer(data.id),
+    getProperties(),
+  ]);
 
   if (!property) {
     notFound();
   }
+
+  const related = getRelatedProperties(property, allProperties);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
   const mainImage = property.images && property.images.length > 0
@@ -102,14 +128,11 @@ export default async function PropertyDetailsPage({ params }: PageProps) {
 
   return (
     <>
-      {mainImage && (
-        <link rel="preload" as="image" href={mainImage} fetchPriority="high" />
-      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
       />
-      <PropertyDetailsClient property={property} />
+      <PropertyDetailsClient property={property} related={related} />
     </>
   );
 }

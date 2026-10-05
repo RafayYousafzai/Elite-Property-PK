@@ -111,8 +111,8 @@ const Header: React.FC = () => {
     };
   }, [navbarOpen]);
 
-  // Only Homepage ('/') and Property Details ('/explore/[id]') have dark hero backgrounds
-  const hasDarkHero = pathname === "/" || (pathname.startsWith("/explore/") && pathname !== "/explore");
+  // Only the homepage has a dark photo hero behind the header
+  const hasDarkHero = pathname === "/";
   const useWhiteHeader = hasDarkHero && !sticky;
 
   const isActive = (href: string) => {

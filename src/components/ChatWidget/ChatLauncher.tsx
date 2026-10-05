@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { AVATAR_URL } from "./avatar";
 
 // The full chat panel pulls in @ai-sdk/react, ai, zod and @dnd-kit (~250KB
 // of JS that Lighthouse flags as 85-99% unused on load). None of that
 // should be fetched or executed until the visitor actually opens the chat.
 const ChatWidget = dynamic(() => import("./ChatWidget"), { ssr: false });
 
-const avatar_url =
-  "https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=256&auto=format&fit=crop";
+const avatar_url = AVATAR_URL;
 
 const BUBBLE_MESSAGES = [
   "Looking for DHA or Bahria plots?",
@@ -80,7 +80,7 @@ export default function ChatLauncher() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="chat-launcher-dock fixed bottom-6 right-6 z-50">
       <div className="relative">
         <div
           className={`absolute right-full top-1/2 z-10 mr-4 -translate-y-1/2 transition-all duration-500 ease-out ${

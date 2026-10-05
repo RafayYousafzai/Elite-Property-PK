@@ -205,3 +205,10 @@ section {
 .blog-details p {
   @apply text-dark text-xm leading-[1.2];
 }
+
+/* Lift the chat launcher above the property page's mobile enquiry bar */
+@media (max-width: 1023px) {
+  body:has([data-mobile-enquiry-bar]) .chat-launcher-dock {
+    bottom: 5.5rem;
+  }
+}

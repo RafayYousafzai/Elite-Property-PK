@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { Button, Text } from "./heroui-shims";
+import { AVATAR_URL } from "./avatar";
 
 interface ChatHeaderProps {
   title: string;
@@ -17,8 +18,7 @@ export function ChatHeader({
   avatarSrc,
   onMinimize,
 }: ChatHeaderProps) {
-  const defaultAvatar =
-    "https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=256&auto=format&fit=crop";
+  const defaultAvatar = AVATAR_URL;
 
   return (
     <header className="relative z-10 flex items-center justify-between gap-2 px-4 py-3 shrink-0 bg-white border-b border-black/5">

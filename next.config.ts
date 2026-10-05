@@ -18,8 +18,35 @@ const nextConfig: NextConfig = {
       "react-icons",
     ],
   },
+  // Serve R2 listing photos from the site's own domain (plain pass-through, no
+  // image transformations). Visitors whose ISP struggles with the storage
+  // domain can still load photos, since they only ever talk to this site.
+  async rewrites() {
+    return [
+      {
+        source: "/media/:path*",
+        destination: "https://elitepropertyimages.rafaykhan.website/:path*",
+      },
+    ];
+  },
+  // Listing photos never change once uploaded (new uploads get new names),
+  // so let browsers and the CDN cache the proxied copies for a year.
+  async headers() {
+    return [
+      {
+        source: "/media/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+          { key: "CDN-Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+    ];
+  },
   images: {
     formats: ["image/avif", "image/webp"],
+    // Keep optimized copies cached for a month so remote images (team photos,
+    // chat avatar) are only transformed once, staying well inside free quotas.
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       {
         protocol: "https",

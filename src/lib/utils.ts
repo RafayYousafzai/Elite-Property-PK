@@ -92,3 +92,11 @@ export function getThumbnailUrl(
 
   return `${domain}${thumbPath}`;
 }
+
+// Same-origin path for a URL on the R2 image domain (see the /media rewrite in
+// next.config.ts). Other URLs are returned unchanged.
+export function toSameOrigin(url: string): string {
+  return url.startsWith(PROPERTY_IMAGE_DOMAIN)
+    ? `/media/${url.slice(PROPERTY_IMAGE_DOMAIN.length)}`
+    : url;
+}
