@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import ThirdPartyScripts from "@/components/shared/ThirdPartyScripts";
+import { display } from "@/lib/fonts";
 
 const font = Bricolage_Grotesque({ subsets: ["latin"], display: "swap" });
 
@@ -84,7 +85,7 @@ export default function RootLayout({
                   ],
                   "contactPoint": {
                     "@type": "ContactPoint",
-                    "telephone": "+92-300-0511111",
+                    "telephone": "+92-334-4111778",
                     "contactType": "customer service",
                     "areaServed": "PK",
                     "availableLanguage": ["English", "Urdu"]
@@ -106,7 +107,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={`${font.className} bg-white text-slate-900 antialiased`}>
+      <body className={`${font.className} ${display.variable} bg-white text-slate-900 antialiased`}>
         <NextTopLoader color="#d8b648" showSpinner={false} />
         <Providers>
           <Suspense fallback={null}>{children}</Suspense>

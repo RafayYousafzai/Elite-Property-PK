@@ -1,139 +1,132 @@
-import { Icon } from "@iconify/react";
-import Image from "next/image";
-import Link from "next/link";
 import { Metadata } from "next";
-import LocationMap from "@/components/Home/Office";
+import { ArrowUpRight, Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { display } from "@/lib/fonts";
+import CallbackForm from "@/components/shared/CallbackForm";
+
 export const metadata: Metadata = {
   title: "Contact Us | Elite Property Exchange",
   description: "Get in touch with Elite Property Exchange. Contact our expert real estate agents for consultations, bookings, or inquiries in DHA Islamabad.",
   keywords: ["contact elite property", "dha islamabad real estate office", "real estate agent contact islamabad"],
 };
 
+const MAP_EMBED =
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3325.7026272595363!2d73.16746392552783!3d33.53511641307411!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfed8930128de7%3A0x4b866d1a81e61490!2sElite%20Property%20Exchange!5e0!3m2!1sen!2s!4v1759570688102!5m2!1sen!2s";
+
+const channels = [
+  {
+    icon: Phone,
+    label: "Call us",
+    value: "+92 334 4111778",
+    href: "tel:+923344111778",
+  },
+  {
+    icon: MessageCircle,
+    label: "WhatsApp",
+    value: "Chat with an advisor",
+    href: "https://wa.me/923344111778",
+  },
+  {
+    icon: Mail,
+    label: "Email",
+    value: "pk.eliteproperty@gmail.com",
+    href: "mailto:pk.eliteproperty@gmail.com",
+  },
+  {
+    icon: MapPin,
+    label: "Office",
+    value: "2nd Floor, Plaza No. 19, Tipu Boulevard, Sector G, DHA Phase II, Islamabad",
+    href: "https://www.google.com/maps/dir/?api=1&destination=33.535113,73.170038",
+  },
+];
+
 export default function ContactUs() {
   return (
-    <div className="container max-w-8xl mx-auto px-5 2xl:px-0 pt-32 md:pt-44 pb-14 md:pb-28">
-      {/* <div className="mb-16">
-        <div className="flex gap-2.5 items-center justify-center mb-3">
-          <span>
-            <Icon
-              icon={"ph:house-simple-fill"}
-              width={20}
-              height={20}
-              className="text-primary"
-            />
-          </span>
-          <p className="text-base font-semibold text-badge dark:text-white/90">
-            Contact us
+    <main className={`${display.variable} bg-[#faf8f3] text-[#1a1714]`}>
+      <section className="relative overflow-hidden !pt-48 !pb-16 md:!pt-56 md:!pb-20">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_50%_at_15%_0%,rgba(212,175,55,0.16),transparent_70%)]"
+        />
+        <div className="container relative mx-auto max-w-8xl px-5 2xl:px-0">
+          <p className="mb-6 inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
+            <span className="h-px w-8 bg-primary/60" />
+            Contact
+          </p>
+          <h1 className="max-w-4xl font-[family-name:var(--font-display)] text-5xl font-medium leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+            Let&apos;s <em className="text-[#9a7a1e]">talk property</em>
+          </h1>
+          <p className="mt-6 max-w-xl text-stone-600 md:text-lg">
+            Buying, selling or investing in DHA Islamabad — tell us what you
+            need and an advisor will get back to you.
           </p>
         </div>
-        <div className="text-center">
-          <h3 className="text-4xl sm:text-52 font-medium tracking-tighter text-black dark:text-white mb-3 leading-10 sm:leading-14">
-            Have questions? ready to help!
-          </h3>
-          <p className="text-xm font-normal tracking-tight text-black/50 dark:text-white/50 leading-6">
-            Looking for your dream home or ready to sell? Our expert team offers
-            personalized guidance and market expertise tailored to you.
-          </p>
-        </div>
-      </div>
-      <div className="border border-black/10 dark:border-white/10 rounded-2xl p-4 shadow-xl dark:shadow-white/10">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-12">
-          <div className="relative w-fit">
-            <Image
-              src={"/images/contactUs/contactUs.jpg"}
-              alt="wall"
-              width={497}
-              height={535}
-              className="rounded-2xl brightness-50 h-full"
-              unoptimized={true}
-            />
-            <div className="absolute top-6 left-6 lg:top-12 lg:left-12 flex flex-col gap-2">
-              <h5 className="text-xl xs:text-2xl mobile:text-3xl font-medium tracking-tight text-white">
-                Contact information
-              </h5>
-              <p className="text-sm xs:text-base mobile:text-xm font-normal text-white/80">
-                Ready to find your dream home or sell your property? We’re here
-                to help!
+      </section>
+
+      <section className="!pt-0 !pb-24 md:!pb-32">
+        <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
+          <div className="grid gap-12 lg:grid-cols-[7fr_5fr] lg:gap-16">
+            {/* Form */}
+            <div className="self-start rounded-sm border border-stone-200 bg-white p-6 sm:p-10 md:p-12">
+              <h2 className="font-[family-name:var(--font-display)] text-3xl font-medium md:text-4xl">
+                Request a call back
+              </h2>
+              <p className="mt-2 mb-10 text-stone-500">
+                A few quick details help us prepare the right options for you.
               </p>
+              <CallbackForm trackingCategory="Contact Page Lead" />
             </div>
-            <div className="absolute bottom-6 left-6 lg:bottom-12 lg:left-12 flex flex-col gap-4 text-white">
-              <Link href={"/"} className="w-fit">
-                <div className="flex items-center gap-4 group w-fit">
-                  <Icon icon={"ph:phone"} width={32} height={32} />
-                  <p className="text-sm xs:text-base mobile:text-xm font-normal group-hover:text-primary">
-                    +1 0239 0310 1122
-                  </p>
-                </div>
-              </Link>
-              <Link href={"/"} className="w-fit">
-                <div className="flex items-center gap-4 group w-fit">
-                  <Icon icon={"ph:envelope-simple"} width={32} height={32} />
-                  <p className="text-sm xs:text-base mobile:text-xm font-normal group-hover:text-primary">
-                    support@gleamer.com
-                  </p>
-                </div>
-              </Link>
-              <div className="flex items-center gap-4">
-                <Icon icon={"ph:map-pin"} width={32} height={32} />
-                <p className="text-sm xs:text-base mobile:text-xm font-normal">
-                  Blane Street, Manchester
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex-1/2">
-            <form>
-              <div className="flex flex-col gap-8">
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    autoComplete="username"
-                    placeholder="Name*"
-                    required
-                    className="px-6 py-3.5 border border-black/10 dark:border-white/10 rounded-full outline-primary focus:outline w-full"
-                  />
-                  <input
-                    type="number"
-                    name="mobile"
-                    id="mobile"
-                    autoComplete="mobile"
-                    placeholder="Phone number*"
-                    required
-                    className="px-6 py-3.5 border border-black/10 dark:border-white/10 rounded-full outline-primary focus:outline w-full"
-                  />
-                </div>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  autoComplete="email"
-                  placeholder="Email address*"
-                  required
-                  className="px-6 py-3.5 border border-black/10 dark:border-white/10 rounded-full outline-primary focus:outline"
+
+            {/* Direct channels */}
+            <div>
+              <h2 className="text-[10px] font-semibold uppercase tracking-[0.3em] text-stone-400">
+                Or reach us directly
+              </h2>
+              <ul className="mt-6 border-t border-stone-300">
+                {channels.map(({ icon: Icon, label, value, href }) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target={href.startsWith("http") ? "_blank" : undefined}
+                      rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                      className="group flex items-start gap-5 border-b border-stone-200 py-6"
+                    >
+                      <Icon size={20} strokeWidth={1.5} className="mt-1 shrink-0 text-[#9a7a1e]" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[10px] font-medium uppercase tracking-[0.3em] text-stone-400">
+                          {label}
+                        </span>
+                        <span className="mt-1 block break-words text-base transition-colors group-hover:text-[#9a7a1e] md:text-lg">
+                          {value}
+                        </span>
+                      </span>
+                      <ArrowUpRight
+                        size={18}
+                        strokeWidth={1.5}
+                        className="mt-1 shrink-0 text-stone-400 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#9a7a1e]"
+                      />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-6 flex items-center gap-3 text-sm text-stone-600">
+                <Clock size={18} strokeWidth={1.5} className="text-[#9a7a1e]" />
+                Open Monday – Sunday, 9:00 AM – 7:00 PM
+              </p>
+
+              <div className="relative mt-10 aspect-[4/3] overflow-hidden rounded-sm border border-stone-200 bg-stone-100">
+                <iframe
+                  src={MAP_EMBED}
+                  title="Elite Property Exchange office on Google Maps"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="absolute inset-0 h-full w-full border-0 grayscale-[30%]"
                 />
-                <textarea
-                  rows={8}
-                  cols={50}
-                  name="message"
-                  id="message"
-                  placeholder="Write here your message"
-                  required
-                  className="px-6 py-3.5 border border-black/10 dark:border-white/10 rounded-2xl outline-primary focus:outline"
-                ></textarea>
-                <button className="px-8 py-4 rounded-full bg-primary text-white text-base font-semibold w-full mobile:w-fit hover:cursor-pointer hover:bg-dark duration-300">
-                  Send message
-                </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
-      </div> */}
-      {/* <br />
-      <br />
-      <br /> */}
-      <LocationMap />
-    </div>
+      </section>
+    </main>
   );
 }

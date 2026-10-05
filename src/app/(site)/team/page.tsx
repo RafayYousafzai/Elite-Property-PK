@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { display } from "@/lib/fonts";
 import { getTeamMembersServer } from "@/lib/supabase/team-server";
 import TeamShowcase from "@/components/Team/TeamShowcase";
@@ -66,39 +65,6 @@ export default async function TeamPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative overflow-hidden border-t border-stone-200 bg-white !py-24 md:!py-32">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_100%,rgba(212,175,55,0.16),transparent_70%)]"
-        />
-        <div className="container relative mx-auto max-w-8xl px-5 2xl:px-0">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="font-[family-name:var(--font-display)] text-4xl font-medium leading-tight md:text-6xl">
-              Let&apos;s find your next{" "}
-              <em className="text-[#9a7a1e]">address</em>
-            </h2>
-            <p className="mx-auto mt-6 max-w-xl text-stone-600 md:text-lg">
-              Speak with an advisor today and experience the Elite Property
-              difference from the very first conversation.
-            </p>
-            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
-              <Link
-                href="/contactus"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-[#1a1714] px-8 text-sm font-semibold uppercase tracking-[0.15em] text-white transition-colors hover:bg-[#9a7a1e]"
-              >
-                Book a Consultation
-              </Link>
-              <Link
-                href="/explore"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-stone-300 px-8 text-sm font-semibold uppercase tracking-[0.15em] text-[#1a1714] transition-colors hover:border-[#9a7a1e] hover:text-[#9a7a1e]"
-              >
-                View Properties
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
