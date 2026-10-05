@@ -43,6 +43,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import formatNumberShort from "@/lib/formatNumberShort";
+import { propertyTypes } from "@/lib/property-types";
 
 export interface PropertyFormData {
   purpose: "Sell" | "Rent";
@@ -73,26 +74,7 @@ export interface PropertyFormData {
   featured_image_index?: number; // Index 0 = first image is the cover/featured
 }
 
-export const propertyTypes = {
-  Home: [
-    "House",
-    "flat/appartment",
-    "Farm House",
-    "Room",
-    "Upper Portion",
-    "Lower Portion",
-    "Penthouse",
-  ],
-  Plots: [
-    "Residential Plot",
-    "Commercial Plot",
-    "Agricultural Land",
-    "Industrial Land",
-    "Plot File",
-    "Plot Form",
-  ],
-  Commercial: ["Office", "Shop", "Warehouse", "Factory", "Building", "Other"],
-};
+export { propertyTypes };
 
 const cities = [
   "Karachi",

@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import type { SearchFilters } from "@/types/property";
-import { propertyTypes } from "@/components/Admin/PropertyForm";
+import { propertyTypes } from "@/lib/property-types";
 import formatNumberShort from "@/lib/formatNumberShort";
 
 interface SearchSidebarProps {
@@ -17,9 +16,7 @@ export default function SearchSidebar({
   onFiltersChange,
   onClearFilters,
 }: SearchSidebarProps) {
-  const [priceRange, setPriceRange] = useState<[number, number]>(
-    filters.priceRange
-  );
+  const priceRange = filters.priceRange;
 
   const handlePropertyTypeChange = (
     type: "all" | "homes" | "plots" | "apartments" | "commercial"
@@ -37,13 +34,11 @@ export default function SearchSidebar({
 
   const handlePriceRangeChange = (value: number[]) => {
     const newRange: [number, number] = [value[0], value[1]];
-    setPriceRange(newRange);
     onFiltersChange({ ...filters, priceRange: newRange });
   };
 
   const handlePresetPrice = (min: number, max: number) => {
     const newRange: [number, number] = [min, max];
-    setPriceRange(newRange);
     onFiltersChange({ ...filters, priceRange: newRange });
   };
 
@@ -72,23 +67,20 @@ export default function SearchSidebar({
   ];
 
   return (
-    <div className="w-full md:w-80 bg-transparent border-0">
-      <div className="py-2 md:py-6 px-1 md:px-6 space-y-6">
+    <div className="w-full bg-transparent border-0">
+      <div className="py-6 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-              Filters
+            <h2 className="text-lg font-semibold text-[#1a1714]">
+              Refine your search
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Refine property search
-            </p>
           </div>
           {activeFiltersCount > 0 && (
             <button
               type="button"
               onClick={onClearFilters}
-              className="text-xs font-semibold text-primary hover:underline cursor-pointer border-0 bg-transparent"
+              className="text-xs font-semibold text-[#9a7a1e] underline-offset-4 hover:underline cursor-pointer border-0 bg-transparent"
             >
               Reset All ({activeFiltersCount})
             </button>
@@ -97,7 +89,7 @@ export default function SearchSidebar({
 
         {/* Property Type */}
         <div className="space-y-2.5">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <h3 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-400">
             Property Type
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -121,10 +113,10 @@ export default function SearchSidebar({
                       | "commercial"
                   )
                 }
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer border-0 shadow-none ${
+                className={`px-3.5 py-1.5 rounded-full border text-xs font-semibold transition-colors duration-200 cursor-pointer shadow-none ${
                   filters.propertyType === type.value
-                    ? "bg-primary text-white"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    ? "bg-[#1a1714] border-[#1a1714] text-white"
+                    : "bg-white border-stone-200 text-stone-700 hover:border-[#9a7a1e] hover:text-[#9a7a1e]"
                 }`}
               >
                 {type.label}
@@ -137,7 +129,7 @@ export default function SearchSidebar({
         {filters.propertyType !== "all" &&
           filters.propertyType !== "apartments" && (
             <div className="space-y-2.5">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-400">
                 Category
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -153,10 +145,10 @@ export default function SearchSidebar({
                     key={subType}
                     type="button"
                     onClick={() => handleSubCategoryChange(subType)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer border-0 shadow-none ${
+                    className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors duration-200 cursor-pointer shadow-none ${
                       filters.subCategory === subType
-                        ? "bg-primary text-white"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                        ? "bg-[#1a1714] border-[#1a1714] text-white"
+                        : "bg-white border-stone-200 text-stone-700 hover:border-[#9a7a1e] hover:text-[#9a7a1e]"
                     }`}
                   >
                     {subType}
@@ -169,7 +161,7 @@ export default function SearchSidebar({
         {/* DHA Phase (All + Phase 1 to Phase 7) */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-400">
               Select DHA Islamabad Phase
             </h3>
           </div>
@@ -193,10 +185,10 @@ export default function SearchSidebar({
                   key={phase.label}
                   type="button"
                   onClick={() => handlePhaseChange(phase.value)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer border-0 shadow-none ${
+                  className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors duration-200 cursor-pointer shadow-none ${
                     isSelected
-                      ? "bg-primary text-white"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                      ? "bg-[#1a1714] border-[#1a1714] text-white"
+                      : "bg-white border-stone-200 text-stone-700 hover:border-[#9a7a1e] hover:text-[#9a7a1e]"
                   }`}
                 >
                   {phase.label}
@@ -209,10 +201,10 @@ export default function SearchSidebar({
         {/* Price Range Slider & Preset Chips */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-400">
               Price Range
             </h3>
-            <span className="text-xs font-semibold text-primary">
+            <span className="text-xs font-semibold text-[#9a7a1e]">
               PKR {formatNumberShort(priceRange[0])} - {formatNumberShort(priceRange[1])}
             </span>
           </div>
@@ -236,10 +228,10 @@ export default function SearchSidebar({
                   key={preset.label}
                   type="button"
                   onClick={() => handlePresetPrice(preset.min, preset.max)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all duration-200 cursor-pointer border-0 shadow-none ${
+                  className={`px-2.5 py-1 rounded-full border text-[11px] font-semibold transition-colors duration-200 cursor-pointer shadow-none ${
                     isPresetActive
-                      ? "bg-primary text-white"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      ? "bg-[#1a1714] border-[#1a1714] text-white"
+                      : "bg-white border-stone-200 text-stone-600 hover:border-[#9a7a1e] hover:text-[#9a7a1e]"
                   }`}
                 >
                   {preset.label}
@@ -254,7 +246,7 @@ export default function SearchSidebar({
           <div className="space-y-5 pt-1">
             {/* Bedrooms */}
             <div className="space-y-2.5">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-400">
                 Bedrooms
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -276,10 +268,10 @@ export default function SearchSidebar({
                           beds: b.value,
                         })
                       }
-                      className={`min-w-9 h-9 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center cursor-pointer border-0 shadow-none ${
+                      className={`min-w-9 h-9 px-3 rounded-full border text-xs font-semibold transition-colors duration-200 flex items-center justify-center cursor-pointer shadow-none ${
                         isSelected
-                          ? "bg-primary text-white"
-                          : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                          ? "bg-[#1a1714] border-[#1a1714] text-white"
+                          : "bg-white border-stone-200 text-stone-700 hover:border-[#9a7a1e] hover:text-[#9a7a1e]"
                       }`}
                     >
                       {b.label}
@@ -291,7 +283,7 @@ export default function SearchSidebar({
 
             {/* Bathrooms */}
             <div className="space-y-2.5">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-400">
                 Bathrooms
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -313,10 +305,10 @@ export default function SearchSidebar({
                           baths: b.value,
                         })
                       }
-                      className={`min-w-9 h-9 px-3 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center cursor-pointer border-0 shadow-none ${
+                      className={`min-w-9 h-9 px-3 rounded-full border text-xs font-semibold transition-colors duration-200 flex items-center justify-center cursor-pointer shadow-none ${
                         isSelected
-                          ? "bg-primary text-white"
-                          : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                          ? "bg-[#1a1714] border-[#1a1714] text-white"
+                          : "bg-white border-stone-200 text-stone-700 hover:border-[#9a7a1e] hover:text-[#9a7a1e]"
                       }`}
                     >
                       {b.label}

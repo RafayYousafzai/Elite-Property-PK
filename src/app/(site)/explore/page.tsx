@@ -1,6 +1,7 @@
 import { getProperties } from "@/lib/supabase/properties-server";
 import SearchPageClient from "./SearchPageClient";
 import { Metadata } from "next";
+import { display } from "@/lib/fonts";
 
 // Pre-render the explore listings statically, revalidate on-demand or every 24 hours fallback
 export const revalidate = 86400;
@@ -13,5 +14,9 @@ export const metadata: Metadata = {
 
 export default async function SearchPage() {
   const initialProperties = await getProperties();
-  return <SearchPageClient initialProperties={initialProperties} />;
+  return (
+    <div className={display.variable}>
+      <SearchPageClient initialProperties={initialProperties} />
+    </div>
+  );
 }

@@ -1,6 +1,6 @@
 import { createClient as createBrowserClient } from "@/utils/supabase/client";
 import { DatabaseProperty, Property, SearchFilters } from "@/types/property";
-import { propertyTypes } from "@/components/Admin/PropertyForm";
+import { propertyTypes } from "@/lib/property-types";
 import { extractImagePath, getImageUrl } from "@/lib/utils";
 
 // Transform database property to app property
@@ -159,6 +159,65 @@ export function parsePropertyRate(rate: string | number | null | undefined): num
 }
 
 // Function to get properties with filters
+const APARTMENT_TYPES = ["flat", "apartment", "flat/appartment", "penthouse"];
+
+const normalize = (value: string | null | undefined) =>
+  (value || "").toLowerCase().replace(/\s+/g, " ").trim();
+
+// In-memory equivalent of getFilteredProperties — used by the explore page so
+// filtering the already-loaded listings is instant, with no network round-trip.
+export function filterProperties(
+  properties: Property[],
+  filters: SearchFilters
+): Property[] {
+  const typeOf = (p: Property) => normalize(p.property_type);
+  const matchesSubCategory = (p: Property, sub: string) => {
+    const term = normalize(sub);
+    return typeOf(p).includes(term) || normalize(p.property_category).includes(term);
+  };
+  const typeLists: Record<string, string[]> = {
+    homes: propertyTypes.Home.map(normalize),
+    plots: propertyTypes.Plots.map(normalize),
+    commercial: propertyTypes.Commercial.map(normalize),
+    apartments: APARTMENT_TYPES,
+  };
+
+  const term = normalize(filters.searchQuery);
+  const [minPrice, maxPrice] = filters.priceRange || [0, 1000000000];
+  const priceFiltered = minPrice > 0 || maxPrice < 1000000000;
+
+  return properties.filter((p) => {
+    if (filters.propertyType !== "all") {
+      if (filters.subCategory && filters.propertyType !== "apartments") {
+        if (!matchesSubCategory(p, filters.subCategory)) return false;
+      } else if (!typeLists[filters.propertyType].includes(typeOf(p))) {
+        return false;
+      }
+    } else if (filters.subCategory && !matchesSubCategory(p, filters.subCategory)) {
+      return false;
+    }
+
+    if (term) {
+      const haystack = normalize(
+        [p.name, p.location, p.phase, p.sector, p.city, p.property_type, p.property_category]
+          .filter(Boolean)
+          .join(" ")
+      );
+      if (!haystack.includes(term)) return false;
+    }
+
+    if (filters.beds && getBedsCount(p) < filters.beds) return false;
+    if (filters.baths && getBathsCount(p) < filters.baths) return false;
+
+    if (priceFiltered) {
+      const price = parsePropertyRate(p.rate);
+      if (price < minPrice || price > maxPrice) return false;
+    }
+
+    return true;
+  });
+}
+
 export async function getFilteredProperties(
   filters: SearchFilters
 ): Promise<Property[]> {

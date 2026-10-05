@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Property, SearchFilters } from "@/types/property";
+import { Property } from "@/types/property";
 import {
-  getFilteredProperties,
   getPropertiesClient,
   transformDatabaseProperty,
 } from "@/lib/supabase/properties";
@@ -11,17 +10,16 @@ import { createClient } from "@/utils/supabase/client";
 
 interface UsePropertiesReturn {
   properties: Property[];
-  filteredProperties: Property[];
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
-  applyFilters: (filters: SearchFilters) => Promise<void>;
 }
 
+// Holds the full listing set (seeded from the server render) and keeps it live
+// via a realtime subscription. Filtering happens in memory on the caller side.
 export function useProperties(initialProperties: Property[] = []): UsePropertiesReturn {
   const [properties, setProperties] = useState<Property[]>(initialProperties);
-  const [filteredProperties, setFilteredProperties] = useState<Property[]>(initialProperties);
-  const [isLoading, setIsLoading] = useState(initialProperties.length === 0);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProperties = useCallback(async () => {
@@ -30,7 +28,6 @@ export function useProperties(initialProperties: Property[] = []): UseProperties
       setError(null);
       const data = await getPropertiesClient();
       setProperties(data);
-      setFilteredProperties(data);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch properties"
@@ -41,25 +38,12 @@ export function useProperties(initialProperties: Property[] = []): UseProperties
     }
   }, []);
 
-  const applyFilters = useCallback(async (filters: SearchFilters) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await getFilteredProperties(filters);
-      setFilteredProperties(data);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to filter properties"
-      );
-      console.error("Error filtering properties:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Real-time updates subscription only (no initial fetch here because search page immediately applies filters on mount)
+  // Fall back to a client fetch only if the server render came back empty
   useEffect(() => {
-    // Set up real-time subscription
+    if (initialProperties.length === 0) fetchProperties();
+  }, [initialProperties.length, fetchProperties]);
+
+  useEffect(() => {
     const supabase = createClient();
     const channel = supabase
       .channel("properties-changes")
@@ -70,9 +54,7 @@ export function useProperties(initialProperties: Property[] = []): UseProperties
           schema: "public",
           table: "properties",
         },
-        (payload) => {
-          console.log("Properties changed:", payload);
-          // Refetch properties when changes occur
+        () => {
           fetchProperties();
         }
       )
@@ -85,11 +67,9 @@ export function useProperties(initialProperties: Property[] = []): UseProperties
 
   return {
     properties,
-    filteredProperties,
     isLoading,
     error,
     refetch: fetchProperties,
-    applyFilters,
   };
 }
 
