@@ -39,9 +39,9 @@ const BrowseListings = ({ properties }: { properties: Property[] }) => {
   }).filter((p) => p.total > 0);
 
   return (
-    <section className="border-y border-stone-200 bg-white !py-24 md:!py-32">
+    <section className="border-y border-stone-200 bg-white !py-14 md:!py-20">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
-        <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
               Browse
@@ -93,7 +93,7 @@ const BrowseListings = ({ properties }: { properties: Property[] }) => {
 
         {/* By phase */}
         {phases.length > 0 && (
-          <div className="mt-16">
+          <div className="mt-12">
             <h3 className="mb-6 text-[10px] font-semibold uppercase tracking-[0.3em] text-stone-400">
               Browse by DHA phase
             </h3>

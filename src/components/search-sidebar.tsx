@@ -68,7 +68,7 @@ export default function SearchSidebar({
 
   return (
     <div className="w-full bg-transparent border-0">
-      <div className="py-6 space-y-8">
+      <div className="py-5 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -243,7 +243,7 @@ export default function SearchSidebar({
 
         {/* Bedrooms & Bathrooms */}
         {filters.propertyType !== "plots" && (
-          <div className="space-y-5 pt-1">
+          <div className="space-y-5">
             {/* Bedrooms */}
             <div className="space-y-2.5">
               <h3 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-400">

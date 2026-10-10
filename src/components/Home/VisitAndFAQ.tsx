@@ -34,7 +34,7 @@ const office = {
 
 const VisitAndFAQ = () => {
   return (
-    <section className="!py-24 md:!py-32">
+    <section className="!py-14 md:!py-20">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
         <div className="grid gap-16 lg:grid-cols-2 lg:gap-20">
           {/* FAQ */}
@@ -46,7 +46,7 @@ const VisitAndFAQ = () => {
               Good to <em className="text-[#9a7a1e]">know</em>
             </h2>
 
-            <div className="mt-12 border-t border-stone-300">
+            <div className="mt-8 border-t border-stone-300">
               {faqs.map((f, i) => (
                 <details
                   key={f.q}
@@ -76,7 +76,7 @@ const VisitAndFAQ = () => {
               Meet us in <em className="text-[#9a7a1e]">person</em>
             </h2>
 
-            <MapEmbed className="mt-12 aspect-[4/3]" />
+            <MapEmbed className="mt-8 aspect-[4/3]" />
 
             <ul className="mt-8 space-y-4 text-stone-700">
               <li className="flex gap-4">

@@ -53,7 +53,7 @@ const Footer = () => {
     <footer className="relative z-10 border-t border-stone-200 bg-white text-[#1a1714]">
       {/* Closing call to action */}
       <div className="border-b border-stone-200 bg-[#faf8f3] bg-[radial-gradient(45%_90%_at_50%_100%,rgba(212,175,55,0.14),transparent_70%)]">
-        <div className="container mx-auto flex max-w-8xl flex-col gap-10 px-5 py-20 md:py-24 lg:flex-row lg:items-end lg:justify-between 2xl:px-0">
+        <div className="container mx-auto flex max-w-8xl flex-col gap-10 px-5 py-14 md:py-16 lg:flex-row lg:items-end lg:justify-between 2xl:px-0">
           <div>
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
               Begin your search
@@ -84,7 +84,7 @@ const Footer = () => {
       </div>
 
       {/* Link columns */}
-      <div className="container mx-auto grid max-w-8xl grid-cols-2 gap-x-6 gap-y-12 px-5 py-16 md:py-20 lg:grid-cols-12 lg:gap-10 2xl:px-0">
+      <div className="container mx-auto grid max-w-8xl grid-cols-2 gap-x-6 gap-y-10 px-5 py-12 md:py-14 lg:grid-cols-12 lg:gap-10 2xl:px-0">
         <div className="col-span-2 lg:col-span-4">
           <Link href="/" aria-label="Elite Property Exchange home">
             <Image

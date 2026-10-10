@@ -27,18 +27,30 @@ export default function CallbackPopup() {
       return;
     }
 
-    const show = () => setIsOpen(true);
-    const timer = window.setTimeout(show, SHOW_AFTER_MS);
+    let timer = 0;
+    const stop = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+    // Show at most once: stop both triggers, and re-check the flag in case it
+    // was dismissed in another tab or earlier on this page
+    const show = () => {
+      stop();
+      try {
+        if (sessionStorage.getItem(DISMISSED_KEY)) return;
+      } catch {
+        return;
+      }
+      setIsOpen(true);
+    };
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       if (max > 0 && window.scrollY / max > SHOW_AFTER_SCROLL) show();
     };
+    timer = window.setTimeout(show, SHOW_AFTER_MS);
     window.addEventListener("scroll", onScroll, { passive: true });
 
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener("scroll", onScroll);
-    };
+    return stop;
   }, [pathname]);
 
   useEffect(() => {

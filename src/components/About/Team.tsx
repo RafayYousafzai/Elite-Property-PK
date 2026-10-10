@@ -8,7 +8,7 @@ const Team = ({ members }: { members: TeamMember[] }) => {
   if (members.length === 0) return null;
 
   return (
-    <section className="border-t border-stone-200 bg-white !py-24 md:!py-32">
+    <section className="border-t border-stone-200 bg-white !py-14 md:!py-20">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
@@ -28,7 +28,7 @@ const Team = ({ members }: { members: TeamMember[] }) => {
           </Link>
         </div>
 
-        <div className="mt-14 flex flex-wrap justify-center gap-x-6 gap-y-10">
+        <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-10">
           {members.map((m) => (
             <Link
               key={m.id}

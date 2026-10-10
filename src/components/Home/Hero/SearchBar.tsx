@@ -2,139 +2,98 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Home, Building2, MapPin, Store } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Select, SelectItem } from "@heroui/react";
+import { ChevronDown, MapPin, Search } from "lucide-react";
 
-const PropertyTypeButton = ({
-  icon: Icon,
-  label,
-  isActive,
-  onClick,
-}: {
-  icon: React.ElementType;
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`flex items-center gap-1.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
-      isActive
-        ? "bg-primary text-white shadow-md shadow-primary/30 font-semibold"
-        : "bg-white/10 backdrop-blur-md text-white/80 hover:bg-white/20 hover:text-white"
-    }`}
-  >
-    <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-    <span>{label}</span>
-  </button>
-);
+const PROPERTY_TYPES = [
+  { value: "all", label: "All" },
+  { value: "homes", label: "Homes" },
+  { value: "plots", label: "Plots" },
+  { value: "apartments", label: "Apartments" },
+  { value: "commercial", label: "Commercial" },
+];
 
-interface HeroSearchBarProps {
-  selectedType?: string;
-  onTypeChange?: (type: string) => void;
-  query?: string;
-  onQueryChange?: (query: string) => void;
-  onSearch?: () => void;
-}
+const PHASES = Array.from({ length: 7 }, (_, i) => `Phase ${i + 1}`);
 
-export default function HeroSearchBar({
-  selectedType: propSelectedType,
-  onTypeChange,
-  query: propQuery,
-  onQueryChange,
-  onSearch: propOnSearch,
-}: HeroSearchBarProps = {}) {
-  const [internalSelectedType, setInternalSelectedType] = useState<string>("all");
-  const [internalQuery, setInternalQuery] = useState<string>("");
+// Plain controls (no component library) keep the homepage's first-load JS small.
+export default function HeroSearchBar() {
   const router = useRouter();
+  const [type, setType] = useState("all");
+  const [phase, setPhase] = useState("");
 
-  const selectedType = propSelectedType ?? internalSelectedType;
-  const setSelectedType = (type: string) => {
-    if (onTypeChange) onTypeChange(type);
-    else setInternalSelectedType(type);
-  };
-
-  const query = propQuery ?? internalQuery;
-  const setQuery = (q: string) => {
-    if (onQueryChange) onQueryChange(q);
-    else setInternalQuery(q);
-  };
-
-  const propertyTypes = [
-    { value: "all", label: "All", icon: Building2 },
-    { value: "homes", label: "Homes", icon: Home },
-    { value: "apartments", label: "Apartments", icon: Building2 },
-    { value: "plots", label: "Plots", icon: MapPin },
-    { value: "commercial", label: "Commercial", icon: Store },
-  ];
-
-  // Generate Phase options
-  const phases = Array.from({ length: 10 }, (_, i) => ({
-    value: `Phase ${i + 1}`,
-    label: `DHA Phase ${i + 1}`,
-  }));
-
-  const handleSearch = () => {
-    if (propOnSearch) {
-      propOnSearch();
-      return;
-    }
+  const search = () => {
     const params = new URLSearchParams();
-    if (selectedType !== "all") params.set("type", selectedType);
-    if (query) params.set("search", query);
-    router.push(`/explore?${params.toString()}`);
+    if (type !== "all") params.set("type", type);
+    if (phase) params.set("search", phase);
+    const qs = params.toString();
+    router.push(qs ? `/explore?${qs}` : "/explore");
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-5">
-      {/* Property Type Filters */}
-      <div className="flex flex-wrap gap-2 sm:gap-2.5 justify-center lg:justify-start">
-        {propertyTypes.map((type) => (
-          <PropertyTypeButton
-            key={type.value}
-            icon={type.icon}
-            label={type.label}
-            isActive={selectedType === type.value}
-            onClick={() => setSelectedType(type.value)}
-          />
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        search();
+      }}
+      className="w-full rounded-2xl bg-white/95 p-4 text-[#1a1714] shadow-2xl shadow-black/30 backdrop-blur-md sm:p-5"
+    >
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-stone-500">
+        Find a property
+      </p>
+
+      <div role="radiogroup" aria-label="Property type" className="-mx-1 flex gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {PROPERTY_TYPES.map((t) => (
+          <button
+            key={t.value}
+            type="button"
+            role="radio"
+            aria-checked={type === t.value}
+            onClick={() => setType(t.value)}
+            className={`h-9 shrink-0 cursor-pointer rounded-full px-3.5 text-[13px] font-medium transition-colors sm:px-4 ${
+              type === t.value
+                ? "bg-[#1a1714] text-white"
+                : "text-stone-600 hover:bg-stone-100 hover:text-[#1a1714]"
+            }`}
+          >
+            {t.label}
+          </button>
         ))}
       </div>
 
-      {/* Phase Dropdown */}
-      <div className="flex flex-row items-center gap-3">
-        <Select
-          aria-label="Select DHA Phase"
-          placeholder="Select in islamabad DHA..."
-          selectedKeys={query ? [query] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0] as string;
-            setQuery(selected || "");
-          }}
-          startContent={<MapPin className="w-5 h-5 text-slate-400" />}
-          className="flex-1"
-          classNames={{
-            trigger: "h-12 rounded-xl",
-          }}
-        >
-          {phases.map((phase) => (
-            <SelectItem key={phase.value}>
-              {phase.label}
-            </SelectItem>
-          ))}
-        </Select>
+      <div className="mt-3 flex gap-2">
+        <label className="relative flex-1">
+          <span className="sr-only">DHA phase</span>
+          <MapPin
+            size={17}
+            strokeWidth={1.5}
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9a7a1e]"
+          />
+          <select
+            value={phase}
+            onChange={(e) => setPhase(e.target.value)}
+            className="h-12 w-full cursor-pointer appearance-none rounded-full border border-stone-200 bg-[#faf8f3] pl-11 pr-10 text-[15px] outline-none transition-colors hover:border-stone-300 focus:border-[#9a7a1e]"
+          >
+            <option value="">Any DHA phase</option>
+            {PHASES.map((p) => (
+              <option key={p} value={p}>
+                DHA {p}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            size={16}
+            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-stone-400"
+          />
+        </label>
 
-        {/* Desktop search button (hidden on mobile) */}
-        <Button
-          onClick={handleSearch}
-          aria-label="Search properties"
-          className="hidden lg:flex h-12 w-12 aspect-square p-0 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 items-center justify-center cursor-pointer shrink-0"
+        <button
+          type="submit"
+          className="inline-flex h-12 shrink-0 cursor-pointer items-center gap-2 rounded-full bg-[#1a1714] px-5 text-xs font-semibold uppercase tracking-[0.15em] text-white transition-colors hover:bg-[#9a7a1e] sm:px-6"
         >
-          <Search className="w-5 h-5 text-white" />
-        </Button>
+          <Search size={16} strokeWidth={2} />
+          <span className="hidden sm:inline">Search</span>
+          <span className="sr-only sm:hidden">Search properties</span>
+        </button>
       </div>
-    </div>
+    </form>
   );
 }
-

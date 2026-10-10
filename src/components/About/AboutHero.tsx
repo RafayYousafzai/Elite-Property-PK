@@ -4,7 +4,7 @@ import { MapPin } from "lucide-react";
 
 const AboutHero = () => {
   return (
-    <section className="relative overflow-hidden !pt-48 !pb-20 md:!pt-56 md:!pb-28">
+    <section className="relative overflow-hidden !pt-40 !pb-12 md:!pt-44 md:!pb-16">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_45%_at_15%_10%,rgba(212,175,55,0.16),transparent_70%)]"

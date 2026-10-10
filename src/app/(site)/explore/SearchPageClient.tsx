@@ -298,7 +298,7 @@ export default function SearchPageClient({
         <aside className="hidden w-80 shrink-0 lg:block">
           <div
             data-lenis-prevent
-            className="sticky top-36 max-h-[calc(100vh-10rem)] overflow-y-auto pb-8 [scrollbar-width:thin]"
+            className="sticky top-32 max-h-[calc(100vh-8.5rem)] overflow-y-auto pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <SearchSidebar
               filters={filters}

@@ -31,7 +31,7 @@ const contactMethods = [
 
 const AboutCTA = () => {
   return (
-    <section className="border-t border-stone-200 !py-24 md:!py-32">
+    <section className="border-t border-stone-200 !py-14 md:!py-20">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
           <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-stone-200">

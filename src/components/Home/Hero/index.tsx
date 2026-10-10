@@ -1,133 +1,69 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import HeroSearchBar from "./SearchBar";
 
-const Hero: React.FC = () => {
-  const [selectedType, setSelectedType] = useState<string>("all");
-  const [query, setQuery] = useState<string>("");
-  const router = useRouter();
-
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (selectedType !== "all") params.set("type", selectedType);
-    if (query) params.set("search", query);
-    router.push(`/explore?${params.toString()}`);
-  };
-
+// Server-rendered: only the search panel ships JavaScript.
+const Hero = () => {
   return (
-    // Set min-height to avoid content being cut off on smaller screens and use flex to center content.
-    // pt-[10vh] adds padding at the top to account for your navbar.
-    // pb-12 adds some bottom padding for better spacing.
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-[15vh] pb-12">
-      {/* Background Image & Overlays */}
+    <section className="relative flex min-h-[100svh] items-end overflow-hidden !pb-28 !pt-40 md:!pb-20 lg:items-center lg:!pb-16">
+      {/* Background image & overlays */}
       <div className="absolute inset-0 z-0">
         <picture>
           <source media="(max-width: 768px)" srcSet="/images/hero/hero-bg-mobile.webp" type="image/webp" />
           <source media="(min-width: 769px)" srcSet="/images/hero/hero-bg.webp" type="image/webp" />
           <img
             src="/images/hero/hero-bg.webp"
-            alt="Elite Property Exchange DHA Islamabad Luxury Villa"
+            alt="Aerial view of DHA Islamabad"
             fetchPriority="high"
-            className="w-full h-full object-cover object-center"
+            className="h-full w-full object-cover object-center"
           />
         </picture>
-        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+        {/* Darker on the text side and at the bottom so copy stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-black/30" />
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 w-full">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column: Text Content & CTAs */}
-            {/* Centered on mobile, left-aligned on large screens */}
-            <div className="space-y-8 text-center lg:text-left">
-              <div className="space-y-6">
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight tracking-tighter">
-                  Live
-                  <span className="bg-gradient-to-r from-primary to-amber-400 bg-clip-text text-transparent">
-                    {" "}
-                    Elite
-                  </span>{" "}
-                  by
-                  <span className="bg-gradient-to-r from-primary to-amber-400 bg-clip-text text-transparent">
-                    {" "}
-                    Elite
-                  </span>
-                </h1>
-                <p className="-mt-5 text-lg sm:text-xl text-white/90 leading-snug max-w-2xl mx-auto lg:mx-0 font-light text-balance">
-                  Step into a world of modern architecture and secure
-                  investments. At Elite Property Exchange, every property is
-                  verified and handpicked to match your lifestyle and financial
-                  goals.
-                </p>
-              </div>
+      <div className="container relative z-10 mx-auto max-w-8xl px-5 2xl:px-0">
+        <div className="grid items-end gap-10 lg:grid-cols-12 lg:gap-16">
+          <div className="min-w-0 lg:col-span-7">
+            <p className="mb-5 inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.25em] text-[#e6c45a] sm:mb-6 sm:tracking-[0.35em]">
+              <span className="hidden h-px w-8 bg-[#e6c45a]/70 sm:block" />
+              DHA Islamabad · Verified listings
+            </p>
 
-              {/* Category Buttons for mobile - Replaced with Search Bar */}
-              <div className="lg:hidden">
-                <HeroSearchBar
-                  selectedType={selectedType}
-                  onTypeChange={setSelectedType}
-                  query={query}
-                  onQueryChange={setQuery}
-                  onSearch={handleSearch}
-                />
-              </div>
+            <h1 className="font-[family-name:var(--font-display)] text-6xl font-medium leading-[0.95] tracking-tight text-white sm:text-7xl lg:text-8xl xl:text-9xl">
+              Live{" "}
+              <em className="font-semibold italic text-[#e6c45a]">
+                Elite
+              </em>
+              <br /> by{" "}
+              <em className="font-semibold italic text-[#e6c45a]">
+                Elite
+              </em>
+            </h1>
 
-              {/* Main Call-to-Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                {query && (
-                  <Button
-                    onClick={handleSearch}
-                    className="lg:hidden h-12 bg-primary hover:bg-primary/90 text-primary-foreground px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-none border-0 flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Search className="w-5 h-5" />
-                    <span>Search Properties</span>
-                  </Button>
-                )}
-                <Button
-                  asChild
-                  className={`h-12 bg-primary hover:bg-primary/90 text-primary-foreground px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-none border-0 ${
-                    query ? "hidden lg:flex" : "flex"
-                  }`}
-                >
-                  <Link href="/contactus">Book a visit</Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-12 border-0 bg-white/15 backdrop-blur-md text-white cursor-pointer hover:bg-white/25 hover:text-white px-6 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-none"
-                >
-                  <Link href="/explore">View Properties</Link>
-                </Button>
-              </div>
+            <p className="mt-6 max-w-lg text-base leading-relaxed text-white/80 md:text-lg">
+              Verified homes, plots and commercial property across DHA
+              Islamabad — handpicked to fit your lifestyle and investment goals.
+            </p>
 
-              {/* Trust line */}
-              <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-medium uppercase tracking-[0.2em] text-white/75 lg:justify-start">
-                {["Verified listings", "DHA Phases 1–7", "Overseas support"].map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <span className="h-1 w-1 rounded-full bg-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:flex">
+              <Link
+                href="/contactus"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-white px-4 text-[11px] sm:px-7 sm:text-xs font-semibold uppercase tracking-[0.15em] text-[#1a1714] transition-colors hover:bg-[#e6c45a]"
+              >
+                Book a visit
+              </Link>
+              <Link
+                href="/explore"
+                className="inline-flex h-12 items-center justify-center rounded-full border border-white/40 px-4 text-[11px] sm:px-7 sm:text-xs font-semibold uppercase tracking-[0.15em] text-white transition-colors hover:border-white hover:bg-white/10"
+              >
+                View properties
+              </Link>
             </div>
+          </div>
 
-            {/* Right Column: Search Bar for Desktop */}
-            <div className="hidden lg:flex flex-col items-center justify-center space-y-10">
-              <HeroSearchBar
-                selectedType={selectedType}
-                onTypeChange={setSelectedType}
-                query={query}
-                onQueryChange={setQuery}
-                onSearch={handleSearch}
-              />
-            </div>
+          <div className="min-w-0 lg:col-span-5">
+            <HeroSearchBar />
           </div>
         </div>
       </div>

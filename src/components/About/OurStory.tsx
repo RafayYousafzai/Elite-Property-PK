@@ -1,6 +1,6 @@
 const OurStory = () => {
   return (
-    <section className="border-y border-stone-200 bg-white !py-24 md:!py-32">
+    <section className="border-y border-stone-200 bg-white !py-14 md:!py-20">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
         <p className="mb-8 text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
           Our Philosophy
@@ -12,7 +12,7 @@ const OurStory = () => {
           <em className="text-[#9a7a1e]">transparent</em>.&rdquo;
         </blockquote>
 
-        <div className="mt-16 grid gap-10 text-stone-600 md:grid-cols-2 md:gap-16 md:text-lg md:leading-relaxed">
+        <div className="mt-10 grid gap-10 text-stone-600 md:grid-cols-2 md:gap-16 md:text-lg md:leading-relaxed">
           <p>
             Our mission is to bring trust and clarity back into real estate by
             connecting serious buyers and sellers through honest, verified and
@@ -25,7 +25,7 @@ const OurStory = () => {
           </p>
         </div>
 
-        <div className="mt-20 grid border-t border-stone-200 md:grid-cols-2">
+        <div className="mt-14 grid border-t border-stone-200 md:grid-cols-2">
           {[
             {
               label: "Our Mission",

@@ -48,9 +48,9 @@ export default async function ClientStories() {
   const [lead, ...rest] = stories;
 
   return (
-    <section className="border-y border-stone-200 bg-white !py-24 md:!py-32">
+    <section className="border-y border-stone-200 bg-white !py-14 md:!py-20">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
-        <p className="mb-10 text-center text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
+        <p className="mb-8 text-center text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
           Client Stories
         </p>
 
@@ -72,7 +72,7 @@ export default async function ClientStories() {
         </figure>
 
         {rest.length > 0 && (
-          <div className="mt-20 grid gap-px border-y border-stone-200 bg-stone-200 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-px border-y border-stone-200 bg-stone-200 md:grid-cols-2 lg:grid-cols-3">
             {rest.map((t, i) => (
               <figure
                 key={t.id}

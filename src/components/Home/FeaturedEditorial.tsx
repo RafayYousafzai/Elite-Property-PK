@@ -38,9 +38,9 @@ const FeaturedEditorial = ({ properties }: { properties: Property[] }) => {
   const [lead, ...rest] = picks;
 
   return (
-    <section className="!py-24 md:!py-32">
+    <section className="!py-14 md:!py-20">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
-        <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
               Featured Listings

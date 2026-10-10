@@ -18,7 +18,7 @@ export default async function TeamPage() {
   return (
     <main className={`${display.variable} bg-[#faf8f3] text-[#1a1714]`}>
       {/* Hero */}
-      <section className="relative overflow-hidden !pt-52 !pb-16 md:!pt-60 md:!pb-24">
+      <section className="relative overflow-hidden !pt-40 !pb-10 md:!pt-48 md:!pb-14">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,rgba(212,175,55,0.18),transparent_70%)]"
@@ -53,7 +53,7 @@ export default async function TeamPage() {
       </section>
 
       {/* Members */}
-      <section className="!pt-16 !pb-24 md:!pt-24 md:!pb-32">
+      <section className="!pt-8 !pb-14 md:!pt-12 md:!pb-20">
         <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
           {members.length > 0 ? (
             <TeamShowcase members={members} />

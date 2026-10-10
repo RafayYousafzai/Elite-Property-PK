@@ -351,7 +351,7 @@ export default function PropertyDetailsClient({ property, related = [] }: Proper
         )}
 
         {/* Body */}
-        <section className="!pt-12 !pb-24 md:!pt-16 md:!pb-32">
+        <section className="!pt-10 !pb-14 md:!pt-12 md:!pb-20">
           <div className="container mx-auto grid max-w-8xl gap-14 px-5 lg:grid-cols-12 lg:gap-16 2xl:px-0">
             <div className="min-w-0 space-y-16 lg:col-span-8">
               {/* Key facts */}
@@ -533,9 +533,9 @@ export default function PropertyDetailsClient({ property, related = [] }: Proper
 
         {/* Similar listings */}
         {related.length > 0 && (
-          <section className="border-t border-stone-200 bg-white !py-20 md:!py-28">
+          <section className="border-t border-stone-200 bg-white !py-14 md:!py-20">
             <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
-              <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+              <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                 <div>
                   <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
                     You may also like

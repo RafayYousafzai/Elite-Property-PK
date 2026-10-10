@@ -35,7 +35,7 @@ const services = [
 
 const WhyChooseUs = () => {
   return (
-    <section className="!py-24 md:!py-32">
+    <section className="!py-14 md:!py-20">
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
@@ -52,7 +52,7 @@ const WhyChooseUs = () => {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-px border-y border-stone-200 bg-stone-200 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-px border-y border-stone-200 bg-stone-200 sm:grid-cols-2 lg:grid-cols-4">
           {pillars.map(({ icon: Icon, title, text }, i) => (
             <div
               key={title}
@@ -72,7 +72,7 @@ const WhyChooseUs = () => {
           ))}
         </div>
 
-        <div className="mt-24 grid gap-12 rounded-sm border border-stone-200 bg-white p-8 md:p-14 lg:grid-cols-[1fr_2fr] lg:gap-20">
+        <div className="mt-14 grid gap-12 rounded-sm border border-stone-200 bg-white p-8 md:p-14 lg:grid-cols-[1fr_2fr] lg:gap-20">
           <div>
             <h3 className="font-[family-name:var(--font-display)] text-3xl font-medium md:text-4xl">
               What we offer

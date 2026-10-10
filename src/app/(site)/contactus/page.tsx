@@ -40,7 +40,7 @@ const channels = [
 export default function ContactUs() {
   return (
     <main className={`${display.variable} bg-[#faf8f3] text-[#1a1714]`}>
-      <section className="relative overflow-hidden !pt-48 !pb-16 md:!pt-56 md:!pb-20">
+      <section className="relative overflow-hidden !pt-40 !pb-10 md:!pt-44 md:!pb-12">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_50%_at_15%_0%,rgba(212,175,55,0.16),transparent_70%)]"
@@ -60,7 +60,7 @@ export default function ContactUs() {
         </div>
       </section>
 
-      <section className="!pt-0 !pb-24 md:!pb-32">
+      <section className="!pt-0 !pb-14 md:!pb-20">
         <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
           <div className="grid gap-12 lg:grid-cols-[7fr_5fr] lg:gap-16">
             {/* Form */}
