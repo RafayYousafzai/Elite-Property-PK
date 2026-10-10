@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: "Request a Call Back",
   description:
     "Tell us what you're looking for in DHA Islamabad and an Elite Property Exchange advisor will call you back.",
+  // Ad landing page — the contact page is the indexable version
+  robots: { index: false, follow: true },
 };
 
 const promises = [

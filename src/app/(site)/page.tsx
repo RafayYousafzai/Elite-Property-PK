@@ -20,11 +20,10 @@ import { Metadata } from "next";
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: "Elite Property Exchange | Buy, Sell & Rent in DHA Islamabad",
-  description: "Explore elite real estate listings in DHA Islamabad Phase 1, Phase 2, and DHA Valley. View luxury villas, residential plots, and premium commercial listings.",
-  alternates: {
-    canonical: "/",
-  },
+  title: { absolute: "Elite Property Exchange | Houses & Plots for Sale in DHA Islamabad" },
+  description:
+    "Verified houses, plots and commercial property for sale in DHA Islamabad Phases 1–7. Real photos, current prices, video tours and expert advisors in DHA Phase II, Islamabad.",
+  alternates: { canonical: "/" },
 };
 
 export default async function Home() {
@@ -34,50 +33,9 @@ export default async function Home() {
     getTeamMembersServer(),
   ]);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
-  const agentSchema = {
-    "@context": "https://schema.org",
-    "@type": "RealEstateAgent",
-    "name": "Elite Property Exchange",
-    "image": `${siteUrl}/elite-logo-brown.png`,
-    "@id": `${siteUrl}/#realestateagent`,
-    "url": siteUrl,
-    "telephone": "+92-334-4111778",
-    "priceRange": "$$$",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "DHA Phase 2",
-      "addressLocality": "Islamabad",
-      "postalCode": "44000",
-      "addressCountry": "PK"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 33.5244,
-      "longitude": 73.1492
-    },
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday"
-      ],
-      "opens": "09:00",
-      "closes": "19:00"
-    }
-  };
 
   return (
     <main className={`${display.variable} bg-[#faf8f3] text-[#1a1714]`}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(agentSchema) }}
-      />
       <Hero />
       <FeaturedEditorial properties={featuredProperties} />
       <BrowseListings properties={allProperties} />

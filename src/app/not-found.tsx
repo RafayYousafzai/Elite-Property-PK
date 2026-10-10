@@ -3,7 +3,8 @@ import { Metadata } from "next";
 import { Icon } from "@iconify/react/dist/iconify.js"
 
 export const metadata: Metadata = {
-  title: "404 Page | Property ",
+  title: "Page not found",
+  robots: { index: false },
 };
 
 const ErrorPage = () => {

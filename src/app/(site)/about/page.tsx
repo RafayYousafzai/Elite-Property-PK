@@ -11,11 +11,10 @@ import AboutCTA from "@/components/About/AboutCTA";
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: "About Us - Elite Property | Premium Real Estate in DHA Islamabad",
+  title: "About Us – Trusted Real Estate Agency in DHA Islamabad",
   description:
-    "Discover the story behind Elite Property - your trusted partner in luxury real estate. Learn about our mission, vision, and commitment to excellence in DHA Islamabad properties.",
-  keywords:
-    "about Elite Property, real estate company, DHA Islamabad, luxury properties, property investment, real estate experts",
+    "Elite Property Exchange is a DHA Islamabad real estate agency listing verified properties only. Meet the team, our process, and why buyers and overseas Pakistanis trust us.",
+  alternates: { canonical: "/about" },
 };
 
 export default async function AboutPage() {

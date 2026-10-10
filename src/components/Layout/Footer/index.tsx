@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { getProperties } from "@/lib/supabase/properties-server";
+import { allLandingPages } from "@/lib/seo/landing";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -48,7 +50,13 @@ const socials = [
   { label: "YouTube", href: "https://www.youtube.com/@elitepropertypk", icon: Youtube },
 ];
 
-const Footer = () => {
+const Footer = async () => {
+  // Most-stocked search pages, linked site-wide so search engines find them
+  const popular = allLandingPages(await getProperties().catch(() => []))
+    .filter((p) => p.filter.kind && (p.filter.phase || p.filter.sizeMarla))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
+
   return (
     <footer className="relative z-10 border-t border-stone-200 bg-white text-[#1a1714]">
       {/* Closing call to action */}
@@ -85,7 +93,7 @@ const Footer = () => {
 
       {/* Link columns */}
       <div className="container mx-auto grid max-w-8xl grid-cols-2 gap-x-6 gap-y-10 px-5 py-12 md:py-14 lg:grid-cols-12 lg:gap-10 2xl:px-0">
-        <div className="col-span-2 lg:col-span-4">
+        <div className="col-span-2 lg:col-span-3">
           <Link href="/" aria-label="Elite Property Exchange home">
             <Image
               src="/elite-logo-brown.png"
@@ -136,7 +144,24 @@ const Footer = () => {
           </div>
         ))}
 
-        <div className="col-span-2 lg:col-span-4">
+        {popular.length > 0 && (
+          <div className="col-span-2 lg:col-span-2">
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.3em] text-stone-400">
+              Popular searches
+            </h3>
+            <ul className="mt-6 space-y-3.5">
+              {popular.map((p) => (
+                <li key={p.slug}>
+                  <Link href={`/dha-islamabad/${p.slug}`} className="text-stone-700 transition-colors hover:text-[#9a7a1e]">
+                    {p.h1.replace(" for Sale in ", " in ").replace(" Islamabad", "")}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="col-span-2 lg:col-span-3">
           <h3 className="text-[10px] font-semibold uppercase tracking-[0.3em] text-stone-400">
             Visit us
           </h3>
@@ -165,7 +190,7 @@ const Footer = () => {
             <li>
               <a
                 href="mailto:pk.eliteproperty@gmail.com"
-                className="flex gap-3 break-all transition-colors hover:text-[#9a7a1e]"
+                className="flex gap-3 transition-colors hover:text-[#9a7a1e]"
               >
                 <Mail size={18} strokeWidth={1.5} className="mt-0.5 shrink-0 text-[#9a7a1e]" />
                 pk.eliteproperty@gmail.com

@@ -7,9 +7,10 @@ import TeamShowcase from "@/components/Team/TeamShowcase";
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: "Our Team",
+  title: "Our Team – Real Estate Advisors in DHA Islamabad",
   description:
-    "Meet the advisors behind Elite Property Exchange — specialists in luxury homes, plots and commercial real estate across DHA Islamabad and Rawalpindi.",
+    "Meet the property advisors at Elite Property Exchange — specialists in houses, plots and commercial real estate across DHA Islamabad and Rawalpindi.",
+  alternates: { canonical: "/team" },
 };
 
 export default async function TeamPage() {

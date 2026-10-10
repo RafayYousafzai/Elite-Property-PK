@@ -25,12 +25,12 @@ const Hero = () => {
       <div className="container relative z-10 mx-auto max-w-8xl px-5 2xl:px-0">
         <div className="grid items-end gap-10 lg:grid-cols-12 lg:gap-16">
           <div className="min-w-0 lg:col-span-7">
-            <p className="mb-5 inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.25em] text-[#e6c45a] sm:mb-6 sm:tracking-[0.35em]">
+            <h1 className="mb-5 inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.25em] text-[#e6c45a] sm:mb-6 sm:tracking-[0.35em]">
               <span className="hidden h-px w-8 bg-[#e6c45a]/70 sm:block" />
-              DHA Islamabad · Verified listings
-            </p>
+              Houses & plots for sale in DHA Islamabad
+            </h1>
 
-            <h1 className="font-[family-name:var(--font-display)] text-6xl font-medium leading-[0.95] tracking-tight text-white sm:text-7xl lg:text-8xl xl:text-9xl">
+            <p className="font-[family-name:var(--font-display)] text-6xl font-medium leading-[0.95] tracking-tight text-white sm:text-7xl lg:text-8xl xl:text-9xl">
               Live{" "}
               <em className="font-semibold italic text-[#e6c45a]">
                 Elite
@@ -39,7 +39,7 @@ const Hero = () => {
               <em className="font-semibold italic text-[#e6c45a]">
                 Elite
               </em>
-            </h1>
+            </p>
 
             <p className="mt-6 max-w-lg text-base leading-relaxed text-white/80 md:text-lg">
               Verified homes, plots and commercial property across DHA

@@ -87,7 +87,7 @@ export default function VideoTours() {
             >
               <img
                 src={thumb(tour.id, "maxresdefault")}
-                alt=""
+                alt={`${tour.title} video tour, ${tour.subtitle}`}
                 loading="lazy"
                 decoding="async"
                 onError={(e) => {
@@ -131,7 +131,7 @@ export default function VideoTours() {
               >
                 <img
                   src={thumb(t.id, "hqdefault")}
-                  alt=""
+                  alt={`${t.title} video tour`}
                   loading="lazy"
                   decoding="async"
                   className="h-full w-full object-cover"

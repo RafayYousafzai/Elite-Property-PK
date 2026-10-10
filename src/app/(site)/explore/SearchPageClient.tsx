@@ -255,10 +255,10 @@ export default function SearchPageClient({
         <div className="mx-auto flex max-w-[1600px] flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.35em] text-[#9a7a1e]">
-              Explore DHA Islamabad
+              Verified listings
             </p>
             <h1 className="font-[family-name:var(--font-display)] text-5xl font-medium leading-tight tracking-tight md:text-6xl">
-              Premium <em className="text-[#9a7a1e]">properties</em>
+              Properties for sale in <em className="text-[#9a7a1e]">DHA Islamabad</em>
             </h1>
             <p className="mt-3 text-sm text-stone-500 md:text-base">
               <span className="font-semibold text-[#1a1714]">{properties.length}</span>{" "}

@@ -1,4 +1,5 @@
 import { getBlogBySlug } from "@/app/admin/blogs/actions";
+import { SITE_URL } from "@/lib/site";
 import markdownToHtml from "@/components/utils/markdownToHtml";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (result.success && result.data) {
     const blog = result.data;
-    const title = `${blog.title || "Blog Post"} | ${siteName}`;
+    const title = blog.title || "Blog Post";
     const description = blog.excerpt || blog.detail || "";
     const coverImage = blog.cover_image || "";
 
@@ -27,6 +28,7 @@ export async function generateMetadata({ params }: PageProps) {
       title,
       description,
       author: blog.author || authorName,
+      alternates: { canonical: `/blogs/${data.slug}` },
       robots: {
         index: true,
         follow: true,
@@ -68,7 +70,7 @@ export default async function Post({ params }: PageProps) {
 
   const blog = result.data;
   const content = await markdownToHtml(blog.content || "");
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
+  const siteUrl = SITE_URL;
 
   const blogSchema = {
     "@context": "https://schema.org",

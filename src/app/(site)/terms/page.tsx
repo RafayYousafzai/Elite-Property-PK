@@ -2,9 +2,9 @@ import Breadcrumb from "@/components/Breadcrumb";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Elite Property PK",
-  description:
-    "Terms of Service for Elite Property PK. Read our terms and conditions for using our real estate platform.",
+  title: "Terms of Service",
+  description: "Terms and conditions for using the Elite Property Exchange website.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsOfServicePage() {

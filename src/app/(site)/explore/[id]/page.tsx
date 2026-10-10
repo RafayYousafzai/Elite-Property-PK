@@ -3,11 +3,11 @@ import PropertyDetailsClient from "./PropertyDetailsClient";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-import { getImageUrl } from "@/lib/utils";
+import { formatLocation, getImageUrl } from "@/lib/utils";
+import { getBedsCount } from "@/lib/supabase/properties";
+import { formatPrice, kindOf, phaseOf, sizeInMarla, sizeLabel } from "@/lib/listing-taxonomy";
+import { JsonLd, breadcrumbSchema, listingSchema } from "@/lib/seo/schema";
 import type { Property } from "@/types/property";
-
-const phaseOf = (p: Property) =>
-  `${p.phase || ""} ${p.location || ""} ${p.name}`.toLowerCase().match(/phase\s*(\d)/)?.[1];
 
 // Up to three available listings of the same type, preferring the same DHA phase
 function getRelatedProperties(property: Property, all: Property[]): Property[] {
@@ -34,39 +34,67 @@ type PageProps = {
 // They are automatically revalidated on-demand when edited or deleted in the admin dashboard.
 export const revalidate = 86400;
 
+const clip = (text: string, max: number) =>
+  text.length <= max ? text : `${text.slice(0, max - 1).replace(/[\s,|–-]+\S*$/, "")}…`;
+
+/** "Luxury 2.5 Kanal Villa | 15kW Solar | …" -> "Luxury 2.5 Kanal Villa" (keeps titles readable). */
+const headline = (name: string) => name.split(/\s[|–]\s/)[0].trim();
+
+function seoCopy(property: Property) {
+  const kind = kindOf(property);
+  const phase = phaseOf(property);
+  const marla = sizeInMarla(property);
+  const place = phase ? `DHA Phase ${phase} Islamabad` : formatLocation(property.location) || "DHA Islamabad";
+  const price = formatPrice(property.rate);
+  const size = marla ? sizeLabel(marla) : "";
+  const beds = getBedsCount(property);
+  const kindWord = { house: "House", plot: "Plot", apartment: "Apartment", commercial: "Commercial Property" }[kind];
+
+  const name = headline(property.name);
+  const mentionsPlace = /dha|phase/i.test(name);
+  // Clip the name, never the price — it's what people scan for in results
+  const suffix = ` | ${price}`;
+  const titlePlace = phase ? `DHA Phase ${phase}` : place;
+  const title = `${clip(`${name}${mentionsPlace ? "" : ` – ${titlePlace}`}`, 62 - suffix.length)}${suffix}`;
+
+  const facts = [size && `${size} ${kindWord.toLowerCase()}`, beds && `${beds} bedrooms`, price].filter(Boolean).join(", ");
+  const firstSentence = (property.description || "").replace(/\s+/g, " ").split(/(?<=[.!?])\s/)[0] || "";
+  const description = clip(
+    `${property.is_sold ? "Sold: " : "For sale: "}${facts} in ${place}. ${firstSentence}`.trim(),
+    158,
+  );
+  return { title, description, place, kindWord };
+}
+
 // Dynamic SEO metadata for social sharing cards, link previews, and search engines
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const data = await params;
   const property = await getPropertyBySlugServer(data.id);
-  const siteName = "Elite Property";
 
   if (!property) {
-    return {
-      title: `Not Found | ${siteName}`,
-      description: "This property could not be found.",
-    };
+    return { title: "Property not found", robots: { index: false } };
   }
 
-  const title = `${property.name} | ${siteName}`;
-  const description = property.description || `Explore ${property.name} in DHA Islamabad. Premium listings by Elite Property Exchange.`;
-  const mainImage = property.images && property.images.length > 0
-    ? getImageUrl(property.images[0])
-    : undefined;
+  const { title, description } = seoCopy(property);
+  const url = `/explore/${property.slug}`;
+  const mainImage = property.images && property.images.length > 0 ? getImageUrl(property.images[0]) : undefined;
 
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title,
       description,
+      url,
       type: "website",
-      images: mainImage ? [{ url: mainImage }] : [],
+      images: mainImage ? [{ url: mainImage, alt: property.name }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: mainImage ? [mainImage] : [],
+      images: mainImage ? [mainImage] : undefined,
     },
   };
 }
@@ -92,46 +120,18 @@ export default async function PropertyDetailsPage({ params }: PageProps) {
 
   const related = getRelatedProperties(property, allProperties);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
-  const mainImage = property.images && property.images.length > 0
-    ? getImageUrl(property.images[0])
-    : "";
-
-  const listingSchema = {
-    "@context": "https://schema.org",
-    "@type": "RealEstateListing",
-    "name": property.name,
-    "description": property.description || `Premium property listing: ${property.name} in DHA Islamabad.`,
-    "url": `${siteUrl}/explore/${property.slug}`,
-    "image": mainImage ? [mainImage] : [],
-    "datePosted": property.created_at || new Date().toISOString(),
-    "offers": {
-      "@type": "Offer",
-      "price": property.rate,
-      "priceCurrency": "PKR",
-      "businessFunction": property.purpose === "rent" ? "http://purl.org/goodrelations/v1#Rent" : "http://purl.org/goodrelations/v1#Sell"
-    },
-    "about": {
-      "@type": "SingleFamilyResidence",
-      "name": property.name,
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": property.city || "Islamabad",
-        "addressRegion": "Punjab",
-        "addressCountry": "PK",
-        "streetAddress": property.location
-      },
-      "numberOfBedrooms": property.beds || undefined,
-      "numberOfBathroomsTotal": property.baths || undefined
-    }
-  };
+  const phase = phaseOf(property);
+  const crumbs = [
+    { name: "Home", href: "/" },
+    { name: "DHA Islamabad", href: "/dha-islamabad" },
+    ...(phase ? [{ name: `DHA Phase ${phase}`, href: `/dha-islamabad/phase-${phase}` }] : []),
+    { name: headline(property.name), href: `/explore/${property.slug}` },
+  ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
-      />
+      <JsonLd data={listingSchema(property)} />
+      <JsonLd data={breadcrumbSchema(crumbs)} />
       <PropertyDetailsClient property={property} related={related} />
     </>
   );

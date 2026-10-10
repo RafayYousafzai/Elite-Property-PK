@@ -3,43 +3,46 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { Providers } from "./providers";
-import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import ThirdPartyScripts from "@/components/shared/ThirdPartyScripts";
 import { display } from "@/lib/fonts";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { JsonLd, businessSchema } from "@/lib/seo/schema";
 
 const font = Bricolage_Grotesque({ subsets: ["latin"], display: "swap" });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitepropertypk.com";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Elite Property Exchange | Premium DHA Islamabad Real Estate",
-    template: "%s | Elite Property Exchange"
+    default: "Elite Property Exchange | Houses & Plots for Sale in DHA Islamabad",
+    template: "%s | Elite Property",
   },
-  description: "Find luxury homes, commercial plots, and modern designer villas in DHA Islamabad and Rawalpindi. Elite Property is your premier real estate partner.",
-  keywords: ["real estate dha islamabad", "luxury homes islamabad", "dha phase 2 houses", "elite property exchange", "buy plots islamabad", "commercial property dha"],
-  authors: [{ name: "Elite Property Team" }],
-  creator: "Elite Property Exchange",
-  publisher: "Elite Property Exchange",
+  description:
+    "Verified houses, plots and commercial property for sale in DHA Islamabad Phases 1–7. Real photos, current prices and expert advisors in DHA Phase II, Islamabad.",
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
   robots: {
     index: true,
     follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   openGraph: {
     type: "website",
-    locale: "en_US",
-    url: siteUrl,
-    title: "Elite Property Exchange | Premium DHA Islamabad Real Estate",
-    description: "Find luxury homes, commercial plots, and modern designer villas in DHA Islamabad and Rawalpindi. Elite Property is your premier real estate partner.",
-    siteName: "Elite Property Exchange",
+    locale: "en_PK",
+    siteName: SITE_NAME,
+    title: "Elite Property Exchange | Houses & Plots for Sale in DHA Islamabad",
+    description:
+      "Verified houses, plots and commercial property for sale in DHA Islamabad Phases 1–7, with real photos and current prices.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elite Property Exchange | Premium DHA Islamabad Real Estate",
-    description: "Find luxury homes, commercial plots, and modern designer villas in DHA Islamabad and Rawalpindi.",
+    title: "Elite Property Exchange | Houses & Plots for Sale in DHA Islamabad",
+    description: "Verified houses, plots and commercial property for sale in DHA Islamabad Phases 1–7.",
   },
+  formatDetection: { telephone: true },
 };
 
 export default function RootLayout({
@@ -48,59 +51,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en-PK">
       <head>
         {/* Meta Pixel + Google Ads tag: deferred until the visitor actually
             interacts (or a short idle fallback), so their long parse/exec
             tasks land outside the window Lighthouse uses to compute TTI. */}
         <ThirdPartyScripts />
 
-        {/* Global JSON-LD Structured Data Schema */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@graph": [
-                {
-                  "@type": "Organization",
-                  "@id": `${siteUrl}/#organization`,
-                  "name": "Elite Property Exchange",
-                  "url": siteUrl,
-                  "logo": `${siteUrl}/elite-logo-brown.png`,
-                  "sameAs": [
-                    "https://www.facebook.com/elitepropertypk",
-                    "https://www.instagram.com/elitepropertypk",
-                    "https://www.youtube.com/@elitepropertypk"
-                  ],
-                  "contactPoint": {
-                    "@type": "ContactPoint",
-                    "telephone": "+92-334-4111778",
-                    "contactType": "customer service",
-                    "areaServed": "PK",
-                    "availableLanguage": ["English", "Urdu"]
-                  }
-                },
-                {
-                  "@type": "WebSite",
-                  "@id": `${siteUrl}/#website`,
-                  "url": siteUrl,
-                  "name": "Elite Property Exchange",
-                  "description": "Premium luxury properties in DHA Islamabad and Rawalpindi. Find your dream home, commercial plots, and elite residences.",
-                  "publisher": {
-                    "@id": `${siteUrl}/#organization`
-                  }
-                }
-              ]
-            })
-          }}
-        />
+        <JsonLd data={businessSchema()} />
       </head>
 
       <body className={`${font.className} ${display.variable} bg-white text-slate-900 antialiased`}>
         <NextTopLoader color="#d8b648" showSpinner={false} />
         <Providers>
-          <Suspense fallback={null}>{children}</Suspense>
+          {children}
         </Providers>
         <Analytics />
       </body>

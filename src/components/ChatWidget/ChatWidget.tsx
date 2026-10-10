@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ArrowUp, MessageCircle, RotateCcw, Square, X } from "lucide-react";
 import { useChatWidget } from "@/hooks/useChatWidget";
 import { ASSISTANT_NAME, CONTACT } from "@/lib/agent/brand";
+import { SITE_URL } from "@/lib/site";
 import { AssistantAvatar } from "./AssistantAvatar";
 import { ChatMessages, QuickReplies, ViewListingsLink } from "./ChatMessages";
 
@@ -88,7 +89,7 @@ export default function ChatWidget({ open, onClose }: { open: boolean; onClose: 
 
   const whatsappHref = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
     isListingPage(pathname)
-      ? `Hi, I'm interested in this property: https://www.elitepropertypk.com${pathname}`
+      ? `Hi, I'm interested in this property: ${SITE_URL}${pathname}`
       : "Hi, I'd like help finding a property in DHA Islamabad.",
   )}`;
 

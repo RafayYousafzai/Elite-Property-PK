@@ -5,9 +5,10 @@ import CallbackForm from "@/components/shared/CallbackForm";
 import MapEmbed from "@/components/shared/MapEmbed";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Elite Property Exchange",
-  description: "Get in touch with Elite Property Exchange. Contact our expert real estate agents for consultations, bookings, or inquiries in DHA Islamabad.",
-  keywords: ["contact elite property", "dha islamabad real estate office", "real estate agent contact islamabad"],
+  title: "Contact Us – Real Estate Office in DHA Phase II, Islamabad",
+  description:
+    "Visit Elite Property Exchange at Plaza 19, Tipu Boulevard, Sector G, DHA Phase II, Islamabad. Call or WhatsApp +92 334 4111778, open Monday to Sunday 9 AM – 7 PM.",
+  alternates: { canonical: "/contactus" },
 };
 
 const channels = [

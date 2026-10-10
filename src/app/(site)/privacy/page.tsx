@@ -2,9 +2,9 @@ import Breadcrumb from "@/components/Breadcrumb";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Elite Property PK",
-  description:
-    "Privacy Policy for Elite Property PK. Learn how we collect, use, and protect your personal information.",
+  title: "Privacy Policy",
+  description: "How Elite Property Exchange collects, uses and protects your personal information.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPolicyPage() {

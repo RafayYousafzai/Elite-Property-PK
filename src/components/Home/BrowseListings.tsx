@@ -13,10 +13,10 @@ const baseFilters: SearchFilters = {
 };
 
 const TYPES = [
-  { type: "homes", label: "Homes", image: "/images/categories/luxury-villa.jpg" },
-  { type: "plots", label: "Plots", image: "/images/categories/plots.png" },
-  { type: "apartments", label: "Apartments", image: "/images/categories/appartment.jpg" },
-  { type: "commercial", label: "Commercial", image: "/images/categories/office.jpg" },
+  { type: "homes", label: "Homes", landing: "houses-for-sale", image: "/images/categories/luxury-villa.jpg" },
+  { type: "plots", label: "Plots", landing: "plots-for-sale", image: "/images/categories/plots.png" },
+  { type: "apartments", label: "Apartments", landing: "apartments-for-sale", image: "/images/categories/appartment.jpg" },
+  { type: "commercial", label: "Commercial", landing: "commercial-property-for-sale", image: "/images/categories/office.jpg" },
 ] as const;
 
 const PHASES = [1, 2, 3, 4, 5, 6, 7];
@@ -63,7 +63,7 @@ const BrowseListings = ({ properties }: { properties: Property[] }) => {
             return (
               <Link
                 key={t.type}
-                href={`/explore?type=${t.type}`}
+                href={n > 0 ? `/dha-islamabad/${t.landing}` : `/explore?type=${t.type}`}
                 className="group relative aspect-[3/4] overflow-hidden rounded-sm bg-stone-200 md:aspect-[4/5]"
               >
                 <Image
@@ -101,7 +101,7 @@ const BrowseListings = ({ properties }: { properties: Property[] }) => {
               {phases.map((p) => (
                 <Link
                   key={p.n}
-                  href={`/explore?search=${encodeURIComponent(p.q)}`}
+                  href={`/dha-islamabad/phase-${p.n}`}
                   className="group min-w-[calc(50%-1px)] flex-1 bg-white px-4 py-7 transition-colors hover:bg-[#faf8f3] sm:min-w-[calc(33.333%-1px)] sm:px-6 lg:min-w-0"
                 >
                   <span className="flex items-baseline justify-between gap-2">
