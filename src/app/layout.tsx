@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import localFont from "next/font/local";
 import NextTopLoader from "nextjs-toploader";
 import { Providers } from "./providers";
 import { Analytics } from "@vercel/analytics/react";
@@ -9,7 +9,12 @@ import { display } from "@/lib/fonts";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { JsonLd, businessSchema } from "@/lib/seo/schema";
 
-const font = Bricolage_Grotesque({ subsets: ["latin"], display: "swap" });
+// Self-hosted (Bricolage Grotesque variable, latin) so builds don't depend on Google Fonts.
+const font = localFont({
+  src: "../fonts/bricolage-grotesque-latin-wght-normal.woff2",
+  weight: "200 800",
+  display: "swap",
+});
 
 
 export const metadata: Metadata = {
